@@ -26,7 +26,7 @@ public class DbConfParser implements ILabelPaser {
             }
         }
         try{
-            config.setDbConfig(dbUrl, uasername, password);
+            config.setDbConfig(dbUrl, uasername, password, connectMaxNum, connectTimeOut);
         } catch (RuntimeException e){
             e.printStackTrace();
             throw new RuntimeException("[dbUrl:"+dbUrl+"] [uasername:"+uasername+"] [password:"+password+"] [connectMaxNum:"+connectMaxNum+"] [connectTimeOut:"+connectTimeOut+"]");

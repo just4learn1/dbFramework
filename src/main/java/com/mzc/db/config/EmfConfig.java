@@ -2,6 +2,7 @@ package com.mzc.db.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 public class EmfConfig {
     private int serverId;
@@ -14,15 +15,21 @@ public class EmfConfig {
 
     static class DbConfig{
         public String dbUrl;
-
         public String username;
-
         public String password;
+        public int connectMaxNum = 0;
+        public int connectTimeOut = 0;
+        public Properties dbProperties;
 
-        public DbConfig(String dbUrl, String username, String password) {
+        public DbConfig(String dbUrl, String username, String password, String connectMaxNum, String connectTimeOut) {
             this.dbUrl = dbUrl;
             this.username = username;
             this.password = password;
+            this.connectMaxNum = Integer.parseInt(connectMaxNum);
+            this.connectTimeOut = Integer.parseInt(connectTimeOut);
+            dbProperties = new Properties();
+            dbProperties.setProperty("user", this.username);
+            dbProperties.setProperty("password", this.password);
         }
 
         @Override
@@ -63,6 +70,15 @@ public class EmfConfig {
                 '}';
     }
 
+    public String getDbUrl(){
+        return this.dbConfig.dbUrl;
+    }
+
+    public Properties getDbProperties(){
+        return this.dbConfig.dbProperties;
+    }
+
+
     public void addEntityConfig(int id, String classpath){
         entityConfigs.forEach(a->{
             if(a.id == id || a.classPath.equalsIgnoreCase(classpath)){
@@ -96,7 +112,7 @@ public class EmfConfig {
         return dbConfig;
     }
 
-    public void setDbConfig(String dbUrl, String username,String password ) {
-        this.dbConfig = new DbConfig(dbUrl, username, password);
+    public void setDbConfig(String dbUrl, String username,String password ,String connectMaxNum, String connectTimeOut) {
+        this.dbConfig = new DbConfig(dbUrl, username, password, connectMaxNum, connectTimeOut);
     }
 }
