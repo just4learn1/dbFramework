@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='utf-8'?>
+<persistence-units>
+    <base-cfg>
+        <serverId>101</serverId>
+        <serverName>测试1</serverName>
+    </base-cfg>
+    <entity-cfg>
+        <dbEntityManager id='1' class='com.zhixiang.tools.db.entity.Player'></dbEntityManager>
+    </entity-cfg>
+    <dbParameter>
+        <type>mysql</type>
+        <dburl>jdbc:mysql://localhost:3306/tmp?characterEncoding=utf-8&amp;useSSL=false</dburl>
+        <userName>root</userName>
+        <password></password>
+        <connectMaxNum>100</connectMaxNum>
+        <connectTimeOut>300</connectTimeOut>
+    </dbParameter>
+
+</persistence-units>
