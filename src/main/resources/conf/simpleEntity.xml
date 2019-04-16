@@ -5,7 +5,7 @@
         <serverName>测试1</serverName>
     </base-cfg>
     <entity-cfg>
-        <dbEntityManager id='1' class='com.zhixiang.tools.db.entity.Player'></dbEntityManager>
+        <dbEntityManager id='1' class='com.mzc.db.testEntity.Player'></dbEntityManager>
     </entity-cfg>
     <dbParameter>
         <type>mysql</type>
