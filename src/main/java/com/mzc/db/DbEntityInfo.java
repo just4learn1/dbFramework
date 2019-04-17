@@ -8,7 +8,7 @@ public class DbEntityInfo {
     private int id;
     private String className;
     private Class<?> clazz;
-    private IEntityManager<?> dbem = null;
+//    private IEntityManager<?> dbem = null;
     private HashMap<Integer, Class<?>> subClasses = null;
 
     public DbEntityInfo(int id, String className, HashMap<Integer, Class<?>> subClasses) {
@@ -17,11 +17,9 @@ public class DbEntityInfo {
         this.subClasses = subClasses;
         try {
             this.clazz = Class.forName(className);
-            this.dbem = new MysqlEntityManager<>();
-            this.dbem.init();
         } catch (Exception e) {
-//            e.printStackTrace();
-//            throw new RuntimeException(e);
+            e.printStackTrace();
+            throw new RuntimeException(e);
         }
     }
 
@@ -35,10 +33,6 @@ public class DbEntityInfo {
 
     public Class<?> getClazz() {
         return clazz;
-    }
-
-    public IEntityManager<?> getDbem() {
-        return dbem;
     }
 
     public HashMap<Integer, Class<?>> getSubClasses() {

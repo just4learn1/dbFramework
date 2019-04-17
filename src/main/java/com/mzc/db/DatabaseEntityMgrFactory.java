@@ -2,8 +2,7 @@ package com.mzc.db;
 
 import com.mzc.db.cfgLabel.LabelEnum;
 import com.mzc.db.config.EmfConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.mzc.db.mysql.MysqlEntityManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -15,15 +14,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class DatabaseEntityMgrFactory {
-
-    public static Logger logger = LoggerFactory.getLogger(DatabaseEntityMgrFactory.class);
 
     private static volatile DatabaseEntityMgrFactory inst = null;
 
@@ -45,7 +42,7 @@ public class DatabaseEntityMgrFactory {
 
     private Driver d = null;
 
-    private List<DbEntityInfo> dbEntityInfos = null;
+    private HashMap<String, MysqlEntityManager> entityMap = new HashMap<>();
 
     private DatabaseEntityMgrFactory() {
     }
@@ -78,17 +75,19 @@ public class DatabaseEntityMgrFactory {
             this.serverName = config.getServerName();
             this.dbUrl = config.getDbUrl();
             this.dbProperties = config.getDbProperties();
-            this.dbEntityInfos = new ArrayList<>();
-            for(EmfConfig.EntityConfig cfg : config.getEntityConfigs()){
-                this.dbEntityInfos.add(new DbEntityInfo(cfg.id, cfg.classPath, null));
-            }
-            int entitySize = this.dbEntityInfos.size();
+            int entitySize = config.getEntityConfigs().size();
             int avaiableProcessor = Runtime.getRuntime().availableProcessors();
             int coreSize = entitySize > avaiableProcessor ? avaiableProcessor : entitySize;
             this.exexutor = Executors.newScheduledThreadPool(coreSize);
         }
         this.d = (Driver) Class.forName(MYSQL_DRIVER).newInstance();
         this.checkBaseTable();
+        for(EmfConfig.EntityConfig cfg : config.getEntityConfigs()){
+            DbEntityInfo entityInfo = new DbEntityInfo(cfg.id, cfg.classPath, null);
+            MysqlEntityManager entityManager = new MysqlEntityManager(entityInfo);
+            entityManager.init();
+            entityMap.put(entityInfo.getClassName(), entityManager);
+        }
     }
 
     /**
@@ -156,8 +155,8 @@ public class DatabaseEntityMgrFactory {
     }
 
     public static void main(String[] args) {
-        System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
-        DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
+//        System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
+//        DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
 
 //        AtomicLong a = new AtomicLong(2);
 //        long aa = a.incrementAndGet();
