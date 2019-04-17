@@ -42,7 +42,7 @@ public class EmfConfig {
         }
     }
 
-    static class EntityConfig{
+    public class EntityConfig{
         public int id;
         public String classPath;
 
