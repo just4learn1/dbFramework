@@ -1,9 +1,11 @@
 package com.mzc.db.testEntity;
 
 import com.mzc.db.annotation.SimpleEntity;
+import com.mzc.db.annotation.SimpleId;
 
 @SimpleEntity
 public class Player {
+    @SimpleId
     private long id;
     private String username;
     private String accountName;

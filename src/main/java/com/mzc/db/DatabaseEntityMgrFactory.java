@@ -155,8 +155,8 @@ public class DatabaseEntityMgrFactory {
     }
 
     public static void main(String[] args) {
-//        System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
-//        DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
+        System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
+        DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
 
 //        AtomicLong a = new AtomicLong(2);
 //        long aa = a.incrementAndGet();

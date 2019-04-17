@@ -54,6 +54,13 @@ public class ClassUtil {
         return false;
     }
 
+    public static boolean isBasicType(Class clazz){
+        if (clazz.isPrimitive() || isEntitySerialzable(clazz) || clazz == String.class){
+            return true;
+        }
+        return false;
+    }
+
     public static void main(String[] args) {
         Field[] fields = getSerializableFields(Player.class);
         for (Field f : fields) {
