@@ -13,9 +13,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -157,9 +155,5 @@ public class DatabaseEntityMgrFactory {
     public static void main(String[] args) {
         System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
         DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
-
-//        AtomicLong a = new AtomicLong(2);
-//        long aa = a.incrementAndGet();
-//        System.out.println(aa);
     }
 }

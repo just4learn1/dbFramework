@@ -7,6 +7,8 @@ import com.mzc.db.annotation.EntityIndexes;
 import com.mzc.db.annotation.SimpleEntity;
 import com.mzc.db.annotation.SimpleId;
 import com.mzc.db.annotation.TableAlias;
+import com.mzc.db.mysql.data.EntityField;
+import com.sun.xml.internal.bind.v2.TODO;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -36,9 +38,14 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     private static final long INIT_DELAY_TIME = 60L;
 
     private static final String FIELD_DICTIONARY_TABLE_HEAD = "FIELD_DICTIONARY_";
+    private static final String TABLE_NAME_HEAD = "ENTITY_";
 
     private AtomicLong curEntityId;
     private long databaseEntityId = 1;
+    private TablePageManager tablePageManager;
+    private String tableName;
+    //表
+    private EntityField entityField = null;      //包含父类及所有子类的变量（需要限制各子类不能有重名变量）
 
     private DbEntityInfo info;
 
@@ -146,6 +153,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         DatabaseEntityMgrFactory.getInst().exexutor.scheduleAtFixedRate(this, INIT_DELAY_TIME, period, TimeUnit.SECONDS);
         this.pollDatabaseEntityId(0, true);
         this.initTable();
+        this.initSubClass();
     }
 
     private void initTable() throws Exception {
@@ -156,16 +164,16 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         if (!haveNoneParamConstructor(clazz)) {
             throw new Exception("[指定的类没有无参构造方法] [" + info.getClassName() + "]");
         }
-        String tableName = clazz.getSimpleName().toUpperCase();
+        tableName = clazz.getSimpleName().toUpperCase();
         {
-            Annotation annotation = clazz.getAnnotation(TableAlias.class);       //索引
+            Annotation annotation = clazz.getAnnotation(TableAlias.class);       //表名
             if (annotation != null) {
                 tableName = ((TableAlias) annotation).value().toUpperCase();
             }
         }
         Annotation annotation = clazz.getAnnotation(EntityIndexes.class);       //索引
         if (annotation != null) {
-
+            // TODO: 2019/4/17 需要读取注解中配置的索引，在数据表中添加相应的索引，考虑新增或者删除索引？
         }
 
         Field[] fields = getSerializableFields(clazz);
@@ -188,7 +196,20 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         if (idField == null) {
             throw new Exception("[没有定义SimpleId] [" + info.getClassName() + "]");
         }
-        this.checkDictionaryTable(tableName, clazz, fields);
+        this.entityField = new EntityField(idField, otherFieldMap);
+        this.checkDictionaryTable(clazz, fields);
+        this.checkTable();
+    }
+
+    /**
+     * 子类初始化
+     */
+    private void initSubClass(){
+
+    }
+
+    private void checkTable() {
+        this.tablePageManager = new TablePageManager();
     }
 
     /**
@@ -217,7 +238,14 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         return false;
     }
 
-    private void checkDictionaryTable(String tableName, Class clazz, Field[] seralzableFields) throws Exception {
+    /**
+     * 字典表检查
+     *
+     * @param clazz
+     * @param seralzableFields
+     * @throws Exception
+     */
+    private void checkDictionaryTable(Class clazz, Field[] seralzableFields) throws Exception {
         String fullTableName = FIELD_DICTIONARY_TABLE_HEAD + tableName;
         Connection conn = null;
         Statement statement = null;
@@ -226,7 +254,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             statement = conn.createStatement();
             //检查字典表是否存在
             DatabaseMetaData md = conn.getMetaData();
-            String sql = "";
+            String sql;
             ResultSet resultSet = md.getTables(null, null, fullTableName, null);
             if (!resultSet.next()) {        //字典表不存在，需要创建
                 resultSet.close();
@@ -275,6 +303,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     /**
      * 检查字段修改（不允许删除字段，只能加，防止上线后误删数据）
+     *
      * @param conn
      * @param dictionaryTablename
      * @param resultSet
@@ -296,20 +325,23 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
                 newFields.add(f);
                 System.out.printf("[新增字段] [%s] [%s, %s]\n", clazz.getName(), f.getName(), f.getType());
             } else {
-                if (!f.getType().getName().equalsIgnoreCase(info.type)){
-                    throw new RuntimeException("[不允许修改字段类型] ["+clazz.getName()+"] [原类型:"+info.type+"] [修改后类型:"+f.getType().getName()+"]");
+                if (!f.getType().getName().equalsIgnoreCase(info.type)) {
+                    throw new RuntimeException("[不允许修改字段类型] [" + clazz.getName() + "] [原类型:" + info.type + "] [修改后类型:" + f.getType().getName() + "]");
                 }
                 info.exist = true;
             }
         }
-        tableFieldMap.forEach((k, v)->{
-            if (!v.exist){
+        tableFieldMap.forEach((k, v) -> {
+            if (!v.exist) {
                 throw new RuntimeException("[不允许删除字段] [" + clazz.getName() + "] [fieldname：" + k + ", fieldType:" + v.type + "]");
             }
         });
         this.initalDictionaryData(conn, dictionaryTablename, clazz, newFields.toArray(new Field[0]));
     }
 
+    public String getTableBaseName(){
+        return TABLE_NAME_HEAD + this.tableName;
+    }
     @Override
     public void run() {
 
