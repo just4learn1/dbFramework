@@ -8,7 +8,6 @@ import com.mzc.db.annotation.SimpleEntity;
 import com.mzc.db.annotation.SimpleId;
 import com.mzc.db.annotation.TableAlias;
 import com.mzc.db.mysql.data.EntityField;
-import com.sun.xml.internal.bind.v2.TODO;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -22,6 +21,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.mzc.utils.ClassUtil.*;
+import static com.mzc.db.DatabaseEntityMgrFactory.CREATE_TABLE_TAIL;
 
 /**
  * mysql数据库增删改查具体实现类
@@ -208,8 +208,9 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     }
 
-    private void checkTable() {
+    private void checkTable() throws SQLException {
         this.tablePageManager = new TablePageManager();
+        this.tablePageManager.init(this, info.getClazz(), this.entityField);
     }
 
     /**
@@ -258,7 +259,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             ResultSet resultSet = md.getTables(null, null, fullTableName, null);
             if (!resultSet.next()) {        //字典表不存在，需要创建
                 resultSet.close();
-                sql = String.format("CREATE TABLE %S (id int not null primary key auto_increment, classname varchar(200) not null, fieldname varchar(200) not null, fieldType varchar(200) not null)", fullTableName);
+                sql = String.format("CREATE TABLE %S (id int not null primary key auto_increment, classname varchar(200) not null, fieldname varchar(200) not null, fieldType varchar(200) not null)%s", fullTableName, CREATE_TABLE_TAIL);
                 statement.executeUpdate(sql);
             }
             sql = String.format("SELECT * FROM %s WHERE className='%s'", fullTableName, clazz.getSimpleName());
@@ -345,6 +346,10 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     @Override
     public void run() {
 
+    }
+
+    public EntityField getEntityField() {
+        return entityField;
     }
 
     class TableFieldInfo {

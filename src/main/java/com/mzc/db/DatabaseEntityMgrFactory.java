@@ -22,6 +22,8 @@ public class DatabaseEntityMgrFactory {
 
     private static volatile DatabaseEntityMgrFactory inst = null;
 
+    public static final String CREATE_TABLE_TAIL = " ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+
     private static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
 
     private static final String cfgProperty = "simpleDbCfg";
@@ -107,7 +109,7 @@ public class DatabaseEntityMgrFactory {
         DatabaseMetaData metaData = conn.getMetaData();
         try(ResultSet rs = metaData.getTables(null, null, BASE_SEQUENCE_TABLE, null);) {
             if (!rs.next()) {           //表不存在，需要创建基础sequeence表
-                String sql = "CREATE TABLE " + BASE_SEQUENCE_TABLE + "(id int not null primary key auto_increment, classname varchar(200) not null, curId bigint not null, key idx_classname (classname)) ENGINE=InnoDB";
+                String sql = "CREATE TABLE " + BASE_SEQUENCE_TABLE + "(id int not null primary key auto_increment, classname varchar(200) not null, curId bigint not null, key idx_classname (classname))"+CREATE_TABLE_TAIL;
                 try(Statement statement = conn.createStatement()){
                     statement.executeUpdate(sql);
                 }
@@ -153,7 +155,8 @@ public class DatabaseEntityMgrFactory {
     }
 
     public static void main(String[] args) {
-        System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
-        DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
+//        System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
+//        DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
+        System.out.println(new Timestamp(1556103624_000L));
     }
 }

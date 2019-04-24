@@ -7,12 +7,15 @@ public class TablePage {
 
     private int pageIndex;      //当前表分页索引
 
+    private String pageTablename;
+
     private long minId = 0L;     //当前分页主键id最小值
     private long maxId = 0L;     //当前分页主键id最大值
 
     private AtomicInteger count;        //当前分页已存储的数据条数
 
     public TablePage(String tableName, int cnt) {
+        this.pageTablename = tableName;
         int index = tableName.lastIndexOf(TABLE_INDEX_TAG);
         this.pageIndex = Integer.parseInt(tableName.substring(index + 1));
         this.count = new AtomicInteger(cnt);
@@ -38,6 +41,13 @@ public class TablePage {
         return count.incrementAndGet();
     }
 
+    public String getPageStr(){
+        return TABLE_INDEX_TAG + this.pageIndex;
+    }
+
+    public String getPageTablename() {
+        return pageTablename;
+    }
 
     @Override
     public String toString() {
