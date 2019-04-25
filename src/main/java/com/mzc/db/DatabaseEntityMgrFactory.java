@@ -165,13 +165,17 @@ public class DatabaseEntityMgrFactory {
     public static void main(String[] args) throws Exception {
         System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
         DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
-        MysqlEntityManager mgr = inst.getEntityMgr(Player.class);
-        List<Integer> list = new ArrayList<>();
+       MysqlEntityManager<Player> mgr = inst.getEntityMgr(Player.class);
+        /* List<Integer> list = new ArrayList<>();
         list.add(666);
         Map<Integer, String> map = new HashMap<>();
         map.put(999, "qwer");
         Player p = new Player(mgr.nextId(), "asdf", (byte) 1, true, 333, 11.2f, 334.55d, new int[]{1, 2, 3, 4}, list, map);
         mgr.insert(p, true);
-//        System.out.println(Player.class.getName());
+        System.out.println(p.getId());*/
+//        Player p = mgr.getEntity(1101000000000022529L);
+//        System.out.println(p.getAa3().get(999));
+//        System.out.println(mgr.getEntity(1101000000000022529L));
+
     }
 }

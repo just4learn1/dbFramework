@@ -83,7 +83,7 @@ public class EntityData<T> extends WeakReference<T> {
         T t = this.get();
         System.out.println(t);
         index = SqlUtil.fullFillParamater(index, t, pstat, changedFields);
-        pstat.setString(index++, clazz.getSimpleName());
+        pstat.setString(index++, clazz.getName());
         System.out.println(index);
         System.out.println(t);
     }

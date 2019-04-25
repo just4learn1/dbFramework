@@ -3,6 +3,7 @@ package com.mzc.db.testEntity;
 import com.mzc.db.annotation.SimpleEntity;
 import com.mzc.db.annotation.SimpleId;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +35,22 @@ public class Player {
         this.aa1 = aa1;
         this.aa2 = aa2;
         this.aa3 = aa3;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", bb1=" + bb1 +
+                ", bb2=" + bb2 +
+                ", bb3=" + bb3 +
+                ", bb4=" + bb4 +
+                ", bb5=" + bb5 +
+                ", aa1=" + Arrays.toString(aa1) +
+                ", aa2=" + aa2 +
+                ", aa3=" + aa3 +
+                '}';
     }
 
     public long getId() {

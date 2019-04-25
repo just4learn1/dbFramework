@@ -35,6 +35,10 @@ public class TablePage {
         }
     }
 
+    public boolean contains(long id) {
+        return id >= minId && id <= maxId;
+    }
+
     public int notifyAddData(){
         return count.incrementAndGet();
     }

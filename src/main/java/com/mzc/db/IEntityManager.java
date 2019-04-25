@@ -49,7 +49,7 @@ public interface IEntityManager<T> {
     /**
      * 保存一个新的对象
      * @param t
-     * @param 是否立即存库
+     * @param saveNow 是否立即存库
      */
     void insert(T t, boolean saveNow) throws Exception;
 
@@ -62,7 +62,7 @@ public interface IEntityManager<T> {
     void update(T t, String field) throws Exception;
 
     /**
-     * count(*)
+     * count(*)  此方法只会去count已经入库的数据，如果有数据刚执行了insert，但是还没有同步到数据库不会统计出来
      * @return
      * @throws Exception
      */

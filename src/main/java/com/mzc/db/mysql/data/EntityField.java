@@ -4,16 +4,24 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 public class EntityField {
 
+    private Class clazz;
+
+    private HashMap<String, Class> subClasses = null;
+
     private Field idField;        //主键id field
 
-    private HashMap<String, Field> otherFieldMap;
+    private HashMap<String, Field> otherFieldMap = null;
 
-    public EntityField(Field idField, HashMap<String, Field> otherFieldMap) {
+    public EntityField(Class clazz, HashMap<String, Class> subClasses, Field idField, HashMap<String, Field> otherFieldMap) {
         this.idField = idField;
         this.otherFieldMap = otherFieldMap;
+        this.clazz = clazz;
+        this.subClasses = subClasses != null ? subClasses : new HashMap<>();
     }
 
     /**
@@ -31,6 +39,7 @@ public class EntityField {
 
     /**
      * 获取需要添加的字段 (这儿不会检测主键id的添加，因为创建库的时候要求必须有主键id)
+     *
      * @param existFieldNames 当前已存在的字段名数组
      * @return
      */
@@ -50,6 +59,24 @@ public class EntityField {
 
     public HashMap<String, Field> getOtherFieldMap() {
         return otherFieldMap;
+    }
+
+    /**
+     * 通过classname获取对应Class，省去使用Class.forname加载类
+     * @param classname
+     * @return
+     */
+    public Class getClassByClassname(String classname) {
+        if (classname.equalsIgnoreCase(clazz.getName())) {
+            return clazz;
+        }
+        return subClasses.get(classname);
+    }
+
+    public void fullfillObject(Consumer consumer) {
+        otherFieldMap.values().forEach(k->{
+            consumer.accept(k);
+        });
     }
 
 }

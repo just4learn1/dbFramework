@@ -9,6 +9,8 @@ import com.mzc.db.annotation.SimpleId;
 import com.mzc.db.annotation.TableAlias;
 import com.mzc.db.mysql.data.EntityData;
 import com.mzc.db.mysql.data.EntityField;
+import com.mzc.db.mysql.page.TablePage;
+import com.mzc.utils.SqlUtil;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -22,9 +24,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.mzc.utils.ClassUtil.*;
-import static com.mzc.db.DatabaseEntityMgrFactory.*;
+import static com.mzc.db.DatabaseEntityMgrFactory.BASE_SEQUENCE_TABLE;
 import static com.mzc.db.DatabaseEntityMgrFactory.CREATE_TABLE_TAIL;
+import static com.mzc.utils.ClassUtil.*;
 
 /**
  * mysql数据库增删改查具体实现类
@@ -120,6 +122,34 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     @Override
     public T getEntity(long id) throws Exception {
+        EntityData data = entityMap.get(id);
+        if (data != null && data.get() != null) {
+            return (T) data.get();
+        }
+        String sql = tablePageManager.getSelectSql(id);
+        System.out.printf("select sql: %s\n", sql);
+        try (Connection conn = DatabaseEntityMgrFactory.getInst().getConnection(); PreparedStatement statement = conn.prepareStatement(sql)) {
+            statement.setLong(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                String classname = resultSet.getString(CLASSNAME_FIELD);
+                Class clazz = entityField.getClassByClassname(classname);
+                T t = (T) clazz.newInstance();
+                HashMap<String, Integer> nameIndexMap = new HashMap<>();
+                entityField.getIdField().set(t, id);
+                entityField.fullfillObject(f->{
+                    try {
+                        String fieldName = ((Field)f).getName();
+                        nameIndexMap.put(fieldName, resultSet.findColumn(fieldName));
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                });
+                SqlUtil.constructObject(t, nameIndexMap, resultSet, entityField.getOtherFieldMap().values());
+                entityMap.put(id, new EntityData<T>(id, clazz, entityField, t));
+                return t;
+            }
+        }
         return null;
     }
 
@@ -145,7 +175,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         if (data != null) {
             throw new RuntimeException(String.format("[存储对象id重复:%d]", id));
         }
-        data = new EntityData(id, t.getClass(), entityField, t , true);
+        data = new EntityData(id, t.getClass(), entityField, t, true);
         entityMap.put(id, data);
         if (saveNow) {
             insertEntity2DB(t);
@@ -159,7 +189,18 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     @Override
     public long count() throws Exception {
-        return 0;
+        long cnt = 0;
+        try (Connection conn = DatabaseEntityMgrFactory.getInst().getConnection(); Statement statement = conn.createStatement()) {
+            ResultSet resultSet = null;
+            for (String sql : tablePageManager.getCountSqls()) {
+                resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    cnt += resultSet.getLong(1);
+                }
+                resultSet.close();
+            }
+        }
+        return cnt;
     }
 
     @Override
@@ -224,7 +265,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         if (idField == null) {
             throw new Exception("[没有定义SimpleId] [" + info.getClassName() + "]");
         }
-        this.entityField = new EntityField(idField, otherFieldMap);
+        this.entityField = new EntityField(clazz, null, idField, otherFieldMap);
         this.checkDictionaryTable(clazz, fields);
         this.checkTable();
     }
@@ -416,11 +457,11 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             }
             data.compareAndSetChanged(true, false);
             String sql = generateInsertSql(data);
-            System.out.printf("inset sql:%s\n", sql);
+            System.out.printf("insert sql: %s\n", sql);
             PreparedStatement statement = conn.prepareStatement(sql);
             data.fullFillParamater(statement);
             statement.execute();
-            try{
+            try {
                 conn.commit();
             } catch (Exception e) {
                 conn.rollback();
@@ -430,16 +471,18 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
                 conn.setAutoCommit(true);
             }
         } catch (Exception e) {
-            e.printStackTrace();
             if (data != null) {
                 data.compareAndSetNeedInsert(false, true);
                 data.compareAndSetChanged(false, true);
             }
+            e.printStackTrace();
+            throw e;
         }
     }
 
     /**
      * 生成insert语句
+     *
      * @return
      */
     private String generateInsertSql(EntityData data) {
@@ -448,6 +491,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         data.appendInsertStr(sb);
         return sb.toString();
     }
+
 
     class TableFieldInfo {
         public boolean exist = false;

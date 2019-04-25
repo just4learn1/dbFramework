@@ -6,6 +6,9 @@ import com.mzc.utils.typeParseEnum.ClassTypeConvertEnum;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,7 +37,7 @@ public class SqlUtil {
                 throw new RuntimeException("[字段长度不允许超过" + MAX_VARCHAR_LENGTH + "]");
             }
             sb.append(" varchar(").append(len).append(") NOT NULL DEFAULT ''");
-        }else {
+        } else {
             ClassTypeConvertEnum cte = ClassTypeConvertEnum.getByClass(type);
             sb.append(cte.defaultCreateSql);
         }
@@ -107,5 +110,49 @@ public class SqlUtil {
             }
         }
         return parameterIndex;
+    }
+
+    /**
+     * 填充数据
+     * @param t
+     * @param map
+     * @param rs
+     * @param fields
+     * @param <T>
+     * @throws Exception
+     */
+    public static <T> void constructObject(T t, HashMap<String, Integer> map, ResultSet rs, Collection<Field> fields)
+            throws Exception {
+        for (Field f : fields) {
+            Class<?> cl = f.getType();
+            int columnIndex = map.get(f.getName());
+            Object value = null;
+            if (cl == Boolean.TYPE || cl == Boolean.class) {
+                value = rs.getBoolean(columnIndex);
+            } else if (cl == Byte.TYPE || cl == Byte.class) {
+                value = rs.getByte(columnIndex);
+            } else if (cl == Short.TYPE || cl == Short.class) {
+                value = rs.getShort(columnIndex);
+            } else if (cl == Integer.TYPE || cl == Integer.class) {
+                value = rs.getInt(columnIndex);
+            } else if (cl == Character.TYPE || cl == Character.class) {
+                value = rs.getString(columnIndex);
+            } else if (cl == Long.TYPE || cl == Long.class) {
+                value = rs.getLong(columnIndex);
+            } else if (cl == Float.TYPE || cl == Float.class) {
+                value = rs.getFloat(columnIndex);
+            } else if (cl == Double.TYPE || cl == Double.class) {
+                value = rs.getDouble(columnIndex);
+            } else if (cl == String.class) {
+                value = rs.getString(columnIndex);
+            } else {
+                String str = rs.getString(columnIndex);
+                if (str != null) {
+                    value = JsonUtil.objectFromJson(str, f.getGenericType());
+                }
+
+            }
+            f.set(t, value);
+        }
     }
 }

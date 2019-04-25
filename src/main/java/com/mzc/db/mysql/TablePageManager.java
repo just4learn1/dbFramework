@@ -166,4 +166,34 @@ public class TablePageManager {
     public void appendInsertStr(StringBuffer sb) {
         sb.append("INSERT INTO ").append(currentPage.getPageTablename()).append("(");
     }
+
+    public List<String> getCountSqls() {
+        List<String> list = new ArrayList<>();
+        String sql = "SELECT COUNT(*) FROM %s";
+        allPages.forEach(page->{
+            list.add(String.format(sql, page.getPageTablename()));
+        });
+        return list;
+    }
+
+    public TablePage gePageByEntityId(long id) {
+        for (TablePage page : allPages){
+            if(page.contains(id)){
+                return page;
+            }
+        }
+        return currentPage;
+//        throw new RuntimeException(String.format("[没找到%d对应的tablepage]", id));
+    }
+
+    public String getSelectSql(long id) {
+        TablePage page = this.gePageByEntityId(id);
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ").append(CLASSNAME_FIELD).append(",");
+        entityField.getOtherFieldMap().forEach((k, v)->{
+            sb.append(k).append(",");
+        });
+        sb.append(entityField.getIdField().getName()).append(" FROM ").append(page.getPageTablename()).append(" WHERE ").append(entityField.getIdField().getName()).append("=?").append(" LIMIT 1");
+        return sb.toString();
+    }
 }
