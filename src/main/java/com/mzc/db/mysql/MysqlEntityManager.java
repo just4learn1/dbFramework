@@ -7,6 +7,7 @@ import com.mzc.db.annotation.EntityIndexes;
 import com.mzc.db.annotation.SimpleEntity;
 import com.mzc.db.annotation.SimpleId;
 import com.mzc.db.annotation.TableAlias;
+import com.mzc.db.mysql.data.EntityData;
 import com.mzc.db.mysql.data.EntityField;
 
 import java.lang.annotation.Annotation;
@@ -17,10 +18,12 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.mzc.utils.ClassUtil.*;
+import static com.mzc.db.DatabaseEntityMgrFactory.*;
 import static com.mzc.db.DatabaseEntityMgrFactory.CREATE_TABLE_TAIL;
 
 /**
@@ -33,6 +36,8 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     private static final long BASE_ID_SEQUENCE = 1000000000000000000L;
     private static final long SERVERID_SEQUENCE = 1000000000000000L;
 
+    public static final String CLASSNAME_FIELD = "CLASSNAME";
+
     private static final long SEQUENCE_INCREASE_STEP = 1024;
 
     private static final long INIT_DELAY_TIME = 60L;
@@ -40,23 +45,25 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     private static final String FIELD_DICTIONARY_TABLE_HEAD = "FIELD_DICTIONARY_";
     private static final String TABLE_NAME_HEAD = "ENTITY_";
 
-    private AtomicLong curEntityId;
+    private AtomicLong curEntityId = null;
     private long databaseEntityId = 1;
     private TablePageManager tablePageManager;
     private String tableName;
     //表
     private EntityField entityField = null;      //包含父类及所有子类的变量（需要限制各子类不能有重名变量）
+    //有修改的数据
+    private ConcurrentHashMap<Long, EntityData> entityMap = new ConcurrentHashMap<>();
 
     private DbEntityInfo info;
-
-    public MysqlEntityManager(DbEntityInfo info) {
-        this.info = info;
-    }
-
     /**
      * 同步数据库间隔，单位：s
      */
     private long period = 120L;
+
+
+    public MysqlEntityManager(DbEntityInfo info) {
+        this.info = info;
+    }
 
     @Override
     public long nextId() throws Exception {
@@ -68,32 +75,43 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     }
 
     private synchronized void pollDatabaseEntityId(long id, boolean initial) throws SQLException {
-        if (databaseEntityId > id) {
+        if (!initial && databaseEntityId > id) {
             return;
         }
         String classname = info.getClassName();
         Connection conn = null;
         ResultSet resultSet = null;
         Statement statement = null;
-        String sql = String.format("SELECT curId FROM %s WHERE classname = '%s'", DatabaseEntityMgrFactory.BASE_SEQUENCE_TABLE, classname);
+        String sql = String.format("SELECT curId FROM %s WHERE classname = '%s'", BASE_SEQUENCE_TABLE, classname);
+        System.out.println(sql);
         try {
             conn = DatabaseEntityMgrFactory.getInst().getConnection();
             statement = conn.createStatement();
             resultSet = statement.executeQuery(sql);
-            resultSet.next();
-            long curId = resultSet.getLong(1);
-            if (initial) {
-                curEntityId = new AtomicLong(curId);
-            }
+            if (!resultSet.next()) {
+                resultSet.close();
+                sql = String.format("INSERT INTO %s (classname, curId) VALUES (?, ?)", BASE_SEQUENCE_TABLE);
+                statement = conn.prepareStatement(sql);
+                curEntityId = new AtomicLong(0);
+                databaseEntityId = SEQUENCE_INCREASE_STEP;
+                ((PreparedStatement) statement).setString(1, classname);
+                ((PreparedStatement) statement).setLong(2, databaseEntityId);
+                ((PreparedStatement) statement).execute();
+            } else {
+                long curId = resultSet.getLong(1);
+                if (initial) {
+                    curEntityId = new AtomicLong(curId);
+                }
+                resultSet.close();
 //            curId += SEQUENCE_INCREASE_STEP;
-            databaseEntityId = curId + SEQUENCE_INCREASE_STEP;
-            sql = String.format("UPDATE %s SET curId=%d WHERE classname='%s'", DatabaseEntityMgrFactory.BASE_SEQUENCE_TABLE, databaseEntityId, classname);
-            int updateCnt = statement.executeUpdate(sql);
-            System.out.println("[update sequenceId] [classname:" + classname + "] [curId:" + curId + "] [updatecnt:" + updateCnt + "]");
+                databaseEntityId = curId + SEQUENCE_INCREASE_STEP;
+                sql = String.format("UPDATE %s SET curId=%d WHERE classname='%s'", BASE_SEQUENCE_TABLE, databaseEntityId, classname);
+                int updateCnt = statement.executeUpdate(sql);
+                System.out.println("[update sequenceId] [classname:" + classname + "] [curId:" + curId + "] [updatecnt:" + updateCnt + "]");
+            }
         } finally {
             try {
                 statement.close();
-                resultSet.close();
                 conn.close();
             } catch (Exception e) {
             }
@@ -121,8 +139,17 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     }
 
     @Override
-    public void insert(T t) throws Exception {
-
+    public void insert(T t, boolean saveNow) throws Exception {
+        long id = entityField.getIdField().getLong(t);
+        EntityData data = entityMap.get(id);
+        if (data != null) {
+            throw new RuntimeException(String.format("[存储对象id重复:%d]", id));
+        }
+        data = new EntityData(id, t.getClass(), entityField, t , true);
+        entityMap.put(id, data);
+        if (saveNow) {
+            insertEntity2DB(t);
+        }
     }
 
     @Override
@@ -150,7 +177,8 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     @Override
     public void init() throws Exception {
-        DatabaseEntityMgrFactory.getInst().exexutor.scheduleAtFixedRate(this, INIT_DELAY_TIME, period, TimeUnit.SECONDS);
+        //每500ms检查所有改变的数据，查看是否达到入库条件
+        DatabaseEntityMgrFactory.getInst().exexutor.scheduleAtFixedRate(this, INIT_DELAY_TIME, 500, TimeUnit.MILLISECONDS);
         this.pollDatabaseEntityId(0, true);
         this.initTable();
         this.initSubClass();
@@ -372,6 +400,53 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     public EntityField getEntityField() {
         return entityField;
+    }
+
+    private void insertEntity2DB(T t) throws Exception {
+        EntityData data = null;
+        try (Connection conn = DatabaseEntityMgrFactory.getInst().getConnection()) {
+            conn.setAutoCommit(false);
+            long id = entityField.getIdField().getLong(t);
+            data = entityMap.get(id);
+            if (data == null) {
+                throw new RuntimeException(String.format("[需要先insert才可以存库:%d]", id));
+            }
+            if (!data.compareAndSetNeedInsert(true, false)) {
+                return;
+            }
+            data.compareAndSetChanged(true, false);
+            String sql = generateInsertSql(data);
+            System.out.printf("inset sql:%s\n", sql);
+            PreparedStatement statement = conn.prepareStatement(sql);
+            data.fullFillParamater(statement);
+            statement.execute();
+            try{
+                conn.commit();
+            } catch (Exception e) {
+                conn.rollback();
+                throw e;
+            } finally {
+                statement.close();
+                conn.setAutoCommit(true);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            if (data != null) {
+                data.compareAndSetNeedInsert(false, true);
+                data.compareAndSetChanged(false, true);
+            }
+        }
+    }
+
+    /**
+     * 生成insert语句
+     * @return
+     */
+    private String generateInsertSql(EntityData data) {
+        StringBuffer sb = new StringBuffer();
+        tablePageManager.appendInsertStr(sb);
+        data.appendInsertStr(sb);
+        return sb.toString();
     }
 
     class TableFieldInfo {

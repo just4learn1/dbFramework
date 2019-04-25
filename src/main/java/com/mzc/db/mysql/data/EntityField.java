@@ -51,4 +51,5 @@ public class EntityField {
     public HashMap<String, Field> getOtherFieldMap() {
         return otherFieldMap;
     }
+
 }

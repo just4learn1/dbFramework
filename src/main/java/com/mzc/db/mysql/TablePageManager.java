@@ -8,13 +8,17 @@ import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 import static com.mzc.db.DatabaseEntityMgrFactory.CREATE_TABLE_TAIL;
+import static com.mzc.db.mysql.MysqlEntityManager.CLASSNAME_FIELD;
 import static com.mzc.db.mysql.page.TablePage.TABLE_INDEX_TAG;
 import static com.mzc.utils.CommonUtil.replaceStr;
 import static com.mzc.utils.SqlUtil.parseClassType2DbType;
 
 public class TablePageManager {
+
+    private ReentrantLock lock = new ReentrantLock();
 
     private static final String MAIN_TABLE_HEAD = "";       //主表中存储简单对象，利用innodb聚簇索引优势，增加查询效率， 支持添加索引，支持where条件查询
     private static final String SECOND_TABLE_HEAD = "";     //副表中存储复杂数据类型，统一转为json格式存储，不支持索引/where查询
@@ -23,7 +27,7 @@ public class TablePageManager {
     private float loadFactor = 0.9f;                    //负载因子，单表数据量达到 Math.ceil(loadFactor * tableMaxCount) 就会创建preparePage，等达到单表上限后启用新表
 
     private volatile TablePage currentPage = null;           //当前使用的分页 (设置为volatile，主要是为了在使用的时候不加锁，只有在切换为准备表的时候加锁，volatile保证了线程可见性，切换时使用直接赋值(原子操作))
-    private TablePage preparePage = null;           //预备使用的分页
+    private volatile TablePage preparePage = null;           //预备使用的分页
 
     private List<TablePage> allPages = new ArrayList<>();
     private EntityField entityField;
@@ -67,12 +71,15 @@ public class TablePageManager {
      * 切换当前currentPage为preparePage
      */
     private synchronized void switchPage() {
-        this.currentPage = preparePage;
-        this.preparePage = null;
+        if (preparePage != null) {
+            this.currentPage = preparePage;
+            this.preparePage = null;
+        }
     }
 
     /**
      * 检查表中字段，新增字段
+     *
      * @param conn
      * @param tbname
      * @return
@@ -81,13 +88,13 @@ public class TablePageManager {
         DatabaseMetaData metaData = conn.getMetaData();
         ResultSet resultSet = metaData.getColumns(null, null, tbname, null);
         List<String> existNames = new ArrayList<>();
-        while(resultSet.next()) {
+        while (resultSet.next()) {
             String fieldName = resultSet.getString(4);
             existNames.add(fieldName);
         }
         resultSet.close();
         List<Field> addColumn = entityField.needAddFields(existNames);
-        String lastFieldName = existNames.get(existNames.size()-1);
+        String lastFieldName = existNames.get(existNames.size() - 1);
         if (addColumn.size() > 0) {
             StringBuffer addColumnSql = new StringBuffer();
             addColumnSql.append("ALTER TABLE ").append(tbname).append("\n");
@@ -95,14 +102,14 @@ public class TablePageManager {
                 addColumnSql.append("ADD COLUMN ").append(" ").append(parseClassType2DbType(columnField)).append(" AFTER ").append(lastFieldName).append(",");
                 lastFieldName = columnField.getName();
             }
-            String sql = replaceStr(addColumnSql.toString(),addColumnSql.toString().length()-1, ";");
-            try(Statement statement = conn.createStatement()) {
+            String sql = replaceStr(addColumnSql.toString(), addColumnSql.toString().length() - 1, ";");
+            try (Statement statement = conn.createStatement()) {
                 statement.executeUpdate(sql);
             }
         }
         String countSql = String.format("SELECT COUNT(*) FROM %S", tbname);
         int cnt = 0;
-        try(Statement statement = conn.createStatement()){
+        try (Statement statement = conn.createStatement()) {
             resultSet = statement.executeQuery(countSql);
             resultSet.next();
             cnt = resultSet.getInt(1);
@@ -115,6 +122,7 @@ public class TablePageManager {
         StringBuffer sb = new StringBuffer();
         sb.append("CREATE TABLE ").append(page.getPageTablename()).append(" (");
         sb.append(parseClassType2DbType(this.entityField.getIdField())).append(" not null primary key");
+        sb.append(",").append(CLASSNAME_FIELD).append(" varchar(256) not null");
         this.entityField.getOtherFieldMap().forEach((k, v) -> {
             sb.append(",");
             sb.append(parseClassType2DbType(v)).append(" not null ");
@@ -124,5 +132,38 @@ public class TablePageManager {
             System.out.println(sb.toString());
             statement.executeUpdate(sb.toString());
         }
+    }
+
+    /**
+     * 数据表中插入新的数据
+     * @param addNum
+     */
+    public void notifyAddNum(int addNum) {
+        int newNum = currentPage.notifyAddData(addNum);
+
+        if (preparePage == null && newNum >= tableMaxCount * loadFactor) {              //创建准备表
+            lock.lock();
+            try {
+                if (preparePage == null) {
+                    String prepareTableName = replaceStr(currentPage.getPageTablename(), currentPage.getPageTablename().length() - 1, String.valueOf(currentPage.getPageIndex() + 1));
+                    TablePage page = new TablePage(prepareTableName, 0);
+                    try (Connection conn = DatabaseEntityMgrFactory.getInst().getConnection()) {
+                        this.createMainTable(conn, page);
+                        this.preparePage = page;
+                        this.allPages.add(page);
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+        } else if (newNum >= tableMaxCount) {
+            this.switchPage();
+        }
+    }
+
+    public void appendInsertStr(StringBuffer sb) {
+        sb.append("INSERT INTO ").append(currentPage.getPageTablename()).append("(");
     }
 }

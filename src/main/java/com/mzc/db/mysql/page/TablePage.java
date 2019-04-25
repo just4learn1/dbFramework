@@ -26,14 +26,12 @@ public class TablePage {
     }
 
     public int notifyAddData(int addNum) {
-        int oldNum = count.get();
-        int newNum = oldNum + addNum;
-        for (;;){
+        for (int oldNum, newNum;;){
+            oldNum = count.get();
+            newNum = oldNum + addNum;
             if (count.compareAndSet(oldNum, newNum)) {
                 return newNum;
             }
-            oldNum = count.get();
-            newNum = oldNum + addNum;
         }
     }
 

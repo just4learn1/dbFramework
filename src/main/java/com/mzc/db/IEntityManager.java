@@ -49,8 +49,9 @@ public interface IEntityManager<T> {
     /**
      * 保存一个新的对象
      * @param t
+     * @param 是否立即存库
      */
-    void insert(T t) throws Exception;
+    void insert(T t, boolean saveNow) throws Exception;
 
     /**
      *

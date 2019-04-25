@@ -3,6 +3,7 @@ package com.mzc.db;
 import com.mzc.db.cfgLabel.LabelEnum;
 import com.mzc.db.config.EmfConfig;
 import com.mzc.db.mysql.MysqlEntityManager;
+import com.mzc.db.testEntity.Player;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -13,8 +14,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
-import java.util.HashMap;
-import java.util.Properties;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -82,7 +82,7 @@ public class DatabaseEntityMgrFactory {
         }
         this.d = (Driver) Class.forName(MYSQL_DRIVER).newInstance();
         this.checkBaseTable();
-        for(EmfConfig.EntityConfig cfg : config.getEntityConfigs()){
+        for (EmfConfig.EntityConfig cfg : config.getEntityConfigs()) {
             DbEntityInfo entityInfo = new DbEntityInfo(cfg.id, cfg.classPath, null);
             MysqlEntityManager entityManager = new MysqlEntityManager(entityInfo);
             entityManager.init();
@@ -105,19 +105,19 @@ public class DatabaseEntityMgrFactory {
      * 检查基础sequence表是否存在
      */
     public void checkBaseTable() throws SQLException {
-        Connection conn = this.getConnection();
-        DatabaseMetaData metaData = conn.getMetaData();
-        try(ResultSet rs = metaData.getTables(null, null, BASE_SEQUENCE_TABLE, null);) {
-            if (!rs.next()) {           //表不存在，需要创建基础sequeence表
-                String sql = "CREATE TABLE " + BASE_SEQUENCE_TABLE + "(id int not null primary key auto_increment, classname varchar(200) not null, curId bigint not null, key idx_classname (classname))"+CREATE_TABLE_TAIL;
-                try(Statement statement = conn.createStatement()){
-                    statement.executeUpdate(sql);
+        try (Connection conn = this.getConnection()) {
+            DatabaseMetaData metaData = conn.getMetaData();
+            try (ResultSet rs = metaData.getTables(null, null, BASE_SEQUENCE_TABLE, null);) {
+                if (!rs.next()) {           //表不存在，需要创建基础sequeence表
+                    String sql = "CREATE TABLE " + BASE_SEQUENCE_TABLE + "(id int not null primary key auto_increment, classname varchar(200) not null, curId bigint not null, key idx_classname (classname))" + CREATE_TABLE_TAIL;
+                    try (Statement statement = conn.createStatement()) {
+                        statement.executeUpdate(sql);
+                    }
                 }
             }
+            System.out.println("初始化 " + BASE_SEQUENCE_TABLE + " 完成");
         }
-        System.out.println("初始化 " + BASE_SEQUENCE_TABLE + " 完成");
 
-        conn.close();
     }
 
     private EmfConfig parseCfg(String cfgPath) throws Exception {
@@ -132,6 +132,10 @@ public class DatabaseEntityMgrFactory {
             le.parse(nodeList.item(0), config);
         }
         return config;
+    }
+
+    public MysqlEntityManager getEntityMgr(Class clazz) {
+        return entityMap.get(clazz.getName());
     }
 
     public String getDbUrl() {
@@ -154,9 +158,20 @@ public class DatabaseEntityMgrFactory {
         return serverName;
     }
 
-    public static void main(String[] args) {
+    public void destory() {
+        exexutor.shutdown();
+    }
+
+    public static void main(String[] args) throws Exception {
         System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
         DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
-//        System.out.println(new Timestamp(1556103624_000L));
+        MysqlEntityManager mgr = inst.getEntityMgr(Player.class);
+        List<Integer> list = new ArrayList<>();
+        list.add(666);
+        Map<Integer, String> map = new HashMap<>();
+        map.put(999, "qwer");
+        Player p = new Player(mgr.nextId(), "asdf", (byte) 1, true, 333, 11.2f, 334.55d, new int[]{1, 2, 3, 4}, list, map);
+        mgr.insert(p, true);
+//        System.out.println(Player.class.getName());
     }
 }

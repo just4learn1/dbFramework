@@ -20,6 +20,22 @@ public class Player {
     private List<Integer> aa2;
     private Map<Integer, String> aa3;
 
+    public Player() {
+    }
+
+    public Player(long id, String username, byte bb1, boolean bb2, int bb3, float bb4, double bb5, int[] aa1, List<Integer> aa2, Map<Integer, String> aa3) {
+        this.id = id;
+        this.username = username;
+        this.bb1 = bb1;
+        this.bb2 = bb2;
+        this.bb3 = bb3;
+        this.bb4 = bb4;
+        this.bb5 = bb5;
+        this.aa1 = aa1;
+        this.aa2 = aa2;
+        this.aa3 = aa3;
+    }
+
     public long getId() {
         return id;
     }
