@@ -49,6 +49,10 @@ public class TablePage {
         return pageTablename;
     }
 
+    public int getPageIndex() {
+        return pageIndex;
+    }
+
     @Override
     public String toString() {
         return "TablePage{" +

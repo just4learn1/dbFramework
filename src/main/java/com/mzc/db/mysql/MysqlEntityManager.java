@@ -204,7 +204,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     /**
      * 子类初始化
      */
-    private void initSubClass(){
+    private void initSubClass() {
 
     }
 
@@ -220,9 +220,12 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
      * @return
      */
     private boolean checkFieldType(Type type) {
-        if (type instanceof Class) {
+        if (type instanceof ParameterizedType) {
+            checkCollection((ParameterizedType) type);
+            return true;
+        } else if (type instanceof Class) {
             Class clazz = (Class) type;
-            if (isBasicType(clazz)) {
+            if (isBasicType(clazz) || isEntitySerialzable(clazz)) {
                 return true;
             }
             if (clazz.isArray()) {
@@ -233,10 +236,28 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
                 }
             }
             return false;
-        } else if (type instanceof ParameterizedType) {
-            // TODO: 2019/4/17 参数类型需要额外逻辑判定支持的类型
         }
         return false;
+    }
+
+    private void checkCollection(ParameterizedType t) {
+        Type[] types = t.getActualTypeArguments();
+        for (Type type : types) {
+            if (type instanceof ParameterizedType) {
+                checkCollection((ParameterizedType) type);
+            } else if (type instanceof Class) {
+                Class clazz = (Class) type;
+                if (clazz.isArray()) {
+                    throw new RuntimeException("[不支持的类型] [" + clazz.getName() + "]");
+                } else if (clazz.isPrimitive() || isEntitySerialzable(clazz)) {
+                    continue;
+                }
+            }
+        }
+    }
+
+    private void checkArray(Class clazz) {
+
     }
 
     /**
@@ -340,9 +361,10 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         this.initalDictionaryData(conn, dictionaryTablename, clazz, newFields.toArray(new Field[0]));
     }
 
-    public String getTableBaseName(){
+    public String getTableBaseName() {
         return TABLE_NAME_HEAD + this.tableName;
     }
+
     @Override
     public void run() {
 

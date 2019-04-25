@@ -4,13 +4,15 @@ import com.mzc.db.DatabaseEntityMgrFactory;
 import com.mzc.db.mysql.data.EntityField;
 import com.mzc.db.mysql.page.TablePage;
 
+import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.mzc.db.mysql.page.TablePage.TABLE_INDEX_TAG;
-import static com.mzc.utils.SqlUtil.parseClassType2DbType;
 import static com.mzc.db.DatabaseEntityMgrFactory.CREATE_TABLE_TAIL;
+import static com.mzc.db.mysql.page.TablePage.TABLE_INDEX_TAG;
+import static com.mzc.utils.CommonUtil.replaceStr;
+import static com.mzc.utils.SqlUtil.parseClassType2DbType;
 
 public class TablePageManager {
 
@@ -27,6 +29,7 @@ public class TablePageManager {
     private EntityField entityField;
 
     public void init(MysqlEntityManager entityManager, Class clazz, EntityField entityField) throws SQLException {
+        this.entityField = entityManager.getEntityField();
         Connection conn = DatabaseEntityMgrFactory.getInst().getConnection();
         try {
             DatabaseMetaData metaData = conn.getMetaData();
@@ -44,15 +47,15 @@ public class TablePageManager {
                 TablePage page = new TablePage(page1TableName, 0);
                 allPages.add(page);
                 this.currentPage = page;
-                this.entityField = entityManager.getEntityField();
                 this.createMainTable(conn, page);
             } else {
                 // TODO: 2019/4/18 检查主表索引是否有修改（副表不需要检查，由于副表中都存储的是json类型的大数据，不支持添加索引）
-                for (String tbname : tableNames){
-                    resultSet = metaData.getColumns(null, null, tbname, null);
-                    do {
-                        String fieldName = resultSet.getString(3);
-                    } while (resultSet.next());
+                for (String tbname : tableNames) {
+                    TablePage page = this.checkPagetable(conn, tbname);
+                    allPages.add(page);
+                    if (currentPage == null || currentPage.getPageIndex() < page.getPageIndex()) {
+                        currentPage = page;
+                    }
                 }
             }
         } finally {
@@ -64,11 +67,48 @@ public class TablePageManager {
      * 切换当前currentPage为preparePage
      */
     private synchronized void switchPage() {
-
+        this.currentPage = preparePage;
+        this.preparePage = null;
     }
 
-    private void checkTables(Connection conn, TablePage page) {
-
+    /**
+     * 检查表中字段，新增字段
+     * @param conn
+     * @param tbname
+     * @return
+     */
+    private TablePage checkPagetable(Connection conn, String tbname) throws SQLException {
+        DatabaseMetaData metaData = conn.getMetaData();
+        ResultSet resultSet = metaData.getColumns(null, null, tbname, null);
+        List<String> existNames = new ArrayList<>();
+        while(resultSet.next()) {
+            String fieldName = resultSet.getString(4);
+            existNames.add(fieldName);
+        }
+        resultSet.close();
+        List<Field> addColumn = entityField.needAddFields(existNames);
+        String lastFieldName = existNames.get(existNames.size()-1);
+        if (addColumn.size() > 0) {
+            StringBuffer addColumnSql = new StringBuffer();
+            addColumnSql.append("ALTER TABLE ").append(tbname).append("\n");
+            for (Field columnField : addColumn) {
+                addColumnSql.append("ADD COLUMN ").append(" ").append(parseClassType2DbType(columnField)).append(" AFTER ").append(lastFieldName).append(",");
+                lastFieldName = columnField.getName();
+            }
+            String sql = replaceStr(addColumnSql.toString(),addColumnSql.toString().length()-1, ";");
+            try(Statement statement = conn.createStatement()) {
+                statement.executeUpdate(sql);
+            }
+        }
+        String countSql = String.format("SELECT COUNT(*) FROM %S", tbname);
+        int cnt = 0;
+        try(Statement statement = conn.createStatement()){
+            resultSet = statement.executeQuery(countSql);
+            resultSet.next();
+            cnt = resultSet.getInt(1);
+            resultSet.close();
+        }
+        return new TablePage(tbname, cnt);        //单表存储数量一般限制在200W以内
     }
 
     private void createMainTable(Connection conn, TablePage page) throws SQLException {

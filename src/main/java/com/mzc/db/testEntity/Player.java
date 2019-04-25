@@ -3,17 +3,22 @@ package com.mzc.db.testEntity;
 import com.mzc.db.annotation.SimpleEntity;
 import com.mzc.db.annotation.SimpleId;
 
+import java.util.List;
+import java.util.Map;
+
 @SimpleEntity
 public class Player {
     @SimpleId
     private long id;
     private String username;
-    private String accountName;
     private byte bb1;
     private boolean bb2;
     private int bb3;
     private float bb4;
     private double bb5;
+    private int[] aa1;
+    private List<Integer> aa2;
+    private Map<Integer, String> aa3;
 
     public long getId() {
         return id;
@@ -29,14 +34,6 @@ public class Player {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getAccountName() {
-        return accountName;
-    }
-
-    public void setAccountName(String accountName) {
-        this.accountName = accountName;
     }
 
     public byte getBb1() {
@@ -77,5 +74,29 @@ public class Player {
 
     public void setBb5(double bb5) {
         this.bb5 = bb5;
+    }
+
+    public int[] getAa1() {
+        return aa1;
+    }
+
+    public void setAa1(int[] aa1) {
+        this.aa1 = aa1;
+    }
+
+    public List<Integer> getAa2() {
+        return aa2;
+    }
+
+    public void setAa2(List<Integer> aa2) {
+        this.aa2 = aa2;
+    }
+
+    public Map<Integer, String> getAa3() {
+        return aa3;
+    }
+
+    public void setAa3(Map<Integer, String> aa3) {
+        this.aa3 = aa3;
     }
 }

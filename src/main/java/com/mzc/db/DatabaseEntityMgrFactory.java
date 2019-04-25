@@ -155,8 +155,8 @@ public class DatabaseEntityMgrFactory {
     }
 
     public static void main(String[] args) {
-//        System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
-//        DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
-        System.out.println(new Timestamp(1556103624_000L));
+        System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
+        DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
+//        System.out.println(new Timestamp(1556103624_000L));
     }
 }

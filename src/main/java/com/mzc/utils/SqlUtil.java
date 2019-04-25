@@ -6,6 +6,9 @@ import com.mzc.utils.typeParseEnum.ClassTypeConvertEnum;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
+import static com.mzc.utils.ClassUtil.isCollectionField;
+import static com.mzc.utils.ClassUtil.isEntitySerialzable;
+
 public class SqlUtil {
 
     private static int DEFAULT_VARCHAR_LENGTH = 256;
@@ -22,13 +25,13 @@ public class SqlUtil {
         Class type = field.getType();
         Annotation content = field.getAnnotation(Content.class);
         sb.append(field.getName()).append(" ");
-        if(type == String.class) {
+        if (type == String.class || type.isArray() || isEntitySerialzable(type) || isCollectionField(type)) {
             int len = content != null ? ((Content) content).length() : DEFAULT_VARCHAR_LENGTH;
-            if(len > MAX_VARCHAR_LENGTH){
-                throw new RuntimeException("[字段长度不允许超过"+MAX_VARCHAR_LENGTH+"]");
+            if (len > MAX_VARCHAR_LENGTH) {
+                throw new RuntimeException("[字段长度不允许超过" + MAX_VARCHAR_LENGTH + "]");
             }
-            sb.append(" varchar(").append(len).append(")");
-        } else{
+            sb.append(" varchar(").append(len).append(") NOT NULL DEFAULT ''");
+        }else {
             ClassTypeConvertEnum cte = ClassTypeConvertEnum.getByClass(type);
             sb.append(cte.defaultCreateSql);
         }

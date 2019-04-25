@@ -61,10 +61,4 @@ public class ClassUtil {
         return false;
     }
 
-    public static void main(String[] args) {
-        Field[] fields = getSerializableFields(Player.class);
-        for (Field f : fields) {
-            System.out.println(f.getName());
-        }
-    }
 }
