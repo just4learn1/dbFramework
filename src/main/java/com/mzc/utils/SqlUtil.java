@@ -44,7 +44,7 @@ public class SqlUtil {
         return sb.toString();
     }
 
-    public static int fullFillParamater(int parameterIndex, Object o, PreparedStatement pstmt, LinkedList<Field> fields)
+    public static int fullFillParamater(int parameterIndex, Object o, PreparedStatement pstmt, Collection<Field> fields)
             throws Exception {
         for (Field f : fields) {
             Class<?> cl = f.getType();

@@ -63,7 +63,7 @@ public class MyConnection implements Connection {
 
     @Override
     public void close() throws SQLException {
-        System.out.printf("on close: %s", this);
+//        System.out.printf("on close: %s", this);
         pool.back2Poll(this);
     }
 

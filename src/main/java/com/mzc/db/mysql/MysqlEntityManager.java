@@ -9,7 +9,6 @@ import com.mzc.db.annotation.SimpleId;
 import com.mzc.db.annotation.TableAlias;
 import com.mzc.db.mysql.data.EntityData;
 import com.mzc.db.mysql.data.EntityField;
-import com.mzc.db.mysql.page.TablePage;
 import com.mzc.utils.SqlUtil;
 
 import java.lang.annotation.Annotation;
@@ -58,9 +57,9 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     private DbEntityInfo info;
     /**
-     * 同步数据库间隔，单位：s
+     * 同步数据库间隔，单位：ms
      */
-    private long period = 120L;
+    private long period = 120_000L;
 
 
     public MysqlEntityManager(DbEntityInfo info) {
@@ -137,9 +136,9 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
                 T t = (T) clazz.newInstance();
                 HashMap<String, Integer> nameIndexMap = new HashMap<>();
                 entityField.getIdField().set(t, id);
-                entityField.fullfillObject(f->{
+                entityField.fullfillObject(f -> {
                     try {
-                        String fieldName = ((Field)f).getName();
+                        String fieldName = ((Field) f).getName();
                         nameIndexMap.put(fieldName, resultSet.findColumn(fieldName));
                     } catch (SQLException e) {
                         e.printStackTrace();
@@ -175,7 +174,8 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         if (data != null) {
             throw new RuntimeException(String.format("[存储对象id重复:%d]", id));
         }
-        data = new EntityData(id, t.getClass(), entityField, t, true);
+        data = new EntityData(id, t.getClass(), entityField, t);
+        data.notifyInsert();
         entityMap.put(id, data);
         if (saveNow) {
             insertEntity2DB(t);
@@ -183,8 +183,19 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     }
 
     @Override
-    public void update(T t, String field) throws Exception {
-
+    public void update(T t, String fieldname) throws Exception {
+        long id = (long) entityField.getIdField().get(t);
+        EntityData data = entityMap.get(id);
+        if (data == null) {
+            System.out.printf("[需要先执行insert才可以更新数据] [id: %d]\n", id);
+            return;
+        }
+        Field field = entityField.getFieldByFieldName(fieldname);
+        if (field == null) {
+            System.out.printf("[找不到对应field: %s] [id: %d]\n", fieldname, id);
+            return;
+        }
+        data.notifyChanged(field);
     }
 
     @Override
@@ -219,10 +230,11 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
     @Override
     public void init() throws Exception {
         //每500ms检查所有改变的数据，查看是否达到入库条件
-        DatabaseEntityMgrFactory.getInst().exexutor.scheduleAtFixedRate(this, INIT_DELAY_TIME, 500, TimeUnit.MILLISECONDS);
+//        DatabaseEntityMgrFactory.getInst().exexutor.scheduleAtFixedRate(this, INIT_DELAY_TIME, 500, TimeUnit.MILLISECONDS);
         this.pollDatabaseEntityId(0, true);
         this.initTable();
         this.initSubClass();
+        DatabaseEntityMgrFactory.getInst().executeTask(this);
     }
 
     private void initTable() throws Exception {
@@ -436,7 +448,36 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     @Override
     public void run() {
+        try {
+            this.saveChanged(false);
+        } finally {
+            DatabaseEntityMgrFactory.getInst().executeTask(this);
+        }
+    }
 
+    public void destory() {
+        this.saveChanged(true);
+    }
+
+    private void saveChanged(boolean saveAll) {
+        long now = System.currentTimeMillis();
+        entityMap.entrySet().stream().filter(e -> (saveAll || e.getValue().saveTime <= now) && e.getValue().compareAndSetChanged(true, false)).forEach(e -> {
+            EntityData data = e.getValue();
+            if (data.get() == null) {
+                System.out.printf("[有数据丢失，可能是上层没有持有引用在垃圾回收时被回收了] [id : %d]", data.getId());
+            } else {
+                if (data.changed.get()) {
+                    //insert
+                    try {
+                        this.insertEntity2DB((T) data.get());
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    //update
+                }
+            }
+        });
     }
 
     public EntityField getEntityField() {

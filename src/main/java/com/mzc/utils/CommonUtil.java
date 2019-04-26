@@ -1,5 +1,6 @@
 package com.mzc.utils;
 
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -31,8 +32,6 @@ public class CommonUtil {
     }
 
     public static void main(String[] args) {
-        long[] aa = {1L, 23L, 5L, 8L, 3L};
-        Arrays.sort(aa);
-        System.out.println(Arrays.toString(aa));
+        System.out.println(new Timestamp(1556267111425L));
     }
 }

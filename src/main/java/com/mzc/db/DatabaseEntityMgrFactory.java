@@ -16,10 +16,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.*;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.*;
 
-public class DatabaseEntityMgrFactory {
+public class DatabaseEntityMgrFactory implements Runnable {
 
     private static volatile DatabaseEntityMgrFactory inst = null;
 
@@ -30,11 +29,13 @@ public class DatabaseEntityMgrFactory {
     private static final String cfgProperty = "simpleDbCfg";
     public static final long DEFAULT_CONNET_TIMEOUT = 500;
 
+    public static final long DEFAULT_THREADPOOL_EXECUTE_INTEVAL = 1000;
+
     public static final String BASE_SEQUENCE_TABLE = "SEQUENCE";
     /**
      * 管理定时存库线程
      */
-    public ScheduledExecutorService exexutor = null;
+    public ExecutorService exexutor = null;
 
     private ConnectionPool pool;
 
@@ -42,6 +43,19 @@ public class DatabaseEntityMgrFactory {
     private String serverName;
 
     private HashMap<String, MysqlEntityManager> entityMap = new HashMap<>();
+
+    private ConcurrentLinkedQueue<Runnable> waitExecuteQueue;
+
+    private Thread thread;
+
+    private boolean destory = false;
+
+    private Runnable flag = new Runnable() {
+        @Override
+        public void run() {
+            //NOPO
+        }
+    };
 
     private DatabaseEntityMgrFactory() {
     }
@@ -78,14 +92,23 @@ public class DatabaseEntityMgrFactory {
             int entitySize = config.getEntityConfigs().size();
             int avaiableProcessor = Runtime.getRuntime().availableProcessors();
             int coreSize = entitySize > avaiableProcessor ? avaiableProcessor : entitySize;
-            this.exexutor = Executors.newScheduledThreadPool(coreSize);
+            this.exexutor = Executors.newFixedThreadPool(coreSize);
         }
+        this.waitExecuteQueue = new ConcurrentLinkedQueue<>();
         this.checkBaseTable();
         for (EmfConfig.EntityConfig cfg : config.getEntityConfigs()) {
             DbEntityInfo entityInfo = new DbEntityInfo(cfg.id, cfg.classPath, null);
             MysqlEntityManager entityManager = new MysqlEntityManager(entityInfo);
             entityManager.init();
             entityMap.put(entityInfo.getClassName(), entityManager);
+        }
+        thread = new Thread(this, "DATABASE_THREAD_0");
+        thread.start();
+    }
+
+    public void executeTask(Runnable task) {
+        if (!destory) {
+            waitExecuteQueue.offer(task);
         }
     }
 
@@ -101,7 +124,6 @@ public class DatabaseEntityMgrFactory {
         } catch (Exception e) {
             throw new SQLException(e);
         }
-//        return d.connect(this.dbUrl, this.dbProperties);
     }
 
     /**
@@ -149,25 +171,62 @@ public class DatabaseEntityMgrFactory {
         return serverName;
     }
 
-    public void destory() {
+    public void destory() throws InterruptedException {
+        destory = true;
         exexutor.shutdown();
+        entityMap.entrySet().stream().parallel().forEach(e -> {
+            MysqlEntityManager mgr = e.getValue();
+            mgr.destory();
+        });
+        DatabaseEntityMgrFactory.getInst().thread.interrupt();
     }
 
     public static void main(String[] args) throws Exception {
         System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
         DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
         MysqlEntityManager<Player> mgr = inst.getEntityMgr(Player.class);
-        Player p = mgr.getEntity(1101000000000022529L);
-        System.out.println(p);
-        inst.destory();
 
-        /* List<Integer> list = new ArrayList<>();
+        List<Integer> list = new ArrayList<>();
         list.add(666);
         Map<Integer, String> map = new HashMap<>();
         map.put(999, "qwer");
         Player p = new Player(mgr.nextId(), "asdf", (byte) 1, true, 333, 11.2f, 334.55d, new int[]{1, 2, 3, 4}, list, map);
-        mgr.insert(p, true);
-        System.out.println(p.getId());*/
+        mgr.insert(p, false);
+        System.out.println(p);
 
+        TimeUnit.SECONDS.sleep(20);
+//        Player p2 = mgr.getEntity(1101000000000022529L);
+//        System.out.println(p2);
+        inst.destory();
+        System.out.println("=======end========");
+//        for (; ; ) {
+//            if (!inst.runing) {
+//                break;
+//            }
+//            inst.thread.join(1000);
+//        }
+    }
+
+    @Override
+    public void run() {
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                waitExecuteQueue.offer(flag);
+                Runnable task;
+                while ((task = waitExecuteQueue.poll()) != flag) {
+                    try {
+                        exexutor.execute(task);
+                    } catch (Exception e){}
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(DEFAULT_THREADPOOL_EXECUTE_INTEVAL);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
     }
 }

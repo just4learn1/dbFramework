@@ -24,17 +24,11 @@ public class EntityField {
         this.subClasses = subClasses != null ? subClasses : new HashMap<>();
     }
 
-    /**
-     * 是否包含字段
-     *
-     * @param fieldName
-     * @return
-     */
-    public boolean containsField(String fieldName) {
-        if (idField.getName().equalsIgnoreCase(fieldName)) {
-            return true;
+    public Field getFieldByFieldName(String fieldname) {
+        if (fieldname.equalsIgnoreCase(idField.getName())) {
+            return idField;
         }
-        return otherFieldMap.containsKey(fieldName);
+        return otherFieldMap.get(fieldname);
     }
 
     /**
@@ -63,6 +57,7 @@ public class EntityField {
 
     /**
      * 通过classname获取对应Class，省去使用Class.forname加载类
+     *
      * @param classname
      * @return
      */
@@ -74,7 +69,7 @@ public class EntityField {
     }
 
     public void fullfillObject(Consumer consumer) {
-        otherFieldMap.values().forEach(k->{
+        otherFieldMap.values().forEach(k -> {
             consumer.accept(k);
         });
     }

@@ -5,7 +5,7 @@ import com.mzc.utils.SqlUtil;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
-import java.util.LinkedList;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.mzc.db.mysql.MysqlEntityManager.CLASSNAME_FIELD;
@@ -16,7 +16,10 @@ public class EntityData<T> extends WeakReference<T> {
     public Class clazz;
     public AtomicBoolean needInsert = new AtomicBoolean(false);     //标志此对象是需要insert还是update
     public AtomicBoolean changed = new AtomicBoolean(false);
-    LinkedList<Field> changedFields = new LinkedList<>();     //需求顺序，在添加的时候需要排重
+    CopyOnWriteArraySet<Field> changedFields = new CopyOnWriteArraySet<>();
+    public long saveTime = System.currentTimeMillis();
+    private long period = 5_000L;
+
 
     public EntityData(long id, Class clazz, EntityField entityField, T referent) {
         super(referent);
@@ -25,15 +28,18 @@ public class EntityData<T> extends WeakReference<T> {
         this.clazz = clazz;
     }
 
-    public EntityData(long id, Class clazz, EntityField entityField, T t, boolean needInsert) {
-        super(t);
-        this.id = id;
-        this.entityField = entityField;
-        this.needInsert.compareAndSet(false, needInsert);
-        this.changed.compareAndSet(false, needInsert);
-        this.clazz = clazz;
-        if (needInsert) {
-            this.setAllFieldsChanged();
+    public void notifyInsert() {
+        this.compareAndSetNeedInsert(false, true);
+        this.compareAndSetChanged(false, true);
+        this.saveTime = System.currentTimeMillis() + period;
+        this.setAllFieldsChanged();
+    }
+
+    public void notifyChanged() {
+        this.compareAndSetChanged(false, true);
+        long now = System.currentTimeMillis();
+        if (saveTime < now) {
+            this.saveTime = System.currentTimeMillis() + period;
         }
     }
 
@@ -60,6 +66,7 @@ public class EntityData<T> extends WeakReference<T> {
     public void notifyChanged(Field f) {
         if (!changedFields.contains(f)) {
             changedFields.add(f);
+            this.notifyChanged();
         }
     }
 
