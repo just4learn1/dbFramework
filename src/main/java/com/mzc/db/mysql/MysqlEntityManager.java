@@ -463,6 +463,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             statement.execute();
             try {
                 conn.commit();
+                tablePageManager.notifyAddNum(new long[]{id});
             } catch (Exception e) {
                 conn.rollback();
                 throw e;

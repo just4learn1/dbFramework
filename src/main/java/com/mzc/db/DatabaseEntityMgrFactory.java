@@ -3,6 +3,7 @@ package com.mzc.db;
 import com.mzc.db.cfgLabel.LabelEnum;
 import com.mzc.db.config.EmfConfig;
 import com.mzc.db.mysql.MysqlEntityManager;
+import com.mzc.db.pool.ConnectionPool;
 import com.mzc.db.testEntity.Player;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -27,6 +28,7 @@ public class DatabaseEntityMgrFactory {
     private static final String MYSQL_DRIVER = "com.mysql.jdbc.Driver";
 
     private static final String cfgProperty = "simpleDbCfg";
+    public static final long DEFAULT_CONNET_TIMEOUT = 500;
 
     public static final String BASE_SEQUENCE_TABLE = "SEQUENCE";
     /**
@@ -34,13 +36,10 @@ public class DatabaseEntityMgrFactory {
      */
     public ScheduledExecutorService exexutor = null;
 
-    private String dbUrl = null;
-    private Properties dbProperties = null;
+    private ConnectionPool pool;
 
     private int serverId;
     private String serverName;
-
-    private Driver d = null;
 
     private HashMap<String, MysqlEntityManager> entityMap = new HashMap<>();
 
@@ -71,16 +70,16 @@ public class DatabaseEntityMgrFactory {
         }
         EmfConfig config = this.parseCfg(cfgPath);
         {
+            Driver d = (Driver) Class.forName(MYSQL_DRIVER).newInstance();
             this.serverId = config.getServerId();
             this.serverName = config.getServerName();
-            this.dbUrl = config.getDbUrl();
-            this.dbProperties = config.getDbProperties();
+//            String dbUrl = config.getDbUrl();
+            this.pool = new ConnectionPool(config.getDbUrl(), config.getUsername(), config.getPassword(), config.getMaxConnectNum(), d);
             int entitySize = config.getEntityConfigs().size();
             int avaiableProcessor = Runtime.getRuntime().availableProcessors();
             int coreSize = entitySize > avaiableProcessor ? avaiableProcessor : entitySize;
             this.exexutor = Executors.newScheduledThreadPool(coreSize);
         }
-        this.d = (Driver) Class.forName(MYSQL_DRIVER).newInstance();
         this.checkBaseTable();
         for (EmfConfig.EntityConfig cfg : config.getEntityConfigs()) {
             DbEntityInfo entityInfo = new DbEntityInfo(cfg.id, cfg.classPath, null);
@@ -97,14 +96,18 @@ public class DatabaseEntityMgrFactory {
      * @throws SQLException
      */
     public Connection getConnection() throws SQLException {
-        // TODO: 2019/4/16 需要调整为连接池管理
-        return d.connect(this.dbUrl, this.dbProperties);
+        try {
+            return pool.getConn(DEFAULT_CONNET_TIMEOUT);
+        } catch (Exception e) {
+            throw new SQLException(e);
+        }
+//        return d.connect(this.dbUrl, this.dbProperties);
     }
 
     /**
      * 检查基础sequence表是否存在
      */
-    public void checkBaseTable() throws SQLException {
+    public void checkBaseTable() throws Exception {
         try (Connection conn = this.getConnection()) {
             DatabaseMetaData metaData = conn.getMetaData();
             try (ResultSet rs = metaData.getTables(null, null, BASE_SEQUENCE_TABLE, null);) {
@@ -138,18 +141,6 @@ public class DatabaseEntityMgrFactory {
         return entityMap.get(clazz.getName());
     }
 
-    public String getDbUrl() {
-        return dbUrl;
-    }
-
-    public Properties getDbProperties() {
-        return dbProperties;
-    }
-
-    public Driver getD() {
-        return d;
-    }
-
     public int getServerId() {
         return serverId;
     }
@@ -165,7 +156,11 @@ public class DatabaseEntityMgrFactory {
     public static void main(String[] args) throws Exception {
         System.setProperty(cfgProperty, "D:\\git\\db\\src\\main\\resources\\conf\\simpleEntity.xml");
         DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
-       MysqlEntityManager<Player> mgr = inst.getEntityMgr(Player.class);
+        MysqlEntityManager<Player> mgr = inst.getEntityMgr(Player.class);
+        Player p = mgr.getEntity(1101000000000022529L);
+        System.out.println(p);
+        inst.destory();
+
         /* List<Integer> list = new ArrayList<>();
         list.add(666);
         Map<Integer, String> map = new HashMap<>();
@@ -173,9 +168,6 @@ public class DatabaseEntityMgrFactory {
         Player p = new Player(mgr.nextId(), "asdf", (byte) 1, true, 333, 11.2f, 334.55d, new int[]{1, 2, 3, 4}, list, map);
         mgr.insert(p, true);
         System.out.println(p.getId());*/
-//        Player p = mgr.getEntity(1101000000000022529L);
-//        System.out.println(p.getAa3().get(999));
-//        System.out.println(mgr.getEntity(1101000000000022529L));
 
     }
 }

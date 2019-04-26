@@ -9,11 +9,16 @@ public class TablePage {
 
     private String pageTablename;
 
-    private long minId = 0L;     //当前分页主键id最小值
-    private long maxId = 0L;     //当前分页主键id最大值
+    private volatile long minId = 0L;     //当前分页主键id最小值
+    private volatile long maxId = 0L;     //当前分页主键id最大值
 
     private AtomicInteger count;        //当前分页已存储的数据条数
 
+    public TablePage(String tableName, int cnt, long minId, long maxId) {
+        this(tableName, cnt);
+        this.minId = minId;
+        this.maxId = maxId;
+    }
     public TablePage(String tableName, int cnt) {
         this.pageTablename = tableName;
         int index = tableName.lastIndexOf(TABLE_INDEX_TAG);
@@ -25,11 +30,45 @@ public class TablePage {
         return TABLE_INDEX_TAG + pageIndex;
     }
 
-    public int notifyAddData(int addNum) {
+//    /**
+//     * 增加一条数据
+//     * @param id
+//     * @return
+//     */
+//    public int notifyAddData(long id) {
+//        for (int oldNum, newNum;;){
+//            oldNum = count.get();
+//            newNum = oldNum + 1;
+//            if (count.compareAndSet(oldNum, newNum)) {
+//                if (minId > id) {
+//                    minId = id;
+//                }
+//                if (maxId < id) {
+//                    maxId = id;
+//                }
+//                return newNum;
+//            }
+//        }
+//    }
+
+    /**
+     * 批量增加多条数据
+     * @param addNum
+     * @param minId
+     * @param maxId
+     * @return
+     */
+    public int notifyAddData(int addNum, long minId, long maxId) {
         for (int oldNum, newNum;;){
             oldNum = count.get();
             newNum = oldNum + addNum;
             if (count.compareAndSet(oldNum, newNum)) {
+                if (this.minId > minId) {
+                    this.minId = minId;
+                }
+                if (this.maxId < maxId) {
+                    this.maxId = maxId;
+                }
                 return newNum;
             }
         }

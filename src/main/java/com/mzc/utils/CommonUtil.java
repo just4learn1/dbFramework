@@ -1,5 +1,6 @@
 package com.mzc.utils;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 public class CommonUtil {
@@ -27,5 +28,11 @@ public class CommonUtil {
         System.arraycopy(destChars, 0, newChars, replaceIndex, destLen);
         System.arraycopy(chars, replaceIndex+1, newChars, tmpLen, (totalLen-tmpLen));
         return new String(newChars);
+    }
+
+    public static void main(String[] args) {
+        long[] aa = {1L, 23L, 5L, 8L, 3L};
+        Arrays.sort(aa);
+        System.out.println(Arrays.toString(aa));
     }
 }

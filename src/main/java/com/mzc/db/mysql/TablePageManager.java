@@ -7,6 +7,7 @@ import com.mzc.db.mysql.page.TablePage;
 import java.lang.reflect.Field;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -107,15 +108,19 @@ public class TablePageManager {
                 statement.executeUpdate(sql);
             }
         }
-        String countSql = String.format("SELECT COUNT(*) FROM %S", tbname);
+        String countSql = String.format("SELECT COUNT(*),MIN(id),MAX(id) FROM %s", tbname);
         int cnt = 0;
+        long minId = 0;
+        long maxId = 0;
         try (Statement statement = conn.createStatement()) {
             resultSet = statement.executeQuery(countSql);
             resultSet.next();
             cnt = resultSet.getInt(1);
+            minId = resultSet.getLong(2);
+            maxId = resultSet.getLong(3);
             resultSet.close();
         }
-        return new TablePage(tbname, cnt);        //单表存储数量一般限制在200W以内
+        return new TablePage(tbname, cnt, minId, maxId);        //单表存储数量一般限制在200W以内
     }
 
     private void createMainTable(Connection conn, TablePage page) throws SQLException {
@@ -136,10 +141,12 @@ public class TablePageManager {
 
     /**
      * 数据表中插入新的数据
-     * @param addNum
+     * @param ids 新增数据的主键id
      */
-    public void notifyAddNum(int addNum) {
-        int newNum = currentPage.notifyAddData(addNum);
+    public void notifyAddNum(long[] ids) {
+        int addNum = ids.length;
+        Arrays.sort(ids);
+        int newNum = currentPage.notifyAddData(addNum, ids[0], ids[ids.length-1]);
 
         if (preparePage == null && newNum >= tableMaxCount * loadFactor) {              //创建准备表
             lock.lock();
@@ -182,8 +189,7 @@ public class TablePageManager {
                 return page;
             }
         }
-        return currentPage;
-//        throw new RuntimeException(String.format("[没找到%d对应的tablepage]", id));
+        throw new RuntimeException(String.format("[没找到%d对应的tablepage]", id));
     }
 
     public String getSelectSql(long id) {
