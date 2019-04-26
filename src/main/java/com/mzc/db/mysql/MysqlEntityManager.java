@@ -468,6 +468,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             } else {
                 if (data.changed.get()) {
                     //insert
+                    // TODO: 2019/4/26 此处之后可以调整为先统计出来所有需要insert的数据，新增一个batchInsert方法，批量插入
                     try {
                         this.insertEntity2DB((T) data.get());
                     } catch (Exception e1) {
