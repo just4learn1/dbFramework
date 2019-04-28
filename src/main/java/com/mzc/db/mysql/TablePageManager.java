@@ -174,6 +174,11 @@ public class TablePageManager {
         sb.append("INSERT INTO ").append(currentPage.getPageTablename()).append("(");
     }
 
+    public void appendUpdateStr(long id, StringBuffer sb) {
+        TablePage page = this.gePageByEntityId(id);
+        sb.append("UPDATE ").append(page.getPageTablename());
+    }
+
     public List<String> getCountSqls() {
         List<String> list = new ArrayList<>();
         String sql = "SELECT COUNT(*) FROM %s";

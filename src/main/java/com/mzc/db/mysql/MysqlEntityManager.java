@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.mzc.db.DatabaseEntityMgrFactory.BASE_SEQUENCE_TABLE;
@@ -41,8 +40,6 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     private static final long SEQUENCE_INCREASE_STEP = 1024;
 
-    private static final long INIT_DELAY_TIME = 60L;
-
     private static final String FIELD_DICTIONARY_TABLE_HEAD = "FIELD_DICTIONARY_";
     private static final String TABLE_NAME_HEAD = "ENTITY_";
 
@@ -57,7 +54,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     private DbEntityInfo info;
     /**
-     * 同步数据库间隔，单位：ms
+     * 同步数据库间隔，单位：ms (后续根据配置调整)
      */
     private long period = 120_000L;
 
@@ -145,7 +142,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
                     }
                 });
                 SqlUtil.constructObject(t, nameIndexMap, resultSet, entityField.getOtherFieldMap().values());
-                entityMap.put(id, new EntityData<T>(id, clazz, entityField, t));
+                entityMap.put(id, new EntityData<T>(id, clazz, entityField, t, period));
                 return t;
             }
         }
@@ -174,11 +171,11 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         if (data != null) {
             throw new RuntimeException(String.format("[存储对象id重复:%d]", id));
         }
-        data = new EntityData(id, t.getClass(), entityField, t);
+        data = new EntityData(id, t.getClass(), entityField, t, period);
         data.notifyInsert();
         entityMap.put(id, data);
         if (saveNow) {
-            insertEntity2DB(t);
+            insertEntity2DB(id);
         }
     }
 
@@ -196,6 +193,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             return;
         }
         data.notifyChanged(field);
+//        System.out.printf("[update, data: %s ]",data);
     }
 
     @Override
@@ -337,10 +335,6 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         }
     }
 
-    private void checkArray(Class clazz) {
-
-    }
-
     /**
      * 字典表检查
      *
@@ -461,21 +455,29 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     private void saveChanged(boolean saveAll) {
         long now = System.currentTimeMillis();
-        entityMap.entrySet().stream().filter(e -> (saveAll || e.getValue().saveTime <= now) && e.getValue().compareAndSetChanged(true, false)).forEach(e -> {
+        entityMap.entrySet().stream().filter(e -> {
+//            System.out.printf("[update, data: %s ]",e);
+            return (saveAll || e.getValue().saveTime <= now) && e.getValue().changed.get();
+        }).forEach(e -> {
             EntityData data = e.getValue();
             if (data.get() == null) {
                 System.out.printf("[有数据丢失，可能是上层没有持有引用在垃圾回收时被回收了] [id : %d]", data.getId());
             } else {
-                if (data.changed.get()) {
+                if (data.needInsert.get()) {
                     //insert
                     // TODO: 2019/4/26 此处之后可以调整为先统计出来所有需要insert的数据，新增一个batchInsert方法，批量插入
                     try {
-                        this.insertEntity2DB((T) data.get());
+                        this.insertEntity2DB(data.getId());
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                 } else {
                     //update
+                    try {
+                        this.updateEntity2DB(data.getId());
+                    } catch (Exception e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
         });
@@ -485,11 +487,41 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         return entityField;
     }
 
-    private void insertEntity2DB(T t) throws Exception {
+    private void updateEntity2DB(long id) throws Exception {
+        EntityData data = entityMap.get(id);
+        if (data == null || data.get() == null) {
+            System.out.printf("[更新数据异常，不存在id[%d]的对象, 或者数据丢失, data[%s]]\n", id, data);
+            return;
+        }
+        if (!data.compareAndSetChanged(true, false)) {
+            System.out.println("已经更新过");
+            return ;
+        }
+        try (Connection conn = DatabaseEntityMgrFactory.getInst().getConnection()) {
+            String sql = this.generateUpdateSql(data);
+            System.out.printf("[update sql: %s]\n", sql);
+            try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                data.fullFillParamater(statement, false);
+                conn.setAutoCommit(false);
+                statement.execute();
+                try {
+                    conn.commit();
+                    data.clearChanged();
+                } catch (Exception e) {
+                    conn.rollback();
+                    e.printStackTrace();
+                } finally {
+                    conn.setAutoCommit(true);
+                }
+            }
+        }
+
+    }
+
+    private void insertEntity2DB(long id) throws Exception {
         EntityData data = null;
         try (Connection conn = DatabaseEntityMgrFactory.getInst().getConnection()) {
             conn.setAutoCommit(false);
-            long id = entityField.getIdField().getLong(t);
             data = entityMap.get(id);
             if (data == null) {
                 throw new RuntimeException(String.format("[需要先insert才可以存库:%d]", id));
@@ -499,12 +531,13 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             }
             data.compareAndSetChanged(true, false);
             String sql = generateInsertSql(data);
-            System.out.printf("insert sql: %s\n", sql);
+//            System.out.printf("insert sql: %s\n", sql);
             PreparedStatement statement = conn.prepareStatement(sql);
-            data.fullFillParamater(statement);
+            data.fullFillParamater(statement, true);
             statement.execute();
             try {
                 conn.commit();
+                data.clearChanged();
                 tablePageManager.notifyAddNum(new long[]{id});
             } catch (Exception e) {
                 conn.rollback();
@@ -532,6 +565,13 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         StringBuffer sb = new StringBuffer();
         tablePageManager.appendInsertStr(sb);
         data.appendInsertStr(sb);
+        return sb.toString();
+    }
+
+    private String generateUpdateSql(EntityData data) {
+        StringBuffer sb = new StringBuffer();
+        tablePageManager.appendUpdateStr(data.getId(), sb);
+        data.appendUPdataStr(sb);
         return sb.toString();
     }
 

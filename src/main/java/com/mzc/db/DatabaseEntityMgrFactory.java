@@ -186,17 +186,21 @@ public class DatabaseEntityMgrFactory implements Runnable {
         DatabaseEntityMgrFactory inst = DatabaseEntityMgrFactory.getInst();
         MysqlEntityManager<Player> mgr = inst.getEntityMgr(Player.class);
 
-        List<Integer> list = new ArrayList<>();
+        /*List<Integer> list = new ArrayList<>();
         list.add(666);
         Map<Integer, String> map = new HashMap<>();
         map.put(999, "qwer");
         Player p = new Player(mgr.nextId(), "asdf", (byte) 1, true, 333, 11.2f, 334.55d, new int[]{1, 2, 3, 4}, list, map);
         mgr.insert(p, false);
-        System.out.println(p);
+        System.out.println(p);*/
 
-        TimeUnit.SECONDS.sleep(20);
-//        Player p2 = mgr.getEntity(1101000000000022529L);
-//        System.out.println(p2);
+//        TimeUnit.SECONDS.sleep(20);
+        Player p2 = mgr.getEntity(1101000000000022529L);
+        p2.setAa1(new int[]{3,3,9,9,99,9,9,12});
+        p2.setBb3(999);
+        mgr.update(p2, "aa1");
+        mgr.update(p2, "bb3");
+        System.out.println(p2);
         inst.destory();
         System.out.println("=======end========");
 //        for (; ; ) {
