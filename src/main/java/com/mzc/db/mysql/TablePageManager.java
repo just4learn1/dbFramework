@@ -141,12 +141,13 @@ public class TablePageManager {
 
     /**
      * 数据表中插入新的数据
+     *
      * @param ids 新增数据的主键id
      */
     public void notifyAddNum(long[] ids) {
         int addNum = ids.length;
         Arrays.sort(ids);
-        int newNum = currentPage.notifyAddData(addNum, ids[0], ids[ids.length-1]);
+        int newNum = currentPage.notifyAddData(addNum, ids[0], ids[ids.length - 1]);
 
         if (preparePage == null && newNum >= tableMaxCount * loadFactor) {              //创建准备表
             lock.lock();
@@ -175,22 +176,22 @@ public class TablePageManager {
     }
 
     public void appendUpdateStr(long id, StringBuffer sb) {
-        TablePage page = this.gePageByEntityId(id);
+        TablePage page = this.getPageByEntityId(id);
         sb.append("UPDATE ").append(page.getPageTablename());
     }
 
     public List<String> getCountSqls() {
         List<String> list = new ArrayList<>();
         String sql = "SELECT COUNT(*) FROM %s";
-        allPages.forEach(page->{
+        allPages.forEach(page -> {
             list.add(String.format(sql, page.getPageTablename()));
         });
         return list;
     }
 
-    public TablePage gePageByEntityId(long id) {
-        for (TablePage page : allPages){
-            if(page.contains(id)){
+    public TablePage getPageByEntityId(long id) {
+        for (TablePage page : allPages) {
+            if (page.contains(id)) {
                 return page;
             }
         }
@@ -198,13 +199,28 @@ public class TablePageManager {
     }
 
     public String getSelectSql(long id) {
-        TablePage page = this.gePageByEntityId(id);
+        TablePage page = this.getPageByEntityId(id);
+        StringBuffer sb = new StringBuffer();
+        sb.append(this.selectSql(page)).append(" LIMIT 1");
+        return sb.toString();
+    }
+
+    public String generageSelectSql(long[] ids, TablePage page) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(this.selectSql(page));
+        for (int i = 1, len = ids.length; i < len; i++) {
+            sb.append(" or ").append(entityField.getIdField().getName()).append("=?");
+        }
+        return sb.toString();
+    }
+
+    private String selectSql(TablePage page) {
         StringBuffer sb = new StringBuffer();
         sb.append("SELECT ").append(CLASSNAME_FIELD).append(",");
-        entityField.getOtherFieldMap().forEach((k, v)->{
+        entityField.getOtherFieldMap().forEach((k, v) -> {
             sb.append(k).append(",");
         });
-        sb.append(entityField.getIdField().getName()).append(" FROM ").append(page.getPageTablename()).append(" WHERE ").append(entityField.getIdField().getName()).append("=?").append(" LIMIT 1");
+        sb.append(entityField.getIdField().getName()).append(" FROM ").append(page.getPageTablename()).append(" WHERE ").append(entityField.getIdField().getName()).append("=?");
         return sb.toString();
     }
 }

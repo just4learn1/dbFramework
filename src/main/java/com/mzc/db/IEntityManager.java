@@ -18,7 +18,7 @@ public interface IEntityManager<T> {
     T getEntity(long id) throws Exception;
 
     /**
-     * 获取对象列表
+     * 获取对象列表(如果ids中有重复id会被去重，返回的数据会相应有减少)
      * @param ids
      * @return
      */

@@ -173,12 +173,12 @@ public class DatabaseEntityMgrFactory implements Runnable {
 
     public void destory() throws InterruptedException {
         destory = true;
+        DatabaseEntityMgrFactory.getInst().thread.interrupt();
         exexutor.shutdown();
         entityMap.entrySet().stream().parallel().forEach(e -> {
             MysqlEntityManager mgr = e.getValue();
             mgr.destory();
         });
-        DatabaseEntityMgrFactory.getInst().thread.interrupt();
     }
 
     public static void main(String[] args) throws Exception {
@@ -195,12 +195,10 @@ public class DatabaseEntityMgrFactory implements Runnable {
         System.out.println(p);*/
 
 //        TimeUnit.SECONDS.sleep(20);
-        Player p2 = mgr.getEntity(1101000000000022529L);
-        p2.setAa1(new int[]{3,3,9,9,99,9,9,12});
-        p2.setBb3(999);
-        mgr.update(p2, "aa1");
-        mgr.update(p2, "bb3");
-        System.out.println(p2);
+//        Player p2 = mgr.getEntity(1101000000000022529L);
+
+        List<Player> players = mgr.getEntitys(new long[]{1101000000000022529L, 1101000000000050177L, 1101000000000046081L, 1101000000000022529L});
+        players.forEach(System.out::println);
         inst.destory();
         System.out.println("=======end========");
 //        for (; ; ) {

@@ -7,10 +7,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static com.mzc.utils.ClassUtil.isCollectionField;
 import static com.mzc.utils.ClassUtil.isEntitySerialzable;
@@ -154,5 +151,9 @@ public class SqlUtil {
             }
             f.set(t, value);
         }
+    }
+
+    public static void testSort(int[] aa) {
+        Arrays.sort(aa);
     }
 }
