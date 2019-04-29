@@ -111,6 +111,7 @@ public class SqlUtil {
 
     /**
      * 填充数据
+     *
      * @param t
      * @param map
      * @param rs
@@ -151,9 +152,5 @@ public class SqlUtil {
             }
             f.set(t, value);
         }
-    }
-
-    public static void testSort(int[] aa) {
-        Arrays.sort(aa);
     }
 }

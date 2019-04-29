@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Collectors;
 
 import static com.mzc.db.DatabaseEntityMgrFactory.CREATE_TABLE_TAIL;
 import static com.mzc.db.mysql.MysqlEntityManager.CLASSNAME_FIELD;
@@ -214,6 +215,25 @@ public class TablePageManager {
         return sb.toString();
     }
 
+    public String generageSelectSql(long[] ids, TablePage page, List<String> fieldnames) {
+        List<Field> list = fieldnames.stream().map(s->entityField.getFieldByFieldName(s)).collect(Collectors.toList());
+        StringBuffer sb = new StringBuffer();
+        sb.append(this.selectSql(page, list));
+        for (int i = 1; i < ids.length; i++) {
+            sb.append(" or ").append(entityField.getIdField().getName()).append("=?");
+        }
+        return sb.toString();
+    }
+
+    public List<String> countAllSql() {
+        List<String> list = new ArrayList<>();
+        String str = "SELECT COUNT(*) FROM %s";
+        allPages.forEach(page->{
+            list.add(String.format(str, page.getPageTablename()));
+        });
+        return list;
+    }
+
     private String selectSql(TablePage page) {
         StringBuffer sb = new StringBuffer();
         sb.append("SELECT ").append(CLASSNAME_FIELD).append(",");
@@ -221,6 +241,16 @@ public class TablePageManager {
             sb.append(k).append(",");
         });
         sb.append(entityField.getIdField().getName()).append(" FROM ").append(page.getPageTablename()).append(" WHERE ").append(entityField.getIdField().getName()).append("=?");
+        return sb.toString();
+    }
+
+    private String selectSql(TablePage page, List<Field> fields) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT ");
+        fields.forEach((f) -> {
+            sb.append(f.getName()).append(",");
+        });
+        sb.append(CLASSNAME_FIELD).append(" FROM ").append(page.getPageTablename()).append(" WHERE ").append(entityField.getIdField().getName()).append("=?");
         return sb.toString();
     }
 }

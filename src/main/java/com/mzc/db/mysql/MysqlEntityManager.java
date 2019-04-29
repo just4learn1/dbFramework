@@ -10,16 +10,16 @@ import com.mzc.db.annotation.TableAlias;
 import com.mzc.db.mysql.data.EntityData;
 import com.mzc.db.mysql.data.EntityField;
 import com.mzc.db.mysql.page.TablePage;
+import com.mzc.utils.CommonUtil;
 import com.mzc.utils.SqlUtil;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
+import java.lang.reflect.*;
 import java.sql.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static com.mzc.db.DatabaseEntityMgrFactory.BASE_SEQUENCE_TABLE;
 import static com.mzc.db.DatabaseEntityMgrFactory.CREATE_TABLE_TAIL;
@@ -152,6 +152,23 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         entityMap.put(id, new EntityData<T>(id, clazz, entityField, t, period));
         return t;
     }
+    private T fullfileObject(ResultSet resultSet, List<String> fieldnames) throws Exception {
+        List<Field> fields = fieldnames.stream().map(s->entityField.getFieldByFieldName(s)).collect(Collectors.toList());
+        String classname = resultSet.getString(CLASSNAME_FIELD);
+        Class clazz = entityField.getClassByClassname(classname);
+        T t = (T) clazz.newInstance();
+        HashMap<String, Integer> nameIndexMap = new HashMap<>();
+        entityField.fullfillObject(f -> {
+            try {
+                String fieldName = ((Field) f).getName();
+                nameIndexMap.put(fieldName, resultSet.findColumn(fieldName));
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }, fields);
+        SqlUtil.constructObject(t, nameIndexMap, resultSet, fields);
+        return t;
+    }
 
     @Override
     public List<T> getEntitys(long[] ids) throws Exception {
@@ -179,7 +196,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             idMaps.entrySet().stream().forEach(e -> {
                 long[] pageIds = e.getValue();
                 String sql = tablePageManager.generageSelectSql(pageIds, e.getKey());
-                System.out.printf("mul select sql : %s\n", sql);
+//                System.out.printf("mul select sql : %s\n", sql);
                 try (PreparedStatement statement = conn.prepareStatement(sql)) {
                     for (int i = 0, len = pageIds.length; i < len; i++) {
                         statement.setLong((i + 1), pageIds[i]);
@@ -189,6 +206,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
                         T t = fullfileObject(resultSet);
                         result.add(t);
                     }
+                    resultSet.close();
                 } catch (Exception e1) {
                     throw new RuntimeException(e1);
                 }
@@ -204,7 +222,86 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     @Override
     public <S> List<S> queryFields(Class<S> clazz, long[] ids) throws Exception {
-        return null;
+        if (!clazz.isInterface()) {
+            throw new RuntimeException(String.format("[传入的class不是接口: %s]", clazz.getName()));
+        }
+        List<S> result = new ArrayList<>();
+        Map<TablePage, long[]> idMaps = new HashMap<>();
+        Arrays.stream(ids).distinct().forEach(id -> {
+            EntityData data = entityMap.get(id);
+            if (data != null && data.get() != null) {
+                result.add((S) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new EntityDataFieldHandler((T) data.get(), entityField)));
+                return;
+            }
+            TablePage page = tablePageManager.getPageByEntityId(id);
+            long[] value = idMaps.get(page);
+            long[] resultValue = null;
+            if (value == null) {
+                resultValue = new long[]{id};
+            } else {
+                resultValue = new long[value.length + 1];
+                System.arraycopy(value, 0, resultValue, 0, value.length);
+                resultValue[resultValue.length - 1] = id;
+            }
+            idMaps.put(page, resultValue);
+        });
+        List<String> fieldnames = CommonUtil.getFieldnames(clazz);
+        try (Connection conn = DatabaseEntityMgrFactory.getInst().getConnection()) {
+            idMaps.entrySet().stream().forEach(e -> {
+                long[] pageIds = e.getValue();
+                System.out.println(Arrays.toString(pageIds));
+                String sql = tablePageManager.generageSelectSql(pageIds, e.getKey(), fieldnames);
+                System.out.printf("mul select sql : %s\n", sql);
+                try (PreparedStatement statement = conn.prepareStatement(sql)) {
+                    for (int i = 0, len = pageIds.length; i < len; i++) {
+                        statement.setLong((i + 1), pageIds[i]);
+                    }
+                    ResultSet resultSet = statement.executeQuery();
+                    while (resultSet.next()) {
+                        T t = fullfileObject(resultSet, fieldnames);
+                        result.add((S) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new EntityDataFieldHandler(t, entityField)));
+                    }
+                    resultSet.close();
+                } catch (Exception e1) {
+                    throw new RuntimeException(e1);
+                }
+            });
+        }
+        return result;
+    }
+
+    class QueryFieldHandler implements InvocationHandler{
+
+        HashMap<String, Object> valueMap;
+
+        public QueryFieldHandler(HashMap<String, Object> valueMap) {
+            this.valueMap = valueMap;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            String methodname = method.getName();
+            String fieldname = CommonUtil.getFieldname(methodname);
+            return valueMap.get(fieldname);
+        }
+    }
+    class EntityDataFieldHandler implements InvocationHandler{
+
+        T t;
+        EntityField entityField;
+
+        public EntityDataFieldHandler(T t, EntityField entityField) {
+            this.t = t;
+            this.entityField = entityField;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            String methodname = method.getName();
+            String fieldname = CommonUtil.getFieldname(methodname);
+            Field field = entityField.getFieldByFieldName(fieldname);
+            return field == null ? null : field.get(t);
+        }
     }
 
     @Override
@@ -236,7 +333,6 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
             return;
         }
         data.notifyChanged(field);
-//        System.out.printf("[update, data: %s ]",data);
     }
 
     @Override
@@ -257,21 +353,21 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
 
     @Override
     public long count(Class<?> clazz, String prepareWhere, Object[] parameter) throws Exception {
-        Connection conn = null;
-        try {
-            conn = DatabaseEntityMgrFactory.getInst().getConnection();
-            Statement stat = conn.createStatement();
-
-        } finally {
-            conn.close();
+        long cnt = 0;
+        try(Connection conn = DatabaseEntityMgrFactory.getInst().getConnection(); Statement statement = conn.createStatement();) {
+            List<String> sqlList = tablePageManager.countAllSql();
+            for (String sql : sqlList) {
+                ResultSet resultSet = statement.executeQuery(sql);
+                if (resultSet.next()) {
+                    cnt += resultSet.getLong(1);
+                }
+            }
         }
-        return 0;
+        return cnt;
     }
 
     @Override
     public void init() throws Exception {
-        //每500ms检查所有改变的数据，查看是否达到入库条件
-//        DatabaseEntityMgrFactory.getInst().exexutor.scheduleAtFixedRate(this, INIT_DELAY_TIME, 500, TimeUnit.MILLISECONDS);
         this.pollDatabaseEntityId(0, true);
         this.initTable();
         this.initSubClass();

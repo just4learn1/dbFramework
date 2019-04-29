@@ -5,6 +5,7 @@ import com.mzc.db.config.EmfConfig;
 import com.mzc.db.mysql.MysqlEntityManager;
 import com.mzc.db.pool.ConnectionPool;
 import com.mzc.db.testEntity.Player;
+import com.mzc.db.testEntity.SimplePlayer;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -196,9 +197,15 @@ public class DatabaseEntityMgrFactory implements Runnable {
 
 //        TimeUnit.SECONDS.sleep(20);
 //        Player p2 = mgr.getEntity(1101000000000022529L);
-
-        List<Player> players = mgr.getEntitys(new long[]{1101000000000022529L, 1101000000000050177L, 1101000000000046081L, 1101000000000022529L});
-        players.forEach(System.out::println);
+//        long t1 = System.currentTimeMillis();
+//        List<Player> players = mgr.getEntitys(new long[]{1101000000000022529L, 1101000000000050177L, 1101000000000046081L, 1101000000000022529L});
+//        System.out.println((System.currentTimeMillis()-t1));
+//        players.forEach(System.out::println);
+        List<SimplePlayer> list = mgr.queryFields(SimplePlayer.class, new long[]{1101000000000022529L, 1101000000000050177L, 1101000000000046081L, 1101000000000022529L});
+        list.forEach(s->{
+            System.out.printf("[id: %d] [username: %s] [bb1: %d] [aa1: %s] \n", s.getId(), s.getUsername(), s.getBb1(), Arrays.toString(s.getAa1()));
+        });
+//        System.out.println(mgr.count());
         inst.destory();
         System.out.println("=======end========");
 //        for (; ; ) {

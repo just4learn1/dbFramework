@@ -73,5 +73,10 @@ public class EntityField {
             consumer.accept(k);
         });
     }
+    public void fullfillObject(Consumer consumer, List<Field> fields) {
+        fields.forEach(k -> {
+            consumer.accept(k);
+        });
+    }
 
 }
