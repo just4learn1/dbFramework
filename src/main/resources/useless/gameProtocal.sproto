@@ -1,0 +1,214 @@
+#3001 游戏服务器返回客户端的通用结果
+.G2C_RESULT
+{
+	result    0 :integer     #错误码，0表示成功
+	opCode    1 :integer     #表示是那个协议返回的结果
+	params    2 :*string      #客户端需要的一些参数信息
+}
+
+#3004 客户端通知服务器切图完成
+.C2G_MAP_ENTERD
+{
+	mapID     0 :integer     #地图ID
+}
+
+#3023 切换地图请求
+.C2G_MAP_CHANGE
+{
+	mapID     0 :integer     #地图ID
+	mapLine   1 :integer     #需要切换到的地图的分线数（如果为0，则服务器自动选择一个线数），进入普通地图时有效
+	mapType   2 :integer     #地图的类型，0表示普通地图（类似于大世界地图，所有人可以进入），1表示副本地图（有限人进入）
+}
+
+#3034 客户端请求展示动作
+.C2G_SHOW_ANIMATION
+{
+	animType	0:integer	#动作类型
+	duration	1:float		#持续时间
+}
+
+#3035 服务器广播展示动作
+.G2C_SHOW_ANIMATION
+{
+	charId		0:integer	#角色id
+	animType	1:integer	#动作类型
+	duration	2:float		#持续时间
+}
+
+#3037 向服务器查询角色位置
+.C2G_QUERY_CHAR_POS
+{
+	charId		0:integer	#角色id
+}
+
+#3038 服务器返回角色位置查询结果
+.G2C_QUERY_CHAR_POS
+{
+	charId		0:integer	#角色id
+	found		1:boolean	#是否找到
+	posX		2:float		
+	posY		3:float
+}
+
+#3052 客户端发送复活消息
+.C2G_REVIVE
+{
+	reviveType  0 :integer   #复活类型，0表示原地复活，1表示复活点复活
+}
+
+#3055 客户端请求退出副本
+.C2G_LEAVE_MAP
+{
+	
+}
+
+#物品信息
+.ItemInfoMapResult
+{
+	resType 0 : integer			#资源类型
+	resId 1 : integer			#资源ID
+	resValue 2 : integer		#资源数量
+}
+#3056 服务器发送结算信息到客户端
+.G2C_MAP_RESULT
+{
+	result 0 :integer           #副本是否成功, 0表示成功，非0表示不成功，表示为错误码
+	time   1 :integer           #在成功时存在，表示副本耗时
+	death  2 :integer           #在成功时存在，表示死亡次数
+    rewardList 3 : *ItemInfoMapResult    #奖励列表
+}
+
+#3060 联网调试消息返回客户端结果(无业务意义)
+.G2C_DEBUG_MSG
+{
+	numberList 0 : *float		#数字数组，按具体情况解析用
+	stringList 1 : *string		#字符串数组,按具体情况解析用
+	cmd 2 : string              #命令名
+}
+
+#3061 联网调试消息(无业务意义)
+.C2G_DEBUG_MSG
+{
+	destSvr 0 : integer # 目标服务器 1:Base 2:Map
+	cmdStr 1 : string	# 字符串	
+}
+
+#4300 服务器告知客户端有可领取的宝箱
+.G2C_HAVE_LEVEL_TREASURE
+{
+    rewardId 0 : integer    # 可以领取的宝箱
+}
+
+#4301 领取等级宝箱
+.C2G_GET_LEVEL_TREASURE_REWARD
+{
+    rewardId 0 : integer    # 要领奖的ID
+}
+
+# 通用的服务器普通存储协议
+.C2G_COMMON_SAVE_DATA
+{
+	type 0 : string # 类型
+	# key 1 : string # 要存储的键
+	data 1 : string # 要存储的值
+	isPushWhenLogin 2 : boolean # 是否登录时进行推送
+}
+
+# 通用的获取保存的信息协议
+.C2G_COMMON_GET_SAVE_DATA
+{
+	type 0 : string # 类型
+	# key 1 : string # 要存储的键
+}
+
+# 通用的保存的数据格式
+.COMMON_SAVE_DATA
+{
+	type 0 : string # 类型
+	key 1 : string # 要存储的键
+	data 2 : string # 要存储的值
+}
+
+# 通用的返回保存的信息协议
+.G2C_COMMON_RET_SAVE_DATA
+{
+	type 0 : string # 类型
+	key 1 : string # 要存储的键
+	data 2 : string # 要存储的值
+}
+
+.SYNC_COMMON_SAVE
+{
+	syncData 0 : *G2C_COMMON_RET_SAVE_DATA
+}
+
+# 通用的数据库向MapServer返回存储数据的协议
+.D2M_COMMON_RET_SAVE_DATA
+{
+	dataTable 0 : *COMMON_SAVE_DATA
+}
+
+# 个人BOSS的条目信息
+.SINGLE_BOSS_ITEM_INFO
+{
+	floorIndex 0 : integer # 层数序号
+	challengeNum 1 : integer # 剩余的挑战次数
+	buyNum 2 : integer # 剩余可购买的挑战次数
+	regainTime 3 : integer # 下次恢复时间
+}
+
+# 服务器告诉客户端当前个人boss的相关状态
+.G2C_SINGLE_BOSS_STATE
+{
+	successfulMaxFloor 0 : integer # 当前挑战成功的最大层数
+	yesterdaySuccessfulMaxFloor 1 : integer # 昨天挑战成功的最大层数
+	singleBossItemInfo 2 : *SINGLE_BOSS_ITEM_INFO # 当前挑战的每层的信息
+}
+
+# 购买个人BOSS次数
+.C2G_BUY_SINGLE_BOSS_TIME
+{
+	floorIndex 0 : integer # 层数序号
+}
+
+# 返回个人BOSS的地图信息
+.G2C_SINGLE_BOSS_MAP_STATE
+{
+	restFinishTime 0 : integer # 通关剩余时间
+}
+
+# 服务器返回个人BOSS是否成功
+.G2C_SINGLE_BOSS_RESULT
+{
+	result 0 : integer # 结果
+}
+
+.C2G_ENTER_SINGLE_BOSS
+{
+	mapID     0 :integer     #地图ID
+}
+
+.G2C_SYNC_PLAYER_DAMAGE_STATISTIC
+{
+	totalDamage 0 : integer  # 总伤害值
+	statisticTime 1 : integer # 统计时间，以秒为单位
+}
+
+# 用户的活力值信息同步
+.G2C_PLAYER_EXP_ENERGY
+{
+	cur 0 : integer			# 当前剩余的活力值(这个值是对应的经验,客户端展示的时候,需要➗10000后取整)
+	max 1 : integer			# 如果max是0,则表示当前活力值系统没有开启
+	# 服务器跨天,用户登录,用户升级时主动推送
+	# 游戏中如果有活力值的增加例如,使用道具增加的也会重新推送
+	# 但是杀怪引起的扣除不会推送,客户端需要	根据G2C_KILL_MONSTER_EXP_ADD消息自行维护
+} 
+
+# 用户杀怪经验加成
+.G2C_KILL_MONSTER_EXP_ADD
+{
+	exp 0 : integer			# 怪物自身掉落的经验
+	energyExp 1 : integer	# 因为有活力值额外增加的经验(如果这个字段为nil则表示,没有因为活力值额外掉落经验)
+	# 另外客户端收到这个消息后,需要修改本地的经验值数值,修改量为exp+energyExp , 
+	# 同时还有修改活力值系统的剩余量.
+}

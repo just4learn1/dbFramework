@@ -1,0 +1,180 @@
+
+# 	查看威望排行榜
+.C2G_GUILDWAR_VIEW_PRESTIGE
+{	
+}
+#请求查看系统内排行榜(未开战情况，未获取数据)
+.C2G_GUILDWAR_VIEW_BOARDINFO
+{	
+}
+.sBoardInfo
+{
+	ranknum		0	: 	integer		#名次
+	guildName	1	:	string		#名称
+	guildLeader	2	:	string		#帮主
+	power		3	:	integer		#战斗力
+	prestige	4	:	integer		#本周威望
+	guildId		5	:	integer		#id
+	country		6	:	integer		#国家
+	guildLv		7	:	integer		#等级
+}
+.G2C_GUILDWAR_VIEW_BOARDINFO
+{
+	board 	0	:	*sBoardInfo		#帮派列表
+	waring  1  	: 	boolean			#是否战斗中
+}
+
+#参战的帮派
+.sJoinGuild
+{
+	ranknum		0	: 	integer		#名次
+	power		1	:	integer		#战斗力
+	guildName	2	:	string		#名称
+	guildLeader	3	:	string		#帮主
+	guildLv		4	:	integer		#等级
+	guildId		5	:	integer		#id
+	country		6	:	integer		#国家
+}
+# 	查看参战的帮派
+.C2G_GUILDWAR_VIEW_JOIN
+{
+}
+# 返回参战帮派
+.G2C_GUILDWAR_VIEW_JOIN
+{	
+	joinGuild 	0	:	*sJoinGuild		#参战的帮派
+}
+#######################
+#	请求对战信息
+.sGwUnitInfo
+{
+	name		0	:	string
+	totalPower	1	:	integer		#战斗力
+	winRate		2	:	float		#胜率
+	curPoint	3	:	integer		#积分
+	bestScore	4	:	integer		#最好成绩
+	logo		5	:	string		#签名
+	guildId	    6	: 	integer		#帮派id
+}
+.C2G_GUILDWAR_WARINFO
+{
+}
+# 	返回对战信息
+.G2C_GUILDWAR_WARINFO
+{
+	groupId		0	: 	integer		#组id
+	timeLeft	1	: 	integer		#剩余时间(传递本场结束的绝对时间)
+	guild_1		2	: 	sGwUnitInfo	
+	guild_2		3	: 	sGwUnitInfo	
+}
+
+.G2C_GUILDWAR_WARINFO_RT
+{
+	rtCode		0	:	integer		#返回码
+}
+
+#######################
+#查看恩怨组
+.C2G_GUILDWAR_VIEW_GROUP
+{
+}
+.sGroup
+{
+	index		0	:	integer			#恩怨组索引
+	enemyNo		1	:	integer			#敌人个数
+	friendNo	2	:	integer			#友方人数
+}
+.G2C_GUILDWAR_VIEW_GROUP
+{
+	sGroup		0	: 	*sGroup
+}
+
+#######################
+#	选择恩怨组，进入战场
+.C2G_GUILDWAR_SEL_GROUP
+{
+	index		0	:	integer			#进入的恩怨组id
+}
+
+# 	 退出战场
+.C2G_GUILDWAR_QUIT
+{
+}
+
+#######################
+#		-- 战斗结束，结果显示
+.sPlayerRst
+{
+	index				0	:	integer			#名次
+	playerName			1	:	string			#名字
+	kill				2	:	integer			#杀人数
+	die					3	:	integer			#死亡次数
+	point				4	:	integer			#积分
+}
+.sGuildRst
+{
+	guildName			0	:	string			#帮会名称			
+	guildId				1	:	integer			#帮会id
+	totalPoint			2	:	integer			#帮派获得的总积分
+	totalPrestige		3	:	integer			#帮派获得的总威望
+	list				4	:	*sPlayerRst
+}
+.G2C_GUILDWAR_RESULT
+{
+	isWin				0	:	integer			#是否获胜
+	totalKill			1	:	integer			#总共杀人数
+	totalDie			2	:	integer			#总死亡次数
+	myPriExp			3	:	integer			#我的经验奖励
+	myPriMoy			4	:	integer			#我的银币奖励
+	myPriGudDevote		5	:	integer			#我的帮贡奖励
+	friendGuild			6	:	sGuildRst		#友方
+	enemyGuild			7	:	sGuildRst		#敌方
+}
+
+#积分信息
+.sPointInfo{
+	nationalId			0	:	integer			#国家id
+	guildId				1	:	integer			#帮派id
+	value				2	: 	integer			#值
+	guildLogo			3 	:	string			#签名
+	pvpTeam				4	: 	integer			#队伍标志 11,12
+}
+#######################
+#进入的时候返回积分、国家信息
+.G2C_GUILDWAR_INIT_POINT
+{
+	enemyInfo			0 	: 	sPointInfo		#敌人积分信息
+	myInfo				1	:	sPointInfo		#友方积分信息
+	timeLeft			2	: 	integer			#剩余的结束时间
+}
+
+#######################
+#更新改动的积分
+.G2C_GUILDWAR_UPDATE_POINT
+{
+	guildId				0	:	integer			#帮派id
+	value				1	: 	integer			#值
+}
+
+#######################
+#通知客户端
+.G2C_GUILDWAR_CLOSE_WAR
+{
+
+}
+
+#######################
+#请求和并
+.C2G_GUILDWAR_REQUESTS
+{
+
+}
+
+#######################
+#通知红点
+.G2C_GUILDWAR_NOTICE
+{
+	msg			0	: 	integer
+}
+
+

@@ -1,0 +1,102 @@
+
+#夺宝数据
+.Lotty_Data
+{
+	blessNum	0	:	integer
+	lottyCnt	1	:	integer
+	outputRecord	2	:	*Lotty_Record
+	knapStrs	3	:	*string
+}
+#物品信息
+.Lotty_Item
+{
+	resType	0	:	integer
+	resId	1	:	integer
+	resValue	2	:	integer
+	resStr	3	:	string
+}
+.LOTTY_GOOD_DATA
+{
+	resType	0	:	integer	#资源类型
+	resId	1	:	integer	
+	resValue	2	:	integer
+	equipInfo	3	:	EQUIPMENTINFO
+	bind	4	:	integer
+}
+#获取次数记录
+.Lotty_Record
+{
+	lottyId	0	:	integer
+	frequency	1	:	integer	#获取次数
+}
+#夺宝记录数据
+.Lotty_Record_data
+{
+	itemInfo	0	:	string
+	playerName	1	:	string
+	createTime	2	:	integer
+	goodInfo	3	:	LOTTY_GOOD_DATA
+}
+.D2B_QUERY_GLOBAL_LOTTY_DATA
+{
+	recordData	0	:	*Lotty_Record_data
+}
+#打开商城夺宝界面
+.C2G_OPEN_LOTTY
+{
+}
+.G2C_OPEN_LOTTY
+{
+	luckyNum	0:	integer	#幸运值
+}
+#请求夺宝奖池数据
+.C2G_LOTTY_KNAP_DATA
+{
+}
+#请求夺宝奖池数据返回
+.G2C_LOTTY_KNAP_DATA
+{
+	itemDatas	0	:	*LOTTY_GOOD_DATA
+}
+
+
+#商城夺宝
+.C2G_START_LOTTY
+{
+	times	0	:	integer		#夺宝次数，1或者 Const表中的TreasureComboNum
+}
+#商城夺宝返回
+.G2C_START_LOTTY
+{
+	times	0	:	integer
+	treasureIndex	1	:	*LOTTY_TREASURE_DATA
+	luckyNum	2:	integer	#幸运值
+}
+.LOTTY_TREASURE_DATA
+{
+	treasureIndex	0	:	integer
+	itemData	1	:	LOTTY_GOOD_DATA
+}
+#请求个人夺宝记录
+.C2G_QUERY_PLAYER_LOTTY_RECORD
+{
+}
+#请求个人夺宝记录返回
+.G2C_QUERY_PLAYER_LOTTY_RECORD
+{
+	records	0	:	*Lotty_Record_data
+}
+#请求全服夺宝记录
+.C2G_QUERY_GLOBAL_LOTTY_RECORD
+{
+
+}
+#请求全服夺宝记录返回
+.G2C_QUERY_GLOBAL_LOTTY_RECORD
+{
+	records	0	:	*Lotty_Record_data
+}
+#领奖
+.C2G_RECEIVE_LOTTY_REWARK
+{
+}

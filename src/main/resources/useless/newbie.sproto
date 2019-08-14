@@ -1,0 +1,17 @@
+#
+.G2C_GET_NEWBIE
+{
+    allPassed 0 : boolean # 全部通过
+    passed 1 : *integer # 已通过的新手引导
+}
+
+#通过一个新手引导
+.C2G_PASS_NEWBIE
+{
+    newbie 0 : integer # 通过的新手引导
+}
+
+# 通过所有新手引导
+.C2G_PASSALL_NEWBIE
+{
+}

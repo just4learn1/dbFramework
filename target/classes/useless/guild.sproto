@@ -1,0 +1,640 @@
+##################################服务器端协议#######################################
+#帮会信息
+.DB_GUILD
+{
+	guildId 0 : integer
+	guildName 1 : string
+	camp 2 : integer
+	guildLogo 3 : string
+	guildLv 4 : integer
+	guildFunds 5 : integer
+	notice 6 : string
+	recruitState 7 : integer
+	recordUpLevelTime 8 : integer
+	affairsIndex 9 : integer
+	incomePunishState 10 : integer
+	kingGuild 11 : integer
+}
+
+#成员信息
+.DB_MEMEBR
+{
+	memberId 0 : integer
+	guildId 1 : integer
+	guildJob 2 : integer
+	joinTime 3 : integer
+}
+
+#申请信息
+.DB_APPLY
+{
+	guildId 0 : integer
+	playerId 1 : integer
+	applyTime 2: integer
+}
+
+#事件信息
+.DB_AFFARIS
+{
+	guildId 0 : integer
+	affairsIndex 1 : integer
+	affairsType 2 : integer
+	affairsTime 3 : integer
+	args 4 : *string
+	affairsCharId 5 : integer 
+}
+
+#退出帮会记录
+.DB_QUITGUILDRECORD
+{
+	playerId 0 : integer
+	guildId 1 : integer
+	quitTime 2 : integer
+	penaltyReallyDevote 3 : integer
+	penaltyWeekDevote 4 : integer
+}
+
+#帮会建筑数据
+.DB_GUILDBUILD
+{
+	guildId 0 : integer
+	buildType 1 : integer
+	isUnlock 2 : integer
+	buildLv 3 : integer
+	nextUpLvTime 4 : integer
+}
+
+# 帮会BOSS数据信息
+.DB_GUILD_BOSS_DATA
+{
+	guildId 0 : integer
+	bossId 1 : integer
+	beginTime 2 : integer
+	lastKillTime 3 : integer
+	tomorrowBeginTime 4 : integer
+	updateTime 5 : integer
+}
+
+#帮会相关信息
+.D2B_GUILD_QUERY
+{
+	guildData 0 : *DB_GUILD
+	guildMember 1 : *DB_MEMEBR
+	guildApply 2 : *DB_APPLY
+	guildAffairs 3 : *DB_AFFARIS
+	quitGuildRecord 4 : *DB_QUITGUILDRECORD
+	guildBuild 5 : *DB_GUILDBUILD
+	guildBoss 6 : *DB_GUILD_BOSS_DATA
+	finish 7 : integer
+	effectPlay 8 : *B2D_GUILD_LVUP_EFFECT_PLAYER_LIST
+}
+
+#切图信息
+.B2M_GUILD_SCENE_INFO
+{
+	instID 0 : integer
+	guildId 1 : integer		
+}
+
+.GuildShopLvl
+{
+    bType 0 : integer
+    lvl 1 : integer
+    isUnLock 2 : integer
+}
+
+# 简单的帮会信息,用于同步给Map使用
+.SimpleGuildInfo
+{
+    guildId 0 : integer             # 帮会ID
+    camp 1 : integer                # 所属阵营
+    guildLvls 2 : *GuildShopLvl     # 帮会的各个等级(包括建筑和等级)
+}
+
+#帮会信息同步 由Base同步给Map,便于Map处理处理逻辑
+.B2M_GUILD_DATA_SYNC
+{
+    guildInfo 0 : *SimpleGuildInfo
+}
+
+##################################客户端协议#######################################
+
+
+#创建帮会
+.C2G_CREATE_GUILD
+{
+	guildName 0 : string
+	guildLogo 1 : string
+	notice 2 : string
+	autoRecruit 3 : integer 	# 招募的默认规则
+}
+
+#申请加入帮会
+.C2G_APPLY_GUILD
+{
+	guildId 0 : integer
+}
+
+#一键申请加入帮会
+.C2G_ONE_KEY_APPLY_GUILD
+{
+}
+
+
+#审批帮会加入申请
+.C2G_APROVALE_APPLY
+{
+	targetId 0 : integer
+	bAllow 1 : boolean
+}
+
+#一键审批申请
+.C2G_ONE_KEY_APROVALE_APPLY
+{
+	bAllow 0 : boolean
+}
+
+
+#退出帮会
+.C2G_QUIT_GUILD
+{
+}
+
+#踢出帮会成员
+.C2G_EXPEL_MEMBER
+{
+	targetId 0 : integer
+}
+
+#调整职位
+.C2G_ADJUST_GUILD_JOB
+{
+	targetId 0 : integer
+	guildJob 1 : integer
+}
+
+#修改帮派公告
+.C2G_ALTER_GUILD_NOTICE
+{
+	notice 0 : string
+}
+
+#修改帮派名字
+.C2G_ALTER_GUILD_NAME
+{
+	guildName 0 : string
+}
+
+#修改招募状态
+.C2G_ALTER_RECUIT_STATE
+{
+	state 0 : integer
+}
+
+#弹劾帮主
+.C2G_DELATE_LEADER
+{
+}
+
+#辞职
+.C2G_RESIGN_GUILD_JOB
+{
+}
+
+#帮会每日签到
+.C2G_DAY_GUILD_SIGN
+{
+}
+
+#每日捐献
+.C2G_GUILD_DONATE
+{
+	donateType 0 : integer		#SC_EnumType.DonateType
+	param 1 : integer			#捐献参数
+}
+
+#获取帮会列表
+.C2G_GET_GUILD_LIST
+{
+}
+
+#帮会相关信息
+.GuildData
+{
+	guildId 0 : integer					#帮会ID
+	guildName 1 : string				#帮会名字
+	guildLv 2 : integer					#帮会等级
+	memberNum 3 : integer				#帮会成员人数
+	leaderId 4 : integer				#帮主ID
+	leaderNick 5 : string				#帮主昵
+	leadercamp 6 : integer				#帮主阵营
+	guildLogo 7 : string				#榜徽
+	notice 8 : string					#帮会公告
+	recordUpLevelTime 9 : integer		#记录帮会升级的时间
+	memberMaxCount 10 : integer			#帮会玩家上限
+}
+
+#返回帮会列表
+.G2C_GET_GUILD_LIST
+{
+	guildList 0 : *GuildData			#帮会列表中帮会数据
+	myApplySet 1 : *integer				#我申请的帮会集合
+	nextOneKeyApplyTime 2 : integer		#下次一键申请的时间
+	enterGuildTime 3 : integer			#上次进入帮会时间，用来判断CD用
+}
+
+#更新帮会成员信息
+.G2C_UPDATE_MEMBER_INFO
+{
+	affairsRedPoint 0 : boolean
+	applyRedPoint 1 : integer
+}
+
+#获取帮会信息
+.C2G_GET_GUILD_INFO
+{
+
+}
+
+#帮会详细信息
+.G2C_GET_GUILD_INFO
+{
+	guildId 0 : integer					#帮会ID
+	guildName 1 : string				#帮会名字
+	guildLogo 2 : string				#榜徽
+	guildLv 3 : integer					#帮会等级
+	memberNum 4 : integer				#帮会成员人数
+	guildFunds 5 : integer				#帮会资金
+	notice 6 : string					#帮会公告
+	leaderNick 7 : string				#帮主昵称
+	leaderJob 8 : integer				#帮主职业
+	supportNick 9 : string				#副帮主昵称
+	supportJob 10 : integer				#副帮主职业
+	rightNick 11 : string				#右护法昵称
+	rightJob 12 : integer				#右护法职业
+	leafNick 13 : string				#左护法昵称
+	leafJob 14 : integer				#左护法职业
+	myGuildJob 15 : integer				#我的职务
+	affairsRedPoint 16 : boolean		#事务红点
+	applyRedPoint	17 : integer #申请人员个数，原先红点用，现在改为发送申请的个数
+	rankNum 18 : integer				#帮会排名
+	memberMaxCount 19 : integer			#帮会人数上限
+	guildFightVal 20 : integer			#帮会繁荣度（战力）
+	buildRedPoint 21 : boolean			#建筑升级红点
+	guildFundsMax 22 : integer			#帮会资金上限
+	leaderLvl 23 : integer				#帮助 , 副帮主 , 左右护法等级
+	supportLvl 24 : integer 
+	rightLvl 25 : integer
+	leftLvl 26 : integer
+}
+
+
+#获取成员信息
+.C2G_GET_GUILD_MEMBER_LIST
+{
+}
+
+#帮会成员信息
+.GuildMember
+{
+	memberId 0 : integer		#玩家id
+	memberNick 1 : string		#昵称
+	level 2 : integer			#等级
+	guildJob 3 : integer		#职务
+	weekGuildDevote 4 : integer	#周帮贡
+	guildDevote 5 : integer		#帮贡
+	isOnline 6 : boolean		# 是否在线
+	logoutTime 7 : integer		#登出时间
+	vipLv 8 : integer			#vip
+	camp 9 : integer			#阵营
+	job 10 : integer			#职业	
+	teachState 11 : integer		#传授的状态  0 什么也干不了 1.传授 2被传授
+	totalGuildDevote 12 : integer # 总历史帮贡
+	fightVal 13 : integer     # 战斗力
+}
+
+#获取成员信息
+.G2C_GET_GUILD_MEMBER_LIST
+{
+	memberList 0 : *GuildMember
+}
+
+#获取事务信息列表
+.C2G_GET_GUILD_AFFAIRS_LIST
+{
+}
+
+.Affairs
+{
+	affairsType 0 : integer
+	affairsTime 1 : integer
+	args 2 : *string
+	affairsCharId 3 : integer
+}
+
+#返回事务信息列表
+.G2C_GET_GUILD_AFFAIRS_LIST
+{
+	affairsList 0 : *Affairs 
+}
+
+
+#获取帮会申请列表
+.C2G_GUILD_APPLY_LIST
+{
+}
+
+#申请信息
+.GuildApplyInfo
+{
+	applyId 0 : integer
+	applyNick 1 : string
+	level 2 : integer
+	vipLv 3 : integer	
+	fightVal 4 : integer
+	applyTime 5 : integer					
+}
+
+#返回帮会申请列表
+.G2C_GUILD_APPLY_LIST
+{
+	applyList 0 : *GuildApplyInfo
+	recruitState 1 : integer	#招募状态
+}
+
+#获取捐献记录
+.C2G_GET_DONATE_RECORD
+{
+}
+
+#返回获取捐献记录
+.G2C_GET_DONATE_RECORD
+{
+	donateRecord 0: *Affairs
+}
+
+#解散帮会
+.C2G_DISMISS_GUILD
+{
+}
+
+#建筑升级
+.C2G_UP_GUILD_BUILD_LV
+{
+	buildType 0 : integer
+}
+
+#获取建筑信息
+.C2G_GET_BUILD_INFO
+{
+}
+
+#建筑信息
+.Build
+{
+	buildType 0 : integer
+	isUnlock 1 : integer
+	buildLv 2 : integer
+	nextUpLvTime 3 : integer
+}
+
+.G2C_GET_BUILD_INFO
+{
+	guildId 0 : integer
+	buildInfo 1 : *Build
+}
+
+
+#帮会商店兑换商品
+.C2G_BUY_GUILD_SHOP_ITEM
+{
+	pos 0 : integer				#兑换栏位
+	exchangeTimes 1 : integer	#兑换次数
+}
+
+#点赞
+.C2G_CLICK_PRAISE
+{
+	targetId 0 : integer
+}
+
+#移交帮主
+.C2G_TRANSFER_GUILD_LEADER
+{
+	targetId 0 : integer
+}
+
+#进入帮会场景
+.C2G_ENTER_GUILD_SCENE
+{
+}
+
+#进入帮会场景
+.C2G_LEAVE_GUILD_SCENE
+{
+}
+
+#邀请入帮
+.C2G_INVITE_JOIN_GUILD
+{
+	playerId 0 : integer	#邀请玩家ID
+}
+
+#通知玩家被邀请
+.G2C_NOTICE_INVITED
+{
+	charId 0 : string		#玩家ID
+	charName 1 : string		#邀请玩家名字
+	guildId 2 : integer		#帮会ID		
+	guildName 3 : string	#帮会名字
+	validTime 4 : integer	#有效时间
+}
+
+#响应邀请
+.C2G_RESPONSE_INVITE
+{
+	isAgree 0 : boolean		#是否同意
+	guildId 1 : integer		#帮会Id
+}
+
+#通知玩家的职务
+.G2C_PLAYER_GUILD_JOB
+{
+	guildJob 0 : integer
+}
+
+#帮会宴饮酒
+.C2G_GUILD_DRINK_WINE
+{
+	quality 0 : integer
+}
+
+#帮会捐献奖励
+.G2C_GUILD_DONATE_PRIZE
+{
+	obtainGuildFunds 0 :  integer		 #获得的帮会资金
+	obtainGuildDevote 1 :  integer		 #获得的帮贡
+}
+
+#客户端请求建筑等级及解锁状态
+.C2G_SYNC_GUILD_BUILD_INFO
+{
+	buildType 0 : integer
+}
+
+#同步客户端建筑等级及解锁状态
+.G2C_SYNC_GUILD_BUILD_INFO
+{
+	buildType 0 : integer
+	buildLv 1 : integer
+	isUnlock 2 : integer
+}
+
+#客户端请求使用召集令
+.C2G_USE_GUILD_CALL_ITEM
+{
+}
+
+#发送帮会召集令
+.G2C_GUILD_CALL
+{
+	callIndex 0 : integer
+	guildJob 1 : integer
+	nickName 2 : string
+}
+
+#响应帮会召集令
+.C2G_RESPONSE_GUILD_CALL
+{
+	callIndex 0 : integer
+}
+
+#领取帝王帮俸禄
+.C2G_RECEIVE_KING_GUILD_PRIZE
+{
+}
+
+#帮会答题活动题目
+.G2C_GUILD_ANSWER_TITLE
+{
+	index 0 : integer		#序号
+	titleId 1 : integer		#题目ID
+	startTime 2 : integer	#本题答题开始
+	endTime 3 : integer	#本题答题结束
+}
+
+#答题结果
+.C2G_REPLY_QUESTION
+{
+	index 0 : integer
+	replyContent 1 : string
+}
+
+#答题重连发送题目序号
+.G2C_RECONNECT_ANSWER_TITLE
+{
+	index 0 : integer
+	remindReplayTime 1 : integer
+}
+
+#请求传功
+.C2G_REQUEST_GUILD_TEACH
+{
+	teachType 0 : integer		# 传功类型 1 传授功力  2 请求传功
+	targetId 1 : integer     	#
+}
+
+#通知玩家传功请求
+.G2C_NOTICE_GUILD_TEACH
+{
+	teachType 0 : integer		# 传功类型 1 传授功力 2 请求传功
+	targetId 1 : integer
+	targetName 2 : string
+}
+
+#响应传功
+.C2G_RESPONSE_GUILD_TEACH
+{
+	teachType 0 : integer		# 传功类型 1 传授功力 2 请求传功
+	isAgree 1 : boolean
+	targetId 2 : integer	
+}
+
+#通知前端对方外观
+.G2C_GUILD_TEACH_APPEAR
+{
+	roleClass 0 : integer
+	hairId 1 : integer
+	faceId 2 : integer
+	artiWpId 3 : integer
+	artiArmorId 4 : integer
+	fashionFaceId 5 : integer
+	fashionWeaponId 6 : integer
+	fashionDressId 7 : integer
+}
+
+#通知对方拒绝传功
+.G2C_REFUSE_GUILD_TEACH
+{
+	teachType 0 : integer
+	targetName 1 : string
+}
+
+# MapServer向BaseServer请求返回到帮会场景中
+# 如果失败，BaseServer会把玩家传送到主城
+.M2B_RETURN_GUILD_SCENE
+{
+
+}
+
+# BaseServer向MapServer返回帮会场景实例Id
+.B2M_RETURN_GUILD_SCENE
+{
+	guildSceneInstId 0 : integer # 如果实例Id是0的话，则跳转到主城即可
+}
+
+# 请求酿酒协议
+.C2G_REQ_WINE_MAKE
+{
+	id 0 : integer  # 要酿酒的id
+	useUnbind 1 : boolean  # 是否强制使用非绑定材料
+	materials 2 : *UniqueResInfo  # 额外消耗的材料资源
+}
+
+# 服务器返回酿酒结果
+.G2C_REQ_WINE_MAKE
+{
+	result 0 : integer  # 酿酒请求是否成功, 0为成功
+	commonUpdate 1 : G2C_COMMON_UPDATA_INFO  # 酿酒引起的物品变化
+}
+
+# 请求今日已经酿酒的次数
+.C2G_REQ_TODAY_WINE_MAKE_TIME
+{
+
+}
+
+# 服务器返回今日已经酿酒的次数
+.G2C_REQ_TODAY_WINE_MAKE_TIME
+{
+	wineMakeTime 0 : integer  # 今日已经酿酒的次数
+}
+
+# 向服务器请求帮会升级特效是否播放
+.C2G_REQ_GUILD_LVUP_EFFECT_PLAY
+{
+
+}
+
+# 服务器向客户端返回升级特效是否播放
+.G2C_REQ_GUILD_LVUP_EFFECT_PLAY
+{
+	isPlayed 0 : boolean  # 是否已经播放
+}
+
+# 请求保存已经播放的玩家列表
+.B2D_GUILD_LVUP_EFFECT_PLAYER_LIST
+{
+	guildId 0 : integer  # 工会ID
+	playerIdList 1 : *integer  # 已经播放的玩家列表
+}

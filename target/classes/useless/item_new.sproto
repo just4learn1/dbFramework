@@ -1,0 +1,48 @@
+# 新物品结构
+.Item_NEW{
+	id 0 : integer				# 主键ID,对于单个用户自增长(业务逻辑是:一堆儿物品)
+	itemId 1 : integer			# 对应道具表ID
+	cnt 2 : integer 			# 数量
+	bind 3 : integer			# 绑定状态 0:非绑定 1:绑定 对应枚举:SC_EnumType.BindState
+	expireTick 4 : integer		# 过期时间 0:永久道具 , 非0:过期的UTC时刻,单位秒
+	soldTick 5 : integer        # 出售时间 0:未出售 , 非0:卖出的UTC时刻,单位秒 
+	curExp 6 : integer			# 专用字段:经验丹,当前炼化的经验值
+	treasurePos 7 : integer		# 藏宝图专用字段：记录了该藏宝图道具对应的藏宝位置
+}
+
+# ===============================↓ 交互消息 ↓============================  
+
+# 同步道具信息(背包整理)
+.C2G_SYNC_ALL_ITEM{
+	
+}
+.G2C_SYNC_ALL_ITEM{
+	allItem 0 : *Item_NEW(id)
+}
+
+
+# 服务器向客户端同步道具变化
+.G2C_SYNC_ITEM_CHANGE{
+	changeItems 0 : *Item_NEW		# 物品属性/数量变化,以Id与本地匹配
+	delItemIds 1 : *integer			# 删除的物品主键ID
+	costBind 2 : boolean			# 本次操作是否包含绑定物品扣除
+}
+# 客户端请求使用物品
+.C2G_USE_ITEM_NEW{
+	id 0 : integer
+	cnt 1 : integer
+}
+
+# 客户端请求出售物品
+.C2G_SELL_GOODS_NEW{
+	id 0 : integer
+	cnt 1 : integer	
+}
+
+# 扔物品
+
+# 下面几个交互协议,为了减少拼包操作,不封装结构了
+# .M2D_ADD_ITEM{}		# 添加物品 , 直接发送Item_NEW
+# .M2D_UPDATE_ITEM{}	# 更新物品 , 直接发送Item_NEW
+# .M2D_DEL_ITEM{}		# 删除物品 , 直接发送物品的id 二进制:"I"
+# .M2D_UPDATE_ITEM_CNT  # 更新物品-只更新数量 , 直接发送物品的id,新数量 二进制:"I2"

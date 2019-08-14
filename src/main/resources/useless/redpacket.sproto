@@ -1,0 +1,125 @@
+#红包
+# 新红包信息
+.G2C_NEW_REDPACKET
+{
+	id 0 : integer			#id
+	name 1 : string			#发包者
+	time 2 : integer		#发包时间
+	wish 3 : string			#祝语
+	type 4 : integer		#类型
+	typeid 5 : integer		#类型数据
+	num 6 : integer			#个数
+	got 7 : integer			#己领个数
+	recvers 8 : *integer	#己领者charid
+	vip    9 : integer      #vip等级
+	job   10 : integer    	#职业 
+	level  11 : integer    	#等级
+	charId  12 : integer    #角色id服务器唯一
+	money  13 : integer    #总额
+}
+
+# 请求红包列表/刷新
+.C2G_GET_REDPACKETLIST
+{
+}
+
+#单红包信息
+.s_REDPACKETLIST
+{
+	id 0 : integer			#id
+	name 1 : string			#发包者
+	time 2 : integer		#发包时间
+	wish 3 : string			#祝语
+	type 4 : integer		#类型
+	typeid 5 : integer		#类型数据
+	num 6 : integer			#个数
+	got 7 : integer			#己领个数
+	recvers 8 : *integer	#己领者charid
+	money  9 : integer    #总额
+}
+# 返回红包列表
+.G2C_GET_REDPACKETLIST
+{
+	list 0 : *s_REDPACKETLIST	#红包列表
+}
+.D2B_GET_REDPACKETLIST
+{
+	list 0 : *s_REDPACKETLIST	#红包列表
+}
+
+# 发红包
+.C2G_SEND_REDPACKET
+{
+	type  0 : integer			#分类
+	money  1 : integer			#总值
+	num  2 : integer			#个数
+	wish 3 : string				#祝福语
+}
+
+# 抢红包
+.C2G_GET_REDPACKET
+{
+	id  0 : integer
+}
+#红包光了
+.G2C_REDPACKET_OUT
+{
+	id  0 : integer			
+	name  1 : string		#发包者
+}
+# 请求红包详情
+.C2G_REDPACKET_INTO
+{
+	id  0 : integer
+}
+
+#单条红包详情
+.s_REDPACKETINFO
+{
+	orderid 0 : integer		#顺序
+	recver 1 : string		#领取者
+	charId 2 : integer		#领取者id
+	time 3 : integer		#领取时间
+	money 4 : integer		#价值
+}
+# 返回红包详情
+.G2C_REDPACKET_INTO
+{
+	id  0 : integer
+	list 1 : *s_REDPACKETINFO
+}
+.D2B_REDPACKET_INTO
+{
+	id  0 : integer
+	list 1 : *s_REDPACKETINFO
+}
+
+
+# 请求我的红包记录
+.C2G_MY_REDPACKET
+{
+}
+
+#单条记录
+.s_REDPACKET
+{
+	time 0 : integer                #时间
+	num 1 : integer                	#钱 正入负出
+}
+# 返回我的红包记录
+.G2C_MY_REDPACKET
+{
+	sendnum 0 : integer  	#发个数
+	recvnum 1 : integer  	#收个数
+	sendamount 2 : integer  #支出
+	recvamount 3 : integer  #收入
+	list 4 : *s_REDPACKET	#列表
+}
+.D2B_MY_REDPACKET
+{
+	sendnum 0 : integer  	#发个数
+	recvnum 1 : integer  	#收个数
+	sendamount 2 : integer  #支出
+	recvamount 3 : integer  #收入
+	list 4 : *s_REDPACKET	#列表
+}

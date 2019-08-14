@@ -1,0 +1,28 @@
+#戒指信息(用于G2C之间传递数据)
+.RingInfo
+{
+	ringId 0 : integer			#戒指Id，服务器生成的实例id
+	templateId 1 : integer			#excel配置的模板id
+}
+
+##############################################################
+
+#戴上结婚戒指请求
+.C2G_RING_EQUIP
+{
+	ringId 0 : integer			# 戒指id
+}
+#戴上结婚戒指应答
+.G2C_RING_EQUIP
+{
+	ringId 0 : integer			# 戒指id
+	equipValid 1 : integer			# 是否有效  0：失效   1：有效
+}
+#服务器推送戒指信息
+.G2C_RING_SYNC
+{
+	ringEquipId 0 : integer  		#已装备戒指id
+	equipValid 1 : integer			# 是否有效  0：失效   1：有效
+	ringList 2 : *RingInfo			#非卖出的戒指（已装备和背包内戒指）
+	ringSolded 3 : *RingInfo  		#卖出的戒指(尚可赎回) 
+}

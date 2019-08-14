@@ -1,0 +1,123 @@
+#装备翅膀
+.C2G_EQUIP_ON_WING
+{
+	wingId 0 : integer			#翅膀ID
+}
+
+#卸下翅膀
+.C2G_EQUIP_OFF_WING
+{
+
+}
+
+#聚灵
+.C2G_ADVANCE_WING
+{
+	attrEntry 0 : integer		#属性条数	SC_EnumType.WingAttrEntry
+}
+
+
+#一键聚灵
+.C2G_ONE_KEY_ADVANCE_WING
+{
+	attrEntry 0 : integer		#属性条数	SC_EnumType.WingAttrEntry
+}
+
+#广播装备翅膀信息给其他玩家
+.G2C_BROSTCAST_CARRY_WING
+{
+	playerId 0 : integer
+	onWing 1 : integer
+}
+
+#灵羽激活
+.C2G_ACTIVE_WING
+{
+	id 0 : integer
+}
+
+#打开界面返回
+.G2C_QUERY_WINGS_DATA
+{
+	wingData	0	:	WingsData
+}
+
+.SyncWingsData
+{
+	wingData	0	:	WingsData
+	wingsAvailable	1	:	boolean
+}
+
+#升星返回
+.G2C_StarUpRet
+{
+	wingData	0	:	WingsData
+	multipType	1	:	integer	#SC_WINGSLIKE.MULTIPLE_TYPE
+	addExp	2	:	integer
+}
+#升阶返回
+.G2C_RankUpRet
+{
+	wingData	0	:	WingsData
+	multipType 1 : integer
+}
+#镶嵌灵石
+.C2G_WINGS_INLAY
+{
+	index	0	:	integer
+	itemId	1	:	integer	#物品唯一id
+}
+.G2C_WINGS_INLAY
+{
+	wingData	0	:	WingsData
+}
+#拆除灵石
+.C2G_WINGS_TAKEOFF
+{
+	index	0	:	integer
+}
+.G2C_WINGS_TAKEOFF
+{
+	wingData	0	:	WingsData
+}
+
+#打开胸章界面返回
+.G2C_QUERY_BADGE_DATA
+{
+	badgeData 0 : BadgeData
+}
+.SyncBadgeData
+{
+	badgeData 0 : BadgeData
+	badgeAvailable	1	:	boolean
+}
+#升星返回
+.G2C_Badge_StarUpRet
+{
+	badgeData	0	:	BadgeData
+	multipType	1	:	integer	#SC_WINGSLIKE.MULTIPLE_TYPE
+	addExp	2	:	integer
+}
+#镶嵌雕文
+.C2G_Badge_INLAY
+{
+	index	0	:	integer
+	itemId	1	:	integer	#物品唯一id
+}
+.G2C_Badge_INLAY
+{
+	badgeData	0	:	BadgeData
+}
+#拆除雕文
+.C2G_Badge_TAKEOFF
+{
+	index	0	:	integer
+}
+.G2C_Badge_TAKEOFF
+{
+	badgeData	0	:	BadgeData
+}
+.C2G_ACTIVE_WINGS	#激活翅膀or勋章
+{
+	type 0	:	integer	#1翅膀  2勋章
+}

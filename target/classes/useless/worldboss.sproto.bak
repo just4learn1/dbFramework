@@ -1,0 +1,140 @@
+#升级武将
+.C2G_UPGRADE_GENERALS
+{
+	generalsId 0 : integer    	#武将ID 
+}
+.G2C_UPGRADE_GENERALS
+{
+	generalsId 0 : integer    	#武将ID 
+	level 1 : integer  					#当前等级
+}
+#升级羁绊
+.C2G_UPGRADE_FETTERS
+{
+	fettersId 0 : integer				#羁绊ID
+}
+.G2C_UPGRADE_FETTERS
+{
+	fettersId 0 : integer				#羁绊ID
+	level 1 : integer						#当前等级
+}
+
+#推送客户端玩家所有武将、羁绊信息
+.GeneralsData
+{
+	generalsId 0 : integer    	#武将ID
+	level			 1 : integer			#武将等级
+}
+.FettersData
+{
+	fettersId 0 : integer				#羁绊ID
+	level 1 : integer						#羁绊等级
+}
+.G2C_GET_GENERALSINFO
+{
+	generalsinfo 0 : *GeneralsData
+	fettersinfo 1 : *FettersData
+}
+
+#天下大势变化，解锁武将
+.G2C_GENERALS_UNLOCK
+{
+	generalsinfo 0 : *GeneralsData
+}
+
+#-----------------------------------------------------武将卡怪物组刷新逻辑
+.B2M_GENERAL_DO_FLUSH
+{
+    mapId 0 : integer
+    line 1 : *integer
+    genId 2 : integer
+    itemId 3 : integer
+}
+.M2B_BOSS_DROP_LIST
+{
+    ownerName	0	:	string #击杀者姓名
+    mapId	1	:	integer			#地图id
+    itemId	2	:	integer		#怪物场景元素id
+    dropItems	3	:	*string	#掉落的物品串(resourceType_templateId;装备属性，其他类型没有没了)
+    line	4	:	integer		#地图分线
+    genId	5	:	integer	#对应表GeneralMonsterGroup的Id
+}
+.M2B_MST_DROP_LIST
+{
+		ownerName	0	:	string #击杀者姓名
+    mapId	1	:	integer			#地图id
+    itemId	2	:	integer		#怪物场景元素id
+    dropItems	3	:	*string	#掉落的物品串(resourceType_templateId;装备属性，其他类型没有没了)
+    monsterId	4	:	integer
+}
+#世界boss信息
+.G2C_WORLDBOSS_INFO
+{
+	bossInfos	0	:	*SINGLE_WORLDBOSS_INFO
+}
+.SINGLE_WORLDBOSS_INFO
+{
+	genId	0	:	integer
+	state	1	:	integer
+	deathTime	2	:	integer   #上次死亡时刻
+}
+#世界boss掉落信息
+.G2C_WORLDBOSS_DROP_LIST
+{
+	goodInfos 0	:	*G2C_DROP_GOOD_INFO
+}
+.G2C_DROP_GOOD_INFO
+{
+	userName	0	:	string
+	mapId	1	:	integer
+	itemId	2	:	integer
+	dropTime	3	:	integer
+	goodInfo	4	:	GOODS_INFO
+	monsterId 5	:	integer
+}
+.C2G_QUERY_WORLDBOSS_INFO
+{
+	queryType	0	:	integer	#0查询世界boss信息，返回G2C_WORLDBOSS_INFO  1查询掉落信息返回G2C_WORLDBOSS_DROP_LIST
+}
+.D2B_GET_WORLDBOSS_DROPINFO_RT
+{
+	dropLists 0	:	*WROLDBOSS_DROP_SYNC_DATA
+}
+.WROLDBOSS_DROP_SYNC_DATA
+{
+	ownerName	0	:	string
+	mapId	1	:	integer
+	itemId	2	:	integer
+	dropInfo	3	:	string
+	dropTick	4	:	integer
+}
+.G2C_TRIAL_ITEM_INFOS				#当前地图试炼boss存活信息通知
+{
+	infos	0	:	*TRIAL_ITEM_INFO
+}
+.TRIAL_ITEM_INFO
+{
+	groupId	0	:	integer					#怪物组id，客户端可能没用
+	deathTick	1	:	integer				#死亡时间
+	state	2	:	integer						#当前状态(存活/死亡)  SC_EnumType.TrailItemState
+	duobao	3	:	integer					#是否为多宝怪   (1为多宝怪)
+	Inteval	4	:	integer					#刷新间隔时间
+	itemId	5	:	integer					#场景元素ID
+}
+.C2G_ENTER_TRIALMAP
+{
+	trialLv	0	:	integer			#请求进入试炼地图(1为试炼地图1层   2为试炼地图2层)
+}
+#加载世界boss刷新信息
+.D2B_LOAD_WORLDBOSS_INFO
+{
+	infos	0	:	*WORLDBOSS_REFRESHINFO
+}
+
+.WORLDBOSS_REFRESHINFO
+{
+	Id	0	:	integer
+	refreshState	1	:	integer
+	deathTick	2	:	integer
+	refreshTick	3	:	integer
+}

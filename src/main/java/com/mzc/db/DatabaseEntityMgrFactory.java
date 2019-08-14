@@ -203,7 +203,7 @@ public class DatabaseEntityMgrFactory implements Runnable {
 //        players.forEach(System.out::println);
         List<SimplePlayer> list = mgr.queryFields(SimplePlayer.class, new long[]{1101000000000022529L, 1101000000000050177L, 1101000000000046081L, 1101000000000022529L});
         list.forEach(s->{
-            System.out.printf("[id: %d] [username: %s] [bb1: %d] [aa1: %s] \n", s.getId(), s.getUsername(), s.getBb1(), Arrays.toString(s.getAa1()));
+            System.out.printf("[id: %d] [username: %s] [bb1: %d] [aa1: %s] \n", 1, s.getUsername(), s.getBb1(), Arrays.toString(s.getAa1()));
         });
 //        System.out.println(mgr.count());
         inst.destory();

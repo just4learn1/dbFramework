@@ -1,0 +1,57 @@
+#购买记录
+.RECHARGE_TIME_RECORD_DATA
+{
+	charName 0 : string #角色名称
+	times 1 : integer   #购买次数
+	excelId 2 : integer #购买物品对应的表格ID
+	buyTime 3 : integer #购买发生的时间戳
+	cost 4 : integer    #费用(单次的点数)
+	charId 5 : integer  #角色ID
+}
+
+# 上线同步
+.G2C_QUEST_RECHARGE_TIME_INFO
+{
+	serverName 0 : string #区服名称
+	time 1 : integer      #剩余时间(单位s)
+	hasExtra 2 : boolean  #是否有额外的时长
+}
+
+#查询充值记录
+.C2G_QUEST_RECHARGE_RECORD
+{
+	
+}
+
+.G2C_QUEST_RECHARGE_RECORD
+{
+	records 0 : *RECHARGE_TIME_RECORD_DATA  #充值记录
+	size 1 : integer
+}
+
+#购买点卡
+.C2G_GAME_CARD_BUY_TIME
+{	
+#C2G_BUY_TIME
+	itemkey 0 : integer #购买档位
+	times 1 : integer  #购买次数
+}
+
+.G2C_GAME_CARD_BUY_TIME
+{
+#G2C_BUY_TIME
+	increaseTime 0: integer #购买成功后增加的时间
+	time 1: integer 		#剩余时间(单位s)
+}
+
+# 大退 (这个不应该在点卡协议中)
+.C2G_FULL_ESCAPE
+{
+	quitType 0 : integer  # 1:选角 2:重新输入账号
+}
+.G2C_FULL_ESCAPE
+{
+	quitType 0 : integer  # 1:选角 2:重新输入账号
+}
+
+#进入缓冲时间---15分钟后，将玩家踢到选角界面

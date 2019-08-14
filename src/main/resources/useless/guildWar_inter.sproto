@@ -1,0 +1,75 @@
+
+.sTableInfo
+{
+	guildId		0	:	integer		#帮派id
+	winTimes	1 	:	integer		#胜利次数
+	totalTimes	2	:	integer		#总参战次数
+	bestScore	3	:	integer		#最好成绩
+}
+
+#########################################
+#服务器相关协议
+.sDTableInfo
+{
+	guildId		0	:	integer		#帮派id
+	winTimes	1 	:	integer		#胜利次数
+	totalTimes	2	:	integer		#总参战次数
+	bestScore	3	:	integer		#最好成绩
+}
+
+.sDGwUnitInfo
+{
+	sTableInfo	0	: 	sDTableInfo	
+	name		1	:	string
+	totalPower	2	:	integer		#战斗力
+	playerNO	3	:	integer		#玩家个数
+
+	curKill		4	: 	integer		#杀人数
+	curDie		5	:	integer		#死亡数
+	curPoint	6	:	integer		#积分
+	curprestige	7	:	integer		#威望
+}
+
+# 	加载帮派战数据
+.D2B_LOAD_GUILD_WAR_DATA
+{
+	tableInfo	0	:	*sTableInfo		#帮派战数据
+	joinInfo	1	: 	string			#加入帮派战id
+}
+# 同步帮派数据给mapserver
+.B2M_GUILDWAR_GROUP_INFO
+{
+	groupId		0	: 	integer		#组id
+	timeLeft	1	: 	integer 	#剩余时间
+	guild_1		2	: 	sDGwUnitInfo	
+	guild_2		3	: 	sDGwUnitInfo	
+	insId		4	:	integer		#实例id
+}
+
+#同步修改的值
+.B2M_GUILDWAR_CHANGE_VALUE
+{
+	guildId		0	:	integer		
+	vType		1	:	integer		
+	value		2	:	integer		
+}
+#创建恩怨组之后，同步给map
+.B2M_GUILDWAR_UPDATE_INS
+{
+	insId		0	:	integer
+	groupId		1	: 	integer
+}
+
+#客户端请求退出，同时发送给base
+.M2B_GUILDWAR_QUIT
+{
+}
+
+#关闭帮派战的副本场景
+.B2M_GUILDWAR_CLOSE_WAR
+{
+	insId		0	:	integer		#实例id
+	groupId		1	: 	integer		#对应组id
+}
+
+

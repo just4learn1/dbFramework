@@ -1,0 +1,94 @@
+
+
+#3413 神器删除
+.G2C_DELETE_ARTIFACT
+{
+	artifactId 0 : integer 			#删除神器ID
+}
+
+#3416 神器分解
+.C2G_DECOMPOSE_ARTIFACT
+{
+	artifactId 0 : *integer 			#分解神器ID
+}
+
+#---------------------------------------------------------------装备强化 start
+# 请求强化装备
+.C2G_ENHANCE_EQUIPMENT
+{
+	artifactId 0 : integer  # 神器ID
+	bind 1 : boolean # 是否使用绑定材料
+}
+
+# 返回强化结果
+.G2C_ENHANCE_EQUIPMENT
+{
+	artifactId 0 : integer # 神器ID
+	result 1 : string # 结果
+	starLv 2 : integer # 神器星级
+	bindState 3 : integer # 绑定状态
+}
+#---------------------------------------------------------------装备强化 end
+
+#---------------------------------------------------------------装备锻造
+# 锻造玩法上传的消耗材料物品信息
+.ArtiMeterial{
+	resType 0 : integer 	#资源类型
+	resId 1 : integer		#资源Id
+	resValue 2 : integer	#资源数量
+	id 3 : integer			#资源唯一Id(装备/道具类型有效,其他类型可以不用填充)
+}
+# 客户端申请执行锻造
+.C2G_REQ_ARTIFACT_COMPOSE
+{
+	id 0 : integer 						# 要合成的主键Id,对应锻造表主键ID
+	useUnbind 1 : boolean   			# 是否强制使用非绑定材料
+	materials 2 : *ArtiMeterial			# 消耗的材料
+	arrSwitch 3 : *boolean  			# 是否消耗资源,加强概率(填充一个bool数组,分别对应配置表中,每个档位是否开启)
+}
+.G2C_REQ_ARTIFACT_COMPOSE
+{
+	result 0 : integer						# 锻造请求处理结果 0:成功
+	resultIndex 1 : integer 				# 最终命中的结果下标
+	commUpdate 2 : G2C_COMMON_UPDATA_INFO	# 锻造引起的物品变化
+}
+
+#---------------------------------------------------------------装备锻造
+ 
+#---------------------------------------------------------------装备传承 start 
+# 传承装备强化属性
+.C2G_TRANSFER_EQUIPMENT_STARLV
+{
+	sourceId 0 : integer # 来源神器ID
+	targetId 1 : integer # 目标神器ID
+	bind 2 : boolean # 是否使用绑定材料
+}
+
+# 传承装备强化属性结果
+.G2C_TRANSFER_EQUIPMENT_STARLV
+{
+	sourceId 0 : integer # 来源神器ID
+	targetId 1 : integer # 目标神器ID
+	sourceStarLv 2 : integer # 来源神器强化等级
+	targetStarLv 3 : integer # 目标神器强化等级
+	result 4 : string # 结果
+}
+#---------------------------------------------------------------装备传承 end
+
+#---------------------------------------------------------------装备强化测试协议 start
+.C2G_CLEAR_EQUIPMENT_STARLV #客户端请求清除装备强化等级
+{
+	artifactId 0 : integer  # 装备的唯一id
+}
+
+.G2C_CLEAR_EQUIPMENT_STARLV #服务器返回客户端清除装备强化等级
+{
+
+}
+#---------------------------------------------------------------装备强化测试协议 end
+
+.G2C_USE_BLESSING_OIL		#客户端请求使用祝福油返回
+{
+	result	0	:	integer	# 1成功   0失败没掉幸运值   -1 失败掉幸运值
+	blessNum	1	:	integer	#幸运值
+}

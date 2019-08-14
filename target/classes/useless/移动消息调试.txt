@@ -1,0 +1,93 @@
+﻿
+3015. C2G_PLAYER_MOVE
+      玩家请求行走，成功给第三方广播G2C_PLAYER_MOVE，失败给第一方返回G2C_REPORT_POSITION
+      uint32 tick;
+      float  pixelX;
+      float  pixelY;
+      float  cos;   //移动方向
+      float  sin; 
+	  float  speed  //移动速度
+
+3016. G2C_PLAYER_MOVE
+      服务器广播玩家行走
+      uint32 tick;
+      uint32 id;      //角色id
+      float  pixelX;  
+      float  pixelY;  
+      float  cos;    //同C2G_PLAYER_MOVE
+      float  sin;    //...
+	  float  speed   //移动速度
+	  
+3007. G2C_OBJECT_ADD
+	  服务器发送给客户端，物体出现在视野内
+	  uint32 charId  //玩家的charID 
+	  float  pixelX  //玩家的x点坐标
+	  float  pixelY  //玩家的y点坐标
+	  float  cos	 //玩家的朝向的cos值，即dirx
+	  float  sin	 //玩家的朝向的sin值，即diry
+	  uint8  isDead  //角色是否死亡，0标示未死亡，1标示死亡
+	  string name    //玩家名字
+	  uint32 HP      //玩家血量
+	  uint32 MP      //玩家魔法值
+	  uint8 level    //玩家等级
+	  uint8 objType  //物体类型，具体数值参见SC_FieldValue.ObjType
+	  uint16 entryId //玩家和npc的entryid
+	  uint16 mountId //玩家骑乘的坐骑，如果为0表示没有骑乘坐骑
+	  uint16 petId   //玩家装备的宠物，如果为0表示没有装备宠物
+	  uint32 teamId  //玩家所在队伍ID，如果为0表示没有加入队伍
+	  
+3008. G2C_OBJECT_REMOVE
+	  服务器发送给客户端，物体消失在视野内
+	  uint16 count		// remove 角色个数
+	  repeat
+		uint32 charId   //玩家的ID
+		int8   objType	//类型
+	  end
+	  
+3009. G2C_OBJECT_UPDATE
+	uint32	charId	// 角色id
+	uint8 count		//可见状态个数
+	// 然后是key value数组，key都是uint8，value见SC_VisibleStateSyncerCpnt里的格式
+	  
+3019. C2G_PLAYER_STOP
+	  玩家停止行走
+	  uint32 tick
+	  float  pixelX    //停止行走时的坐标点
+	  float  pixelY    
+	  float  cos       //停止行走时的朝向
+	  float  sin
+	  
+3020. G2C_PLAYER_STOP
+      服务器广播玩家停止行走
+	  uint32 tick
+	  uint32 charId
+	  float  pixelX
+	  float  pixelY
+	  float  cos
+	  float  sin
+	  
+3003. G2C_MAP_ENTER
+      进入地图
+      uint32 mapId;     //地图id
+      uint8  line;      //第几线
+      uint8  maxLine;   //总线数
+      float  pixelX;    //坐标x
+      float  pixelY;    //坐标y
+	  
+3025. G2C_AI_START_MOVE
+	  AI开始移动
+	  uint32 tick       
+	  uint32 objId      //AI物体的ID
+	  float  startX     //开始点坐标
+	  float  startY
+	  float  endX       //结束点坐标
+	  float  endY
+	  
+3026. G2C_AI_STOP_MOVE
+      AI停止移动
+	  uint32 tick
+	  uint32 objId
+	  float  endX       //停止移动后所在点的坐标
+	  float  endY
+	  float  cos        //停止移动后的朝向
+	  float  sin

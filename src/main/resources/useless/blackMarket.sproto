@@ -1,0 +1,103 @@
+#拍卖行黑市道具数据同步用
+.s_BlackMarketItem
+{
+	blackId 0 : integer                       #黑市货架
+	itemId 1 : integer                        #黑市商店道具ID
+	price 2 : integer                         #竞拍价格
+	saleTime 3 : integer                      #上架时间
+	downTime 4 : integer                      #下架时间
+	charName 5 : string					  	  #玩家名字
+}
+
+#-------------------------------------------------------------------------------------------------------------------------
+#打开界面时(前)请求
+#请求黑市商品信息By Group
+.C2G_GET_BM_GOODS_BY_GROUP_REQ
+{
+	group 0 : *string  					      #商品组
+}
+
+#应答黑市商品信息By Group
+.G2C_GET_BM_GOODS_BY_GROUP_RESP
+{
+	blackItems 0 : *s_BlackMarketItem         #黑市道具数据
+}
+
+#-------------------------------------------------------------------------------------------------------------------------
+#打开界面后定时请求
+#请求黑市商品价格
+.C2G_GET_BM_PRICES_BY_GROUP_REQ
+{
+	group 0 : *string  					      #商品组
+}
+
+#应答黑市商品价格
+.G2C_GET_BM_PRICES_BY_GROUP_RESP
+{
+	blackItems 0 : *s_BlackMarketItem        #黑市道具数据
+}
+
+#-------------------------------------------------------------------------------------------------------------------------
+#打开界面后，如果有新商品上架，在定时请求的应答中会多出一些商品id和价格。这个协议主要就是用来解决查询这些多出来的商品的详细信息
+#请求黑市商品信息By Id
+.C2G_GET_BM_GOODS_BY_ID_REQ
+{
+	ids 0 : *integer  					      #黑市货架id数组
+}
+
+#应答黑市商品信息By Id
+.G2C_GET_BM_GOODS_BY_ID_RESP
+{
+	blackItems 0 : *s_BlackMarketItem         #黑市道具数据
+}
+
+#-------------------------------------------------------------------------------------------------------------------------
+
+#竞拍黑市商品请求
+.C2G_BUY_BLACK_ITEM_REQ
+{
+	blackId 0 : integer                      #黑市货架id
+	price 1 : integer                        #竞拍价格	
+}
+
+#竞拍黑市商品回应
+.G2C_BUY_BLACK_ITEM_RESP
+{
+	notifyId 0 : integer                     #广播模板ID
+	blackId 1 : integer						 #黑市货架id
+	itemId 2 : integer                       #黑市商品Id
+	price 3 : integer                        #道具价格
+	update 4 : boolean						 #是否需要更新价格
+	playerName 5 : string					 #玩家名字
+}
+
+#已拍黑市商品被他人拍走通知
+.G2C_BUY_BLACK_ITEM_NOTIFY
+{
+	notifyId 0 : integer					#广播模板ID
+	blackId 1 :integer						#黑市货架id
+	itemId 2 : integer						#黑市商品Id
+	price 3 : integer						#道具价格
+	playerId 4 : integer 					#谁抢去了
+	playerName 5 : string					#谁抢去的
+	update 6 : boolean						#是滞需要更新价格
+}
+
+#拍卖行黑市db道具数据
+.db_BlackMarketItem
+{
+	blackId 0 : integer                       #黑市ID
+	itemId 1 : integer                       #黑市商店道具ID
+	owner 2 : integer                        #竞拍玩家ID
+	charName 4 : string                     #竞拍玩家名字
+	price 5 : integer                        #竞拍价格
+	saleTime 6 : integer                     #上架时间
+	downTime 7 : integer                     #下架时间
+	reprice 8 : integer                      #占用的充值元宝的价格
+}
+
+#271 db回应base加载拍卖行黑市数据回应
+.D2B_LOAD_BLACK_MARKET_DATA
+{
+	blackItems 0 : *db_BlackMarketItem          #拍卖行黑市数据
+}

@@ -1,0 +1,140 @@
+#队长请求进入副本，即点情缘试炼 
+.C2G_ENTER_DOUBLETASK_DUNGEON
+{
+	teamId 0 : integer #队伍ID
+}
+#广播给队员，队长请求进入副本
+.G2C_ENTER_DOUBLETASK_DUNGEON
+{
+	charId 0 : integer #队长id
+}
+
+#队员确认或取消进入副本
+.C2G_DOUBLETASK_DUNGEON_CONFIRM
+{
+	teamId 0 : integer #队伍ID
+	confirm 1 : integer # 0确认 1取消
+}
+#广播有人确定或取消进入副本
+.G2C_DOUBLETASK_DUNGEON_CONFIRM
+{
+	confirm 0 : integer #0确认 1取消
+	charId 1 : integer  #角色ID
+}
+#离开副本
+.C2G_LEAVE_DOUBLETASK_DUNGEON
+{
+}
+
+#请求与NPC交互次数
+.C2G_EXCHANGE_NPC_COUNT
+{
+}
+.G2C_EXCHANGE_NPC_COUNT
+{
+	count 0 : integer #交互次数
+}
+#队长与副本内NPC交互
+.C2G_EXCHANGE_DUNGEON_NPC
+{
+}
+#广播给队员，队员需要弹出玩法说明
+.G2C_EXCHANGE_DUNGEON_NPC
+{
+}
+#队员确认玩法规则
+.C2G_CONFIRM_RULES
+{
+	
+}
+#广播队员都已确认规则
+.G2C_CONFIRM_RULES
+{
+	
+}
+#副本结算
+.G2C_DOUBLETASK_DUNGEON_RESULT
+{
+	res 0 : integer #0成功 1失败
+}
+
+#获取剩余挑战(有奖励)次数，可无限次挑战，仅前N次有奖励
+.C2G_DOUBLETASK_GET_COUNT
+{
+}
+.G2C_DOUBLETASK_GET_COUNT
+{
+	count 0 : integer #剩余次数
+}
+
+#答题玩法内的协议
+
+#获取题目
+.C2G_DOUBLETASK_GET_QUESTION
+{
+}
+#回复题目信息
+.G2C_DOUBLETASK_GET_QUESTION
+{
+	questionId 0 : integer          #题目ID
+	rightNum 1 : integer            #答对题目数量
+	endTime 2 : integer          		#结束时间戳
+	canAnswer 3 : integer   				#是否可以回答，每次需要女方先答，0不能 1能
+}
+
+#回答问题
+.C2G_DOUBLETASK_ANSWER_QUESTION
+{
+	questionId 0 : integer          #题目ID
+	selectIndex 1 : integer         #所选答案编号
+	isOverTime 2 : integer          #是否超时0:未超时；1：超时
+}
+#通知轮到玩家来回答
+.G2C_DOUBLETASK_CAN_ANSWER
+{
+}
+#回复给队伍中的两个人，答题结果，如果错误，则此次答题结束，需要重新与NPC交互
+.G2C_DOUBLETASK_ANSWER_QUESTION
+{
+	questionId 0 : integer          #题目ID
+	isRight 	 1 : integer          #是否正确 0：错误、或者双方的回答不一致 ，1：正确
+	isFinish 	 2 : integer          #答题是否全部完成0：未完成，1：已完成
+}
+
+#心愿树玩法
+
+#一个玩家开始交互、或取消交互，玩家移动则取消交互、或者导致交互失败
+.C2G_EXCHANGE_TREE
+{
+	confirm 0 : integer # 0确认 1取消
+}
+#第一个开始交互的返回结束时间戳
+.G2C_EXCHANGE_TREE
+{
+	endtime 0 : integer #结束时间戳
+	charId 1 : integer #正在交互的charId
+}
+
+#如果成功，开始进度条，如果失败，返回失败原因
+.G2C_EXCHANGE_TREE_START
+{
+	res 0 : integer # 0成功 1失败
+	endtime 1 : integer #如果成功，结束时间戳
+	reason 2 : integer #失败原因  0玩家取消交互 1交互超时
+}
+
+#交互结果
+.G2C_EXCHANGE_TREE_RESULT
+{
+	res 0 : integer # 0成功 1失败
+}
+#复活消息
+.C2G_EXCHANGE_TREE_REVIVE
+{
+
+}
+#断线重连
+.G2C_DOUBLE_TASK_RECONNECT
+{
+	remaintime 0 : integer #剩余秒数
+}

@@ -1,0 +1,5 @@
+#使用cdkey
+.C2G_USE_CDKEY
+{
+    cdkey 0 : string    #cdkey
+}

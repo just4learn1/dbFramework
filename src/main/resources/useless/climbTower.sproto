@@ -1,0 +1,44 @@
+# 客户端请求最大爬塔层数
+.C2G_REQ_MAX_CLIMB_NUM
+{
+
+}
+
+# 服务器返回当前最大爬塔层数
+.G2C_REQ_MAX_CLIMB_NUM
+{
+    maxClimbNum 0 : integer
+}
+
+# 服务器通知客户端当前爬塔结果(floorState需要转换为2)
+.G2C_CLIMB_FLOOR_RESULT
+{
+    result 0 : integer #0 成功 否则为失败
+}
+
+# 请求进入爬塔，默认会直接进入当前要挑战的层
+.C2G_REQ_ENTER_CLIMB_TOWER
+{
+    type 0 : integer # 0为其他地图进入爬塔，1为挑战下一层
+}
+
+# 同步杀怪次数
+.G2C_SYNC_KILL_MONSTER_COUNT
+{
+    monsterCount 0 : integer
+}
+
+# 同步玩家伤害协议
+.G2C_SYNC_PLAYER_DAMAGE
+{
+    playerDamage 0 : integer
+}
+
+# 同步玩家爬塔相关信息
+.G2C_SYNC_CLIMB_INFO
+{
+    climbFloorNum 0 : integer  # 当前爬塔层数(表示静态层数)
+    restTime 1 : integer  # 爬塔剩余时间（当floorState状态为1时有效，表示副本剩余秒数）
+    floorState 2 : integer  # 当前爬塔状态 0为没有刷新怪物，1为已刷新怪物，2为副本已结算
+    result 3 : integer # 当floorState状态为2时有效，可以判定result的值0：成功 非0：失败
+}

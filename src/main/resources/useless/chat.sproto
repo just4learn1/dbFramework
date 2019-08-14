@@ -1,0 +1,207 @@
+#离线道具信息
+.c_itemData
+{
+	itemId 0 : integer
+	param  1 : integer
+}
+
+#离线装备数据
+.c_equipData
+{
+	equipPos 	0 : integer		#装备位
+	isEquipOn 	1 : integer 	#是否穿上
+	strengthLv 	2 : integer		#强化等级
+	colorGrade 	3 : integer		#颜色品质
+	luckyValue 	4 : integer    	#幸运值
+	gemBar 		5 : *integer	#宝石
+	soulItemId  6 : integer		#魂石  
+}
+
+#聊天神器数据
+.c_artifactData
+{
+	templateId 0 : integer
+	starLv 1 : integer
+	bindState 2 : integer
+	isBroken 3 : integer
+	extraAttrId 4 : *integer
+	extraAttrVal 5 : *integer
+}
+
+
+#坐骑装备
+.c_mountEquipData
+{
+	charId 0 : integer
+	mountEquipId 1 : integer
+	excelId 2 : integer
+	attrType1 3 : integer
+	attrQuality1 4 : integer
+	attrValue1 5 : float
+	attrType2 6 : integer
+	attrQuality2 7 : integer
+	attrValue2 8 : float
+	attrType3 9 : integer
+	attrQuality3 10 : integer
+	attrValue3 11 : float
+	bindState 12 : integer
+	onEquip 13: integer
+}
+
+#离线戒指数据
+.c_ring
+{
+	templateId 0 : integer
+}
+
+#离线翅膀数据
+.c_wing
+{
+	onWing 0 : integer
+	advanceLv 1 : integer
+	fightVal 2 : integer
+}
+
+#坐标信息数据
+.c_map
+{
+	mapId 	0 : integer         # 地图信息
+	line  	1 : integer
+	x  	  	2 : float           
+	z  	  	3 : float           
+	dis		4 : float           
+    isCur   5 : boolean         # 是否是本地图坐标
+}
+
+
+.c_newEquipData
+{
+	key	0 : integer	
+	templateId 1 : integer
+	bindState 2	: integer
+	equipPower 3 : integer		#装备战力
+	equipAttrs 4 : *EQUIPMENT_ATTR_INFO #属性信息
+	price 5	: integer	#出售价格
+	starLv 6 : integer
+	blessNum 7 : integer
+}
+
+#文本聊天数据
+.TextData
+{
+	type    	0 : integer 			#文字数据类型 SC_EnumType.ChatTextType
+	message 	1 : string  			#文本聊天内容
+	item        2 : c_itemData  		#道具
+	equip  		3 : c_equipData 		#装备(废弃)
+	artifact  	5 : c_artifactData   	#神器数据(废弃)
+	mountEquip  6 : c_mountEquipData 	#坐骑装备
+	wing  	7 : c_wing 					#翅膀装备
+	map 		8 : c_map 				#坐标信息数据
+	ring        9 : c_ring              #戒指数据
+	newEquip    10 : c_newEquipData		#新装备参数类型 
+	param1  	11 : integer			#附加参数1
+	param2  	12 : integer  			#附加参数2
+}
+
+#语音聊天数据
+.VoiceData
+{	
+	type    	0 : integer  #语音数据类型 SC_EnumType.ChatVoiceType
+	duration 	1 : integer  #语音时长
+}
+
+#3801 通知客户端发送聊天消息
+.G2C_SEND_CHAT_MESSAGE
+{
+	text  		0 : *TextData  #文本聊天数据
+	voice 		1 : VoiceData  #语音聊天数据
+	region      2 :	string     #聊天服务器区域（最多2W人）
+	channel     3 : string	   #聊天频道id 
+	subType     4 : integer    #聊天类型系统 枚举SC_EnumType.ChatSubType 
+	vip      	5 :	integer	   #vip等级
+	job			6 :	integer	   #职业 
+	level		7 :	integer	   #等级
+	name  		8 :	string	   #姓名
+	charId      9 :	integer	   #角色id服务器唯一
+	
+}
+
+#3802 通知客户端广播消息
+.G2C_SEND_NTF_MESSAGE
+{
+	templateId 0 : integer 		# 广播的模版Id
+	titleArgs  1 : *TextData    # 标题参数
+	bodyArgs   2 : *TextData    # 内容参数
+	
+	# 下面的字段服务器使用,客户端忽略
+	# 全局发送的广播消息需要将消息从Map发送到Base,Base处理后再将消息发送到Map,最终又各个Map完成发送操作
+	# 每个广播消息只能表示下列发送方式的一种,目前有如下广播类型:
+	# 优先级如下 : 全服广播 > 全服阵营广播 > 帮会广播 > 小队广播 > 指定玩家广播
+	isGlobal   3 : boolean      # 是否是全服广播 false表示不是
+	camp       4 : integer      # 全服阵营广播 如果为nil表示不是
+	guildId    5 : integer      # 帮会广播 如果为nil表示不是
+	teamId     6 : integer      # 小队广播 如果为nil表示不是
+	playerIds  7 : *integer     # 指定玩家广播 如果为nil表示不是
+	titleText  8 : string       # 通报标题|当有此字段时,不需要读取模版里面的标题,直接用此字段进行展示即可.此文本是一个富文本
+	bodyText   9 : string       # 通报内容|当有此字段时,不需要读取模版里面的内容,直接用此字段进行展示即可.此文本是一个富文本
+}
+
+#3803 客户端使用喇叭
+.C2G_USE_LOUDSPEAKER
+{
+	text 0 : *TextData			#消息内容
+}
+
+#3804 全服喇叭广播
+.G2C_LOUDSPEAKER_NTF
+{
+	guid  0  : integer			# 发送者的guid
+	camp  1  : integer			# 发送者阵营
+	name  2  : string			# 发送者名字
+	text  3  : *TextData		# 喇叭内容(服务器已经做了屏蔽字检测)
+	vip   4  : integer          #vip等级
+	level 5  : integer          #等级
+	job   6  : integer          #职业
+	
+}
+
+
+
+#3806 请求聊天频道发言
+.C2G_WORLD_CHAT
+{
+}
+
+#3807 服务器告知客户端聊天频道已发言次数
+.G2C_SYNC_WORLD_CHAT_FREE_TIMES
+{
+    times 0 : integer 	# 今天已经使用的次数
+}
+
+#1251 请求禁言
+.C2G_COUNTRY_BAN_TALK
+{
+	charId			0 : integer		# 被禁言玩家角色ID
+}
+
+# 1253推送玩家禁言信息
+.G2C_PUSH_BAN_TALK
+{	
+	isBan			0 : boolean		# 是否被禁言
+	banTalkTime		1 : integer		# 禁言结束时间
+	charName		2 : string		# 禁言玩家名称
+	banType			3 : integer		# 禁言类型(1:gmt,2:游戏内)
+}
+
+#1252 请求国家玩家是否被禁言
+.C2G_BAN_TALK
+{
+}
+
+#1250 通知客户端玩家禁言
+.G2C_BAN_TALK
+{	
+	isBan			0 : boolean		# 是否被禁言
+	banTalkTime		1 : integer		# 禁言结束时间
+	charName		2 : string		# 禁言玩家名称
+}

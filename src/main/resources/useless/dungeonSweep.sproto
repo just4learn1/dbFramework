@@ -1,0 +1,19 @@
+
+#请求剧情副本扫荡
+.C2G_DUNGEON_SWEEP_REQUEST
+{
+	dungeonId 0 : integer			#副本id
+}
+
+.sSweepReward
+{
+	resType 	0 : integer
+	resId		1 : integer
+	resValue	2 : integer
+}
+
+#返回奖励列表
+.G2C_DUNGEON_SWEEP_REWARD
+{
+	reward 0 : *sSweepReward		#奖励列表
+}

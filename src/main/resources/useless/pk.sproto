@@ -1,0 +1,33 @@
+#pk state
+
+#修改PK状态 
+.C2G_CHANGE_PK_STATE
+{
+	state 0 : integer #0和平 1杀戮
+}
+
+#发送玩家当前状态，登录或有变化时会发送这个
+.G2C_SEND_PK_STATE
+{
+	state 			0 : integer #0和平 1杀戮
+	killvalue 	1 : integer #当前杀戮值
+}
+#使用道具清除杀戮值
+.C2G_PK_STATE_REDUCE_KILLVALUE
+{
+	itemId 0 : integer #道具ID
+	num    1 : integer #使用数量
+}
+
+#使用道具修复破裂武器
+.C2G_PK_STATE_FIX_WEAPON
+{
+}
+
+#武器降星通知
+.G2C_PK_STATE_NOTICE
+{
+	killerName 0 : string #击杀者名字
+	oldStar 1 : integer  #原星级
+	newStar 2 : integer  #现在星级
+}

@@ -1,0 +1,79 @@
+#开服活动
+.SellItem
+{
+	id	0 : integer			#对应表id
+	sold 1 : integer		#是否已售出
+}
+.G2C_HALFSELL_DATA
+{
+	sellItem	0	: 	*SellItem	#出售列表
+	serCreateTime 1	:	integer		#开服时间
+}
+.C2G_HALFSELL_BUY
+{
+	id   0 : integer		#id
+}
+.G2C_HALFSELL_BUY_RT
+{
+	id 	 0 : integer		#成功id
+}
+
+##VIP礼包
+.G2C_VIPGIFTS_DATA
+{
+	buyedGifts	0	:	*integer	#已经购买的礼包列表
+}
+.C2G_VIPGIFTS_BUY
+{
+	id   0 : integer		#id
+}
+.G2C_VIPGIFTS_BUY_RT
+{
+	id 	 0 : integer		#成功id
+}
+
+##每日福利
+.Status
+{
+	level	0 : integer	#奖励id
+	status	1 : integer #状态		1未领取 2已领取 3已过期
+}
+
+.G2C_GIFTS_EVERY_DAY
+{
+	status	0 :	*Status	#奖励状态
+}
+.C2G_GET_EVERY_DAY
+{
+	level 	0 : integer	#VIP礼包
+}
+
+.G2C_GET_EVERY_DAY_RT
+{
+	level		0 :	integer	#领取奖励id
+}
+
+#每日在线
+.G2C_ONLINE_GIFTS
+{
+	status	0 : *integer #奖励领取状态
+	onlineTotal  1 : integer
+	countTimes	2 : integer
+	onlineAid  3 : integer 
+}
+
+#每日登陆
+.LoginEveryDay
+{
+	day	0 : integer					#天数 或者时间
+	status	1 : integer 			#状态		1未领取 2已领取 
+}
+
+.G2C_LOGINEVERYDAY_GIFTS
+{
+	status 0 : *LoginEveryDay		#奖励领取状况
+	loginEveryDayAid 1 : integer	#aid
+}
+
+
+

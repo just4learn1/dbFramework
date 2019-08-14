@@ -1,0 +1,66 @@
+# 充值奖励状态
+.s_RECHARGE_STATE
+{
+	id 0 : integer 			#Recharge配置的档位Id; 0为总首充
+	on 1 : integer			#0:未; 1:本档己达,月卡:到期时间戳
+	prizetime 2: integer	#月卡/生卡/首充 上次领奖时间戳
+}
+
+#4100 单条更新
+.G2C_RECHARGE_STATE_UP
+{
+	id 0 : integer 			#Recharge配置的档位Id; 0为总首充
+	on 1: integer			#0:未; 1:本档己达,月卡:到期时间戳
+}
+
+#4101 全部更新
+.G2C_RECHARGE_STATE_INFOS
+{
+	rechargeState 0 : *s_RECHARGE_STATE
+}
+
+#4102 月卡日领奖请求
+.C2G_GET_MONTHCARD_DAYPRIZE
+{
+}
+#4103 生卡日领奖请求
+.C2G_GET_LIFECARD_DAYPRIZE
+{
+}
+#4104 首充领奖请求
+.C2G_GET_FIRST_RECHARGE_PRIZE
+{
+}
+#4105 领奖请求成功
+.G2C_RECHARGE_STATE_UP_PRIZE
+{
+	id 0 : integer 			#Recharge配置的档位Id; 0为总首充
+	prizetime 1: integer	#月卡/生卡/首充 上次领奖时间戳
+}
+
+.RechargeBackInfo{
+    accountId 0 : integer
+    ingot 1 : integer
+    hassend 3 : integer
+}
+.CharLvlInfo{
+    accountId 0 : integer
+    charId 1 : integer
+    level 2 : integer
+    exp 3 : integer
+}
+
+# 请求-所有尚未发送删档充值邮件的玩家信息
+.B2D_GET_PAYRETURN_DATA{
+        
+}
+
+# 应答-所有尚未发送删档充值邮件的玩家信息
+.D2B_GET_PAYRETURN_DATA{
+    backList 0 : *RechargeBackInfo
+    charInfo 1 : *CharLvlInfo 
+}
+
+
+# 修改数据状态,
+#B2D_UPDATE_PAYRETURN_DATA # 二进制消息

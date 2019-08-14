@@ -1,0 +1,148 @@
+# 沙场点兵参战人员
+.BattlefieldMember
+{
+    charId 0 : integer  # 角色id
+    charName 1 : string # 角色名
+    charJob 2 : integer # 角色职业
+    killNum 3 : integer # 本次战斗中击杀人数
+    multiKill 4 : integer # 连杀数
+    maxMultiKill 5 : integer # 最大连杀
+    dieNum 6 : integer # 死亡次数
+    flagTransNum 7 : integer # 运旗成功次数
+}
+
+.BattlefieldTeam
+{
+    camp 0 : integer # 阵营
+    score 1 : integer # 当前获得积分
+    strongholdCount 2 : integer # 占有据点数量
+    members 3 : *BattlefieldMember # 成员
+}
+
+.BattlefieldTeamResult
+{
+    camp 0 : integer # 阵营
+    score 1 : integer # 当前获得积分
+    win 2 : boolean # 胜负情况
+    members 3 : *BattlefieldMember # 成员
+}
+
+# 进入沙场点兵场景后服务端需要推送信息给玩家。
+.G2C_BATTLEFIELD_INFO
+{
+    state 0 : integer    # 当前状态 （准备、开战前倒计时、开战、结束应该是不需要了）
+    stateTime 1 : integer # 已经保持当前状态多长时间。可能在显示还有多长时间开战这种提示时需要
+    battleTeam 2 : *BattlefieldTeam # 战队
+    mapInstance 3 : integer
+}
+
+# 大战在即,（如果有需要，前端收到这个消息自行倒计时后转换为战斗状态）
+.G2C_BATTLEFIELD_COUNTDOWN
+{}
+
+# 战旗拾取
+.G2C_BATTLEFIELD_FLAG_PICKUP
+{
+    camp 0 : integer # 拾玩家所属阵营
+    charId 1 : integer # 拾取玩家id
+    charName 2 : string # 拾取玩家名 
+}
+
+# 战旗运关成功
+.G2C_BATTLEFIELD_FLAG_TRANSPORT
+{
+    camp 0 : integer # 运送战旗角色所属阵营
+    charId 1 : integer # 运送战旗角色
+    charName 2 : string # 运送战旗角色名
+    score 3 : integer # 运送成功后阵营现有积分
+}
+
+# 有人被杀了
+.G2C_BATTLEFIELD_KILL
+{
+    killerId 0 : integer # 杀手
+    killerName 1 : string # 杀手名
+    kkillCount 2 : integer # 连杀数
+    decedentId 3 : integer # 死者
+    decedentName 4 : string # 死者姓名
+    dkillCount 5 : integer # 死者连杀数
+    reviveTime 6 : integer #如果死者是自己，需要显示复活倒计时
+}
+
+# 据点被占领
+.G2C_BATTLEFIELD_STRONGHOLD
+{
+    campLeft 0 : integer # 阵营
+    scoreLeft 1 : integer # 积分
+    countLeft 2 : integer # 占有据点数量
+
+    campRight 3 : integer # 阵营
+    scoreRight 4 : integer # 积分
+    countRight 5 : integer # 占有据点数量
+}
+
+# 结算,前端收到这个消息，自行停止战斗。进入结束流程
+.G2C_BATTLEFIELD_RESULT
+{
+    battleTeam 0 : *BattlefieldTeamResult # 战队
+}
+
+# 离开沙场点兵场景
+.C2G_BATTLEFIELD_QUIT
+{}
+
+# 报名
+.C2G_BATTLEFIELD_MATCH
+{
+    matchType 0 : integer # 匹配类型 0 表示单人，1表示组队
+    enforce 1 : integer #
+}
+
+# 报名结果
+.G2C_BATTLEFIELD_MATCH
+{
+    matchType 0 : integer # 匹配类型 0 表示单人，1表示组队
+    result 1 : boolean # 成功或者失败
+    errorReason 2 : string # 错误原因
+    errorPlayer 3 : string # 造成失败的人。如果是自己的话，一般都可以忽略，
+}
+
+# 匹配邀请
+.G2C_BATTLEFIELD_MATCH_INVITE
+{
+    chiefName 0 : string # 邀请人名
+    invitedId 1 : integer # 邀请id、其实就是邀请人的id
+}
+
+# 应答邀请
+.C2G_BATTLEFIELD_MATCH_INVITE
+{
+    accept 0 : boolean # 是否同意 
+}
+
+# 取消匹配
+.C2G_BATTLEFIELD_CANCEL_MATCH
+{
+}
+
+# 获取匹配状态
+.C2G_BATTLEFIELD_MATCH_STATUS
+{}
+
+# 获取匹配状态
+.G2C_BATTLEFIELD_MATCH_STATUS
+{
+    isMatching 0 : boolean # 正在匹配
+    matchType 1 : integer # 正在匹配的类型
+}
+# 复活倒计时
+.G2C_BATTLEFIELD_REVIVE_TIME
+{
+	charId 0 : integer #角色id
+	reviveTime 1 : integer #倒计时
+}
+# 累计击杀对方N个玩家，会获得积分奖励
+.G2C_TATOL_KILL_OTHER_SIDE
+{
+	camp 0 : integer # 获得积分的阵营
+}

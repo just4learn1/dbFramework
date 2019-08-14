@@ -1,0 +1,66 @@
+#报名
+.C2G_TOPKING_SIGN_UP
+{
+}
+#离开巅峰之战
+.C2G_TOPKING_PLR_LEAVE_MAP
+{
+}
+
+#巅峰之战倒计时
+.G2C_TOPKING_COUNTDOWN
+{
+	type	0	:	integer			#倒计时类型 1开始  2切换阵营  3结束  4清场
+	countDownTime	1	:	integer
+	costItem	2	:	TOPKING_ITEM_INFO
+}
+
+#排行
+.G2C_TOPKING_RANK_DATA
+{
+	rankInfo	0	: *TOPKING_RANKINFO
+}
+
+.TOPKING_RANKINFO
+{
+	plrId	0	:	integer
+	plrName	1	: string
+	totalKillCnt	2	:	integer	#击杀数
+	assitCnt	3	:	integer	#助攻数
+	maxContinuousCnt	4	:	integer	#最高连续击杀
+	deathCnt	5	:	integer	#死亡数
+	score	6	:	integer	#积分
+}
+
+#排行奖励
+.G2C_TOPKING_RANK_REWARD
+{
+		rank	0	:	integer	#排名
+		rewardInfos	1	:	*TOPKING_ITEM_INFO		#奖励物品信息
+}
+
+.TOPKING_ITEM_INFO
+{
+	resType	0	:	integer
+	resId	1	:	integer
+	resValue	2	:	integer
+}
+#连续击杀
+.G2C_TOPKING_CONTINUOUS_KILL
+{
+	plrName	0	:	string
+	continuousCnt	1	:	integer
+}
+#重置pvpteam完成
+.G2C_TOPKING_FINISH_SWITCH_TEAM
+{
+
+}
+.G2C_TOPKING_CURRENT_PLR_NUM
+{
+	num	0	:	integer
+}
+.G2C_NOTIFY_PLR_CAUSE_DMG
+{
+	dmgNum	0	:	integer
+}

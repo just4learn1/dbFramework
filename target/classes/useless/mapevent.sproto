@@ -1,0 +1,384 @@
+#元素行为信息(在layout配置文件中的位置)
+.EventActionInfo
+{
+	itemId 0 : integer          #场景元素ID
+	triggerName 1 : string      #触发事件名
+	eventIndex 2 : integer      #对应的事件配置下标顺位
+	argSerialize 3 : string     #自定义的参数编码
+    actionType 4 : integer      #行为类型
+    stdActionType 5 : integer   #标准行为(当actionType为执行标准行为时)
+    
+    # 这个协议用于Server命令Client执行一个错误
+    # 有两种业务模式 
+    # A:将一个触发事件发送给Client,客户端基于这个触发自己在本地演算要执行什么行为 | 此时会填充 : itemId , triggerName , eventIndex , argSerialize , 
+    # B:直接要执行的行为发送给Client | : itemId, actionType , stdActionType , argSerialize
+}
+
+#各个类型的场景元素的同步数据
+
+.AvtStatue{
+	playerId 0 : integer		    #玩家id		
+	nickName 1 : string			    #昵称
+	camp 2 : integer			    #阵营
+	job 3 : integer				    #职业
+	hairId 4 : integer			    #发型
+	faceId 5 : integer			    #脸型
+	official 6 : integer		    #官职
+    onWeapon 7 : integer            #神器-武器
+    onArmor	8 : integer             #神器-铠甲
+    fashion_dressId 9 : integer     #时装-衣服
+	fashion_hairId	10 : integer    #时装-头发
+	fashion_faceId  11 : integer    #时装-脸
+    
+    size 13 : integer               #缩放比例(预留:用于控制模型的缩放大小)
+    material 14 : integer           #材质(预留:用于控制模型的材质)
+    avtState 15 : integer           #动作状态,用于控制模型的动作,完好站立/破损 | SC_MapConst.AvtStatueState
+    # 不包含 : 玩家属性 , 战斗力 , 等级 , Vip等级 , 神器是否破碎 , 神器附魔信息
+}
+
+.MonsterGroupState
+{
+	itemId 0 : integer				# 该元素在场景配置中的ItemID
+	aliveCount 1 : integer			# 当前场内数量
+	remainCount 2 : integer			# 剩余未刷新数量
+	updateState 3 : integer 		# 元素更新状态
+	monsterId 4 : integer      		# 怪物模型Id
+}
+
+.RespawnPointState
+{
+	itemId 0 : integer				#该元素在场景配置中的ItemID
+	isOpen 1 : boolean 				#当前是否开启
+	respawnState 2 : integer		#当前复活状态
+	respawnPointCamp 3 : integer 	#复活点所属阵营	
+	updateState 4 : integer			# 元素更新状态
+}
+
+.EntryPointState
+{
+	itemId 0 : integer				#该元素在场景配置中的ItemID
+    entryPointCamp 1 : integer      #所属阵营
+	updateState 2 : integer			# 元素更新状态
+}
+
+.PortalState
+{
+	itemId 0 : integer				#该元素在场景配置中的ItemID
+	openState 1 : boolean			#开启状态
+	onlyCampUse 2 : boolean     	#是否开始仅部分阵营可以用
+	belongCamp 3 : *integer			#可用阵营
+    avtStatue 4 : AvtStatue     	#(可选)展示为雕像
+	updateState 5 : integer			# 元素更新状态
+}
+.DynamicBlockState
+{
+	itemId 0 : integer				#该元素在场景配置中的ItemID
+	openState 1 : integer			#开启状态
+    avtStatue 2 : AvtStatue     	#(可选)展示为雕像
+	updateState 3 : integer			# 元素更新状态
+}
+.SceneNpcState
+{
+	itemId 0 : integer				#该元素在场景配置中的ItemID
+	npcShow 1 : boolean         	#该场景元素当前的展示状态 
+	npcEnrtyId 2 : integer      	#服务器动态控制Npc模型Id(如果不存在就使用模版逻辑本地表中加载)
+	openInteraction 3 : boolean 	#是否可以交互
+	headIcon 4 : *integer       	#头顶Icon
+    avtStatue 5 : AvtStatue     	#(可选)展示为雕像
+	updateState 6 : integer			# 元素更新状态
+}
+.CutsceneState
+{
+	itemId 0 : integer				#该元素在场景配置中的ItemID
+    isShow 1 : boolean          	#是否展示
+    targetPosX 2 : float        	#传送目标点X(可选)
+    targetPosY 3 : float        	#传送目标点Y(可选)
+	updateState 4 : integer			# 元素更新状态
+}
+.PathKeyState
+{
+	itemId 0 : integer				#该元素在场景配置中的ItemID
+	keyIndex 1 : integer 
+	updateState 2 : integer			# 元素更新状态
+	isShow 3 : boolean 				# 是否展示
+}
+.GlobalState
+{
+	itemId 0 : integer				#该元素在场景配置中的ItemID
+	updateState 1 : integer			# 元素更新状态
+}
+.SceneObjectState
+{
+	itemId 0 : integer
+	onlyCampUse 1 : boolean      	#是否仅阵营可见
+	belongCamp 2 : *integer     	#所属元素
+	isShow 3 : boolean          	#是否展示
+    avtStatue 4 : AvtStatue      	#(可选)展示为雕像
+	updateState 5 : integer			# 元素更新状态
+}
+.StaticObjectState
+{
+	itemId 0 : integer
+	isShow 1 : boolean          	#是否展示
+    updateState 2 : integer			# 元素更新状态
+}
+.ControlTowerState
+{
+	itemId 0 : integer
+	belongCamp 1 : integer
+	prograssCamp 2 : integer
+	prograssValue 3 : integer
+	prograssState 4 : integer
+	curOpenState 5 : integer
+	coolDown 6 : integer
+	lastChangeBelongTime 7 : integer
+	attachData 8 : integer			#附加数据
+    avtStatue 9 : AvtStatue      	#(可选)展示为雕像
+	updateState 10 : integer		# 元素更新状态
+}
+.PickableInstInfo				#一个可拾取实例的信息(对应地图上一个能看到的物体,一个vaultMapItem可能有多个这样的拾取对象)
+{
+	posId 0 : integer           # 物品顺位,静态的物品顺位,不作为拾取依赖
+	x 1 : float					# 拾取元素所在的绝对坐标
+	y 2 : float					# 拾取元素所在的绝对坐标
+	pickableGuid 3 : integer	# 拾取索引计数,用于跟踪是拾取的哪个物品	
+    belongPlrId 4 : integer     # 所属玩家信息
+	pickableType 5 : integer	# 拾取类型 SC_MapEventConst.PickableType
+	stuffInside 6: *integer     # 参数列表 如果是Buff类型是BuffId , 如果是物品,则type id cnt
+	rotation 7 : integer		# 拾取角度
+	visualName 8 : string 		# 如果填充,则使用填充的信息,如果没有填充,则使用配置信息
+	
+	# 下面几个字段是动态添加物品是需要使用的字段
+	itemType 9 : integer		# 物品类型 
+	itemId 10 : integer			# 物品Id
+	dropCount 11 : integer 		# 物品数量
+	bind 12 : integer 			# 绑定状态
+	pickType 13 : integer       # 拾取方式,客户端基于这个信息来决定如何展示和触发拾取操作.
+	dropPlayerId 14 : integer   # 掉落物所属玩家
+	updateState 15 : integer	# 元素更新状态
+}
+.VaultState
+{
+	itemId 0 : integer
+	usePvpTeam	1 : boolean
+	pvpTeam	2 :	integer
+	level 3 : integer           # 拾取限制等级
+	pickableInfos 4 : *PickableInstInfo
+	updateState 5 : integer			# 元素更新状态
+}
+.SafeAreaState
+{
+	itemId 0 : integer
+	camp 1 : integer
+	width 2 : integer
+	height 3 : integer
+	updateState 5 : integer			# 元素更新状态
+}
+.BlanceTowerState
+{
+	itemId 0 : integer
+	updateState 1 : integer			# 元素更新状态
+	showType 2 : integer 
+	belongCamp 3 : integer 
+	prograssValue 4 : integer
+	leftCamp 5 : integer
+	rightCamp 6 : integer
+	leftCampCnt 7 : integer
+	rightCampCnt 8 : integer
+}
+
+
+#3301 客户端申请获取所有场景元素状态
+.C2G_SYNC_MAP_ITEM
+{
+}
+
+#3302 服务器返回场景元素状态
+.G2C_SYNC_MAP_ITEM
+{
+	result 0 : integer					# 0:成功 1:失败
+	mstItems 1 : *MonsterGroupState
+	rspItems 2 : *RespawnPointState
+	epItems 3 : *EntryPointState
+    ptlItems 4 : *PortalState
+    dynBlcItems 5 : *DynamicBlockState
+    sceNpcItems 6 : *SceneNpcState
+    cutsceneItems 7 : *CutsceneState
+    pathKeyItems 8 : *PathKeyState
+    gloItems 9 : *GlobalState
+	sceneObjItems 11 : *SceneObjectState
+	towerItems 12: *ControlTowerState
+	vaultItems 13: *VaultState
+	safeItems 14: *SafeAreaState 
+	balTowerItems 15: *BlanceTowerState
+	staticObjItems 16: *StaticObjectState
+}
+
+#3303 服务器通知客户端 执行事件系统元素行为
+.G2C_DO_ITEM_ACTION
+{
+	actionInfos 0 : *EventActionInfo
+}
+
+#3304 服务器通知客户端 角色变身
+.G2C_OBJ_TRANS_BODY
+{
+	guid 0 : integer			#元素Guid 
+	newEntryId 1 : integer 		#变身后的新状态	
+}
+
+#3305 客户端通知服务器触发传送
+.C2G_CHECK_EVENT_POS
+{
+	itemId 0 : integer			#相关元素ID
+}
+
+#3306 客户端通知服务器
+.C2G_TRIGGER_PORTAL
+{
+	itemId 0 : integer			#传送门所属的MapEventId
+	line 1 : integer            #跨地图寻路时,客户端指定的分线
+}
+
+#3307 客户端通知服务器想拾取物体
+.C2G_PICK_VAULT
+{
+	itemId 0 : integer			#拾取物体所属的MapEventId
+	posId 1 : integer			#哪个位置点
+}
+
+#3308 客户端上报触发了某个区域的进出
+.C2G_TRIGGER_AREA
+{
+    isIn 0 : boolean            # 是否是进入
+    itemId 1 : integer          # 进入/离开的元素ID
+}
+
+#3309 服务器全地图广播,玩家触发了某个区域进出
+#.G2C_PLAYER_TRIGGER_AREA | 可能会特别频繁所有使用了2进制发送消息I2b , guid,itemId,isIn
+
+#3310 客户端报告服务器,进出了触发区域
+.C2G_REPORT_CROSS_TRIGGER_AREA
+{
+    itemId 0 : integer      # 触发区域的元素ID
+    isIn 1 : boolean        # 进出情况 true:进入 false:离开的元素ID            
+    guid 2 : integer        # 触发者的guid
+}
+
+.PlayerTriggerInfo{
+    itemId 0 : integer      # 触发区域的元素ID
+    isIn 1 : boolean        # 进出情况 true:进入 false:离开的元素ID            
+    guid 2 : integer        # 触发者的guid
+}
+#3311 所有玩家的触发区域状态(在玩家首次进入场景时,会单独发送给该玩家)
+.G2C_ALL_PLAYER_TRIGGER_INFO
+{
+    allInfo 0 : *PlayerTriggerInfo
+}
+
+.DropItemInfo
+{
+	itemId 0 : integer		# 掉落的物品标记ID
+	state 1 : integer		# 状态(0为创建，1为销毁)
+	itemTemplateId 2 : integer  # 用来前端显示的物品模板ID
+	posX 3 : integer		# 掉落坐标X
+	posZ 4 : integer		# 掉落坐标Z
+	itemType 5 : integer	# 物品类型(用来判断是哪张表来显示物品)
+}
+
+#3312 更新掉落物品的状态
+.G2C_DROP_ITEM_UPDATE
+{
+	allInfo 0 : *DropItemInfo	# 所有的物品掉落更新信息
+}
+
+#================================================= MapItem Aoi 新增消息体
+# 服务器通知客户的删除一个场景元素
+.G2C_MIAOI_REMOVE
+{
+	itemId 0 : integer		# 元素ID
+	itemType 1 : integer	# 元素类型
+}
+# 服务器通知客户端动态添加各种类型的元素(这种填加都是没有配置的)
+.VaultDropItem{
+	pickableGuid 0 : integer 	# 拾取ID,用这个来区分是什么物品
+	itemType 1  : integer   	# 物品类型
+	itemId 2 : integer      	# 物品ID
+	dropCount 3 : integer   	# 物品数量
+	bind 4 : integer			# 绑定状态
+	x 5 : float
+	y 6 : float
+	dropPlayerId 7 : integer    # 所归属的玩家
+	dropTime 8 : integer        # 掉落的时间
+	dropTeamId 9 : integer      # 掉落归属的队伍Id (优先归属dropPlayerId,dropPlayerId为nil时才会输dropTeamId)
+	dropGuildId 10 : integer    # 掉落归属的行会的Id, 如果该项有值，则优先以行会ID为准
+	protectTime 11 : integer    # 掉落保护时间
+}
+.G2C_MIAOI_ADD_VAULT_BY_DROPITEM{
+	# 添加可拾取物体
+	itemId 0 : integer			# (固定的元素信息)场景元素ID
+	x 1 : float 				# (固定的元素信息)坐标信息
+	y 2 : float 				# (固定的元素信息)坐标信息
+	objId 3 : integer 			# (固定的元素信息)AoiMapItem的唯一ID,原理视野做消失处理时,使用的是这个ID告知的客户端
+	itemList 4 : *VaultDropItem # 掉落的物品信息
+	dropById 5 : integer		# 从何人/何怪身上掉落下来的(前端需要区分下这个消息是因为刚刚创建而发送,还是掉落很久通过移动而发送的)
+	dropReason 6 : integer      # 掉落原因
+}
+#可拾取类宝箱的信息
+.VaultChestItem {
+	guid 		0 	: integer 	# 拾取ID,用这个来区分是什么物品
+	id   		1	: integer	# 宝箱的道具ID
+	x 		 	2 	: float 	# 坐标信息
+	y 		 	3 	: float 	# 坐标信息
+	expire		4	: integer	# 宝箱销毁截止时间(unix时间戳),填0则不主动销毁
+	belongId    5	: integer	# 宝箱归属的玩家ID, 0表示无归属
+}
+.G2C_MIAOI_ADD_VAULT_BY_CHEST {
+	# 添加可拾取物体宝箱
+	itemId	 	0	: integer			# (固定的元素信息)场景元素ID
+	x 		 	1 	: float 			# (固定的元素信息)坐标信息
+	y 		 	2 	: float 			# (固定的元素信息)坐标信息
+	objId 	 	3 	: integer 			# (固定的元素信息)AoiMapItem的唯一ID,原理视野做消失处理时,使用的是这个ID告知的客户端
+	itemList	4	: *VaultChestItem	# 宝箱列表
+}
+.G2C_MIAOI_DESTROY_PICKABLE_ITEM {
+	# 销毁一个可拾取条目
+	itemId	 	0	: integer			# (固定的元素信息)场景元素ID
+	pickableId 	1	: integer			# 拾取ID
+}
+.G2C_MIAOI_ADD_BLOCK{
+	# 动态阻挡
+	itemId 0 : integer
+}
+.G2C_MIAOI_ADD_NPC{
+	# NPC
+	itemId 0 : integer
+}      
+.G2C_MIAOI_ADD_SCENEOBJ{
+	# 场景物体
+	itemId 0 : integer
+}
+.G2C_MIAOI_ADD_AVT{
+	# 玩家雕像
+	itemId 0 : integer
+}      
+.G2C_MIAOI_ADD_CUTSCENE{
+	# 过场动画
+	itemId 0 : integer
+} 
+.G2C_MIAOI_ADD_PATHKEY{
+	# 寻路轨迹
+	itemId 0 : integer
+}  
+
+# 客户端通知服务器加载完成后进入了地图
+.C2G_PLAYER_ENTER_MAP
+{
+}
+
+# 怪物AI动作切换 
+.G2C_MONSTER_ACTION_CHANGE
+{
+	charId 0 : integer
+	action 1 : integer
+}

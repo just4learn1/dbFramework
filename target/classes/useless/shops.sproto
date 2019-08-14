@@ -1,0 +1,64 @@
+#------------------------------------------------------ 随机商店
+#随机商店 协议文件
+#随机商店在用户登录、切图时与数据库的交互在login.sproto中
+#随机商店的数据同步用到了与数据库交互相同的proto结构,也在 login.sproto中 
+#此文件 只定义简单的客户端请求和服务器应答消息
+
+.C2G_MANUAL_FLUSH_RANDOM_SHOP
+{
+    # 客户端请求手动刷新随机商店
+    # 处理结果会以sendCommonResult形势发送
+    # 新的数据会在另外一个消息 G2C_SYNC_RANDOM_SHOP 中推送
+	shopId 0 : integer				#随机商场ID
+}
+
+# 购买商城物品
+.C2G_BUY_RANDOM_SHOP_ITEM
+{
+    # 处理结果会以sendCommonResult形势发送
+    # 还会额外发送两个消息 分别是一个物品变化消息(扣除和获得都在里面) 和 一个商城变化消息 G2C_SYNC_RANDOM_SHOP
+	shopId 0 : integer				#随机商城ID
+	pos 1 : integer					#物品栏位ID
+}
+
+#客户获取商城信息
+.C2G_SYNC_RANDOM_SHOP
+{
+	shopId 0 : integer				#随机商场ID
+}
+
+
+#------------------------------------------------------ 兑换商店
+.EsBuyRecord
+{
+    itemId 0 : integer      # 商品Id
+    dCnt 1 : integer        # 当天购买次数 这四个购买次数如果配置中不限制,则为nil
+    wCnt 2 : integer        # 当周购买次数
+    mCnt 3 : integer        # 当月购买次数
+    pCnt 4 : integer        # 永久购买次数
+}
+
+# 申请获取兑换商店的信息
+.C2G_GET_EXCHANGE_SHOP_INFO
+{
+    shopId 0 : integer
+}
+
+# 返回兑换商店的信息
+.G2C_GET_EXCHANGE_SHOP_INFO
+{
+    shopId 0 : integer
+    itemBuyRecord 1 : *EsBuyRecord
+    
+    #客户端解析规则:   这个消息只返回需要服务器下发的数据,目前只有每日,每周,每月,永久已经购买的次数.
+    #                  客户端解析时,先根据配置表格,以及自身的数据,判定展示情况,
+    #                  遍历到有上述数据的商品项后,可在此返回消息中查找对应的商品信息 
+}
+
+# 申请购买兑换商店
+.C2G_EXCHANGE_SHOP_BUY
+{
+    shopId 0 : integer
+    itemId 1 : integer
+    cnt 2 : integer
+}

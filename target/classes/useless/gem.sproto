@@ -1,0 +1,63 @@
+# 宝石操作协议
+.C2G_CHANGE_GEM_EQUIP
+{
+    equipPos 0 : integer
+    slotPos 1 : integer
+    gemTemplateId 2 : integer
+    bindState 3 : integer
+    opType 4 : integer # 0为装备，1为卸下
+}
+
+.GEM_ITEM
+{
+    equipPos 0 : integer  # 装备位置
+    dataContent 1 : string  # 数据内容
+    unlockSlotContent 2 : string  # 解锁槽位的信息
+}
+
+# 数据库操作协议
+.GEM_EQUIP_INFO
+{
+    datas 0 : *GEM_ITEM
+}
+
+.GEM_ITEM_DETAIL
+{
+    slotPos 0 : integer  # 槽位
+    gemTemplateId 1 : integer # 宝石模板ID
+    bindState 2 : integer # 绑定状态
+    isUnlocked 3 : boolean # 是否孔位已经解锁
+}
+
+.GEM_EQUIP_ITEM_INFO
+{
+    equipPos 0 : integer # 装备位置
+    itemDatas 1 : *GEM_ITEM_DETAIL # 宝石物品详细信息
+}
+
+.G2C_GEM_EQUIP_UPDATE
+{
+    datas 0 : *GEM_EQUIP_ITEM_INFO  # 要更新的所有装备信息
+    state 1 : integer # 更新状态，0代表当前是主动推送的，1代表装备，2代表卸下，3代表更换
+}
+
+# 请求解锁宝石槽位
+.C2G_UNLOCK_GEM_SLOT
+{
+    equipPos 0 : integer # 装备位置
+    slotPos 1 : integer  # 槽位
+}
+
+# 客户端请求宝石合成
+.C2G_GEM_TRANSFORM
+{
+    resInfo 0 : *UniqueResInfo # 物品ID
+    targetTemplateId 1 : integer # 目标宝石模板ID
+}
+
+# 服务器返回宝石结果
+.G2C_GEM_TRANSFORM
+{
+    result 0 : boolean # 是否成功
+    updateInfo 1 : G2C_COMMON_UPDATA_INFO
+}

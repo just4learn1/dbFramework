@@ -1,0 +1,47 @@
+# 以下为多人团队挑战副本协议
+
+# 1、购买副本挑战次数 可复用组队副本
+
+# 2、个人、队伍匹配
+.C2G_TEAM_START_MATCH
+{
+	teamId 0 : integer #队伍ID 0代表个人 组队匹配时填队伍ID
+	dungeonId 1 : integer #副本ID
+}
+
+# 3、取消匹配
+.C2G_TEAM_CANCLE_MATCH
+{
+	teamId 0 : integer #队伍ID 0代表个人 组队匹配时填队伍ID
+	dungeonId 1 : integer #副本ID
+}
+
+#结算时选择领取奖励 复用组队副本的，加个队伍类型吧
+#请求各个副本的当前最高评分和挑战次数等信息 这个可以复用组队副本的
+
+
+#9、团队副本qa中，去除了匹配，改为队长开战，队员确认的流程，
+#队长请求进入副本
+.C2G_CHIEF_ENTER_MULTITEAM_DUNGEON
+{
+	teamID       0 : integer          #队伍ID
+}
+#队长请求进入副本后，队伍中的成员来确认或取消进入副本
+.C2G_MEMBER_ENTER_MULTITEAM_DUNGEON
+{
+	teamID       0 : integer          #队伍ID
+	confirm      1 : integer					#0取消 1确定
+}
+
+#离开团队副本
+.C2G_MULTITEAM_LEAVE_DUNGEON
+{
+}
+#团队副本中的操作提示
+.G2C_OPERATE_MULTITEAM_DUNGEON
+{
+	charId 0 : integer #角色ID
+	charName 1 : string #角色名
+	dungeonId 2 : integer #副本ID
+	opType 3 : integer #提示类型  1等级不足 2队员取消进入副本 3队员确认进入副本 4队长已选择开战 5有玩家处于死亡状态 等
+}

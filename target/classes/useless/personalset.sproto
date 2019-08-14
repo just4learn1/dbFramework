@@ -1,0 +1,85 @@
+#1、保存个性签名
+.C2G_SAVE_SIGNATURE
+{
+	signature 0 : string #签名内容
+}
+.G2C_SAVE_SIGNATURE
+{
+	signature 0 : string #如果有屏蔽字，会用星号代替
+}
+#个性信息
+.PERSON_INFO
+{
+	year 	0 : integer			#出生年月日
+	month 1 : integer
+	day 	2 : integer
+	sex	  3 : integer     #0保密 1男 2女
+	province 4 : integer  #省份
+	city 5 : integer			#城市
+	tag 6 : *integer      #标签，长度最多为4
+}
+
+#2.保存个性信息
+.C2G_SAVE_PERSON_INFO
+{
+	info 0 : PERSON_INFO
+}
+#请求的时候可以选择一个或多个，应答里只返回对应的字段
+.G2C_SAVE_PERSON_INFO
+{
+	info 0 : PERSON_INFO
+}
+
+#3 发送留言
+.C2G_SEND_SPACE_MESSAGE
+{
+	charId 0 : integer  #目标角色ID，可以是自己
+	message 1 : string  #留言内容
+}
+#暂时先返回所有的留言
+.G2C_SEND_SPACE_MESSAGE
+{
+	charId 0 : integer #目标ID
+	boardInfo  1 : *BOARD_INFO #所有留言信息
+}
+
+.BOARD_INFO
+{
+	id 					0 : integer #自增长主键
+	sendCharId	1 : integer #发送者的id
+	name   			2 : string  #发送者的名字
+	job					3 : integer #职业
+	level				4 : integer #等级
+	message			5 : string  #留言内容
+	occurtime   6 : integer #时间戳
+	vipLv				7 : integer #vip等级
+}
+#4 个性空间请求
+.C2G_SPACE_REQUEST
+{
+	charId 0 : integer
+}
+
+.G2C_SPACE_REQUEST
+{
+	charId 0 : integer #角色ID
+	gang   1 : string  #帮会
+	job		 2 : integer #职业
+	name	 3 : string  #名字
+	level  4 : integer #等级
+	camp	 5 : integer #阵营
+	signature 6 : string #签名内容
+	personInfo 7 : PERSON_INFO #个性信息
+	boardInfo  8 : *BOARD_INFO #所有留言信息
+}
+#5 删除留言
+.C2G_DELETE_SPACE_MESSAGE
+{
+	charId 0 : integer  #目标角色ID，可以是自己
+	id 1 : integer  #主键
+}
+.G2C_DELETE_SPACE_MESSAGE
+{
+	charId 0 : integer  #目标角色ID，可以是自己
+	id 1 : integer  #主键
+}

@@ -1,0 +1,101 @@
+#帮会捐献
+.GuildDonate
+{
+	guildId 0 : integer
+	donateType 1 : integer
+	donateParam 2 : integer
+	obtainGuildDevote 3 : integer			#获得帮会贡献
+	obtainGuildFunds 4 : integer			#获得帮会资金
+	donatePlayerId 5 : integer
+}
+
+#回归帮会恢复帮贡
+.RecoveryDevote
+{
+	penaltyReallyDevote 0 : integer				#恢复离帮的周帮贡惩罚
+	penaltyWeekDevote 1 : integer 				#恢复周帮贡
+}
+#成就数据
+.AchievementData
+{
+	achType 0 : integer							#成就类型
+	args1 1 : integer							#参数1
+	args2 2 : integer							#参数2
+}
+
+#击杀敌国玩家记录
+.mKillRecord
+{
+	enemyId 0 : integer
+	killNum 1 : integer
+}
+
+#使用帮会资金道具同步base的数据
+.UseGuildFundsItem
+{
+	guildId 0 : integer
+ 	plrName 1 : string
+	itemName 2 : string
+ 	itemNum 3 : integer
+	obtainGuildFunds 4 : integer
+	obtainGuildDevote 5 : integer
+	playerId 6 : integer
+}
+
+#添加经验
+.AddExp
+{
+	expValue 0: integer
+	logType 1 : integer
+}
+
+
+#mapserver同步数据到basesever
+.M2B_SYNC_DATA 
+{
+	fightVal 0 : float							#战力
+	guildDevote	3 : integer						#帮贡
+	weekGuildDevote 4 : integer					#周帮贡
+	guildDonate 5 : GuildDonate					#帮会捐献同步到base数据
+	clickedPraisePlayerId 6 : integer			#被点赞玩家id
+	charName 9 : string							#改名成功同步数据
+	honorTotal 10 : integer						#同步累积荣誉
+	peerages 12 : integer 						#爵位
+	autoLeaveNationalWarTeam 13 : boolean		#离开国战场景 是否退出组队
+	fashionFaceId 14 : integer					#穿戴的时装（脸）
+	fashionWeaponId 15 : integer				#穿戴的时装（武器）
+	fashionDressId 16 : integer					#穿戴的时装（衣服）
+	onWeapon 17 : integer						#穿戴的神器武器
+	onArmor 18 : integer						#穿戴的神器铠甲
+	onWing 19 : integer							#穿戴的翅膀	
+	triggerRewardFinishRecord 20 : *integer		#激活奖励的完成记录
+	killRecordData 21 : *mKillRecord			#杀敌记录数据
+	hp 23 : integer                             #血量
+	hpMax 24 : integer                          #血量上限
+	useGuildFundsItem 25 : UseGuildFundsItem    #使用商票后数据同步
+	addFunds 26 : integer						#增加帮会资金
+	isDead 27 : boolean							#同步死亡状态
+	lastLoginTime 28 : integer					#最后登录的时间
+	ringCount 29 : integer						#拥有的戒指数量
+	totalGuildDevote 30 : integer				#总历史帮贡
+}
+
+#basesever同步数据到mapserver
+.B2M_SYNC_DATA 
+{
+	randomCamp 0 : integer						#天命所归返回的国家
+	guildId 1 : integer							#帮会ID
+	guildName 2: string							#帮会名称
+	achievementData 3 : AchievementData			#成就达成数据
+	isActiveLeaveGuild 4 : boolean				#是否是主动离开帮会
+	clickPraise 5 : integer						#自己被点赞
+	isFirstPopNotice 6 : integer				#每日是否第一次弹出公告
+	recoveryDevote 8 : RecoveryDevote			#回归帮会恢复帮贡
+	triggerRewardType 9 : integer 				#触发激活任务类型
+	limittype 11 : integer						#限次变化1
+	guildJob 12 : integer						#帮会职务
+	kingGuildLv 13 : integer					#领取的帝王帮俸禄奖励	
+	addExpData 15 : AddExp						#添加经验
+	guildTeachType 16 : integer					#帮会传功类型 1 传授功力 2 请求传功
+	lastLeaveGuildTime	17	:	integer	#上次离开帮会时间
+}

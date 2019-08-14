@@ -251,7 +251,7 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
                 long[] pageIds = e.getValue();
                 System.out.println(Arrays.toString(pageIds));
                 String sql = tablePageManager.generageSelectSql(pageIds, e.getKey(), fieldnames);
-                System.out.printf("mul select sql : %s\n", sql);
+//                System.out.printf("mul select sql : %s\n", sql);
                 try (PreparedStatement statement = conn.prepareStatement(sql)) {
                     for (int i = 0, len = pageIds.length; i < len; i++) {
                         statement.setLong((i + 1), pageIds[i]);
@@ -270,21 +270,6 @@ public class MysqlEntityManager<T> implements IEntityManager<T>, Runnable {
         return result;
     }
 
-    class QueryFieldHandler implements InvocationHandler{
-
-        HashMap<String, Object> valueMap;
-
-        public QueryFieldHandler(HashMap<String, Object> valueMap) {
-            this.valueMap = valueMap;
-        }
-
-        @Override
-        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            String methodname = method.getName();
-            String fieldname = CommonUtil.getFieldname(methodname);
-            return valueMap.get(fieldname);
-        }
-    }
     class EntityDataFieldHandler implements InvocationHandler{
 
         T t;

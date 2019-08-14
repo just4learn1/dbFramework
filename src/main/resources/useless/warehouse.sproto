@@ -1,0 +1,58 @@
+# 同步仓库信息(仓库整理)
+.C2G_SYNC_ALL_WAREHOUSE{
+}
+
+# 仓库数据信息
+.G2C_SYNC_ALL_WAREHOUSE{
+	allItems 0 : *Item_NEW
+	allEquips 1 : *EQUIPMENTINFO
+	expandTime 2 : integer
+}
+
+# 放入仓库请求
+.C2G_PUTIN_WAREHOUSE_ITEMS{
+	resTable 0 : *IRes
+}
+
+#取出仓库请求
+.C2G_TAKEOUT_WAREHOUSE_ITEMS{
+	resTable 0 : *IRes
+}
+
+# 扩展仓库请求
+.C2G_EXPEND_WAREHOUSE_CONTAINER{
+
+}
+
+# 仓库增加物品
+.G2C_ADD_WAREHOUSE_ITEMS{
+	items 0 : *Item_NEW
+	equips 1 : *EQUIPMENTINFO
+}
+
+# 仓库移除物品
+.G2C_REMOVE_WAREHOUSE_ITEMS{
+	resKeys 0 : *integer
+}
+
+.C2G_PACK_WAREHOUSE
+{
+
+}
+
+.WAREHOUSE_DATA_ITEM
+{
+	index 0 : integer
+	dataStr 1 : string
+}
+
+.M2D_SAVE_WAREHOUSE_DATA
+{
+	saveDataInfo 0 : *WAREHOUSE_DATA_ITEM
+}
+
+.MAPSERVER_SYNC_WAREHOUSE_DATA
+{
+	saveDataInfo 0 : *WAREHOUSE_DATA_ITEM
+	wareHouseExpandTime 1 : integer
+}

@@ -1,0 +1,109 @@
+#请求boss伤害排行榜
+.C2G_QUERY_GUILD_BOSS_DMGRANK
+{
+	mapItemId	0	:	integer
+}
+.G2C_QUERY_GUILD_BOSS_DMGRANK
+{
+	mapItemId	0	:	integer
+	mstTemplateId	1	:	integer
+	rankInfo	2	:	*GUILD_DMG_RANK
+}
+.GUILD_DMG_RANK
+{
+	guildId	0	:	integer
+	dmgPercent	1	:	float
+	guildName	2	:	string
+}
+
+#奖励结算
+.G2C_BOSS_CHALLENGE_GUILD_REWORDS
+{
+	mstTemplateId	0	:	integer
+	rank	1	:	integer			#本人公会的伤害排名
+	rewardInfo	2	:	*BOSS_CHALLENGE_ITEM_INFO
+}
+.BOSS_CHALLENGE_ITEM_INFO
+{
+	itemType	0	:	integer
+	templateId	1	:	integer
+	itemCnt	2	:	integer
+}
+#存储boss挑战数据
+.B2D_SAVE_BOSS_CHALLENGE_DATA
+{
+	id	0	:	integer
+	refreshInfo	1	: *BOSS_CHALLENGE_DATA
+}
+.BOSS_CHALLENGE_DATA
+{
+	mstGroupId	0	:	integer
+	refreshIndex	1	:	integer
+}
+#查询boss挑战数据返回
+.D2B_QUERY_BOSS_CHALLENGE_DATA
+{
+	id	0	:	integer
+	refreshInfo	1	: *BOSS_CHALLENGE_DATA
+}
+.B2D_QUERY_BOSS_CHALLENGE_DATA
+{
+	id	0	:	integer
+}
+#同步boss挑战活动状态
+.B2M_SYNC_BOSS_CHALLENGE_STATE
+{
+	state	0	:	integer			#1为开启，0为结束
+	refreshInfo	1	:	*BOSS_CHALLENGE_REFRESH_INFO
+}
+.BOSS_CHALLENGE_REFRESH_INFO
+{
+	mstTemplateId	0	:	integer
+	mstGroupId	1	:	integer
+}
+#同步boss击杀结果给baseserver
+.M2B_SYNC_BOSS_CHALLENGE_RESULT
+{
+	result	0	:	*BOSS_CHALLENGE_RESULT_INFO
+	participates	1	:*BOSS_CHALLENGE_PARTICIPATE_MEMBER
+}
+.BOSS_CHALLENGE_RESULT_INFO
+{
+	mstTemplateId	0	:	integer
+	mstGroupId	1	:	integer
+	killed	2	:	integer		#1被击杀
+	rankInfo	3	:	*GUILD_DMG_RANK
+	firstDmgPlrId	4	:	integer	#第一刀玩家id
+	killerPlrId	5	:	integer	#击杀者id
+}
+.BOSS_CHALLENGE_PARTICIPATE_MEMBER
+{
+	guildId	0	:	integer
+	memberIds	1	:	*integer
+}
+.M2B_SYNC_BOSS_CHALLENGE_KILLED
+{
+	result	0	:	BOSS_CHALLENGE_RESULT_INFO
+	participates	1	:*BOSS_CHALLENGE_PARTICIPATE_MEMBER
+}
+.G2C_BOSS_CHALLENGE_END
+{
+	endTime 0 : integer
+}
+
+.G2C_TEAM_DUNGEON_BOSS_CHANGED
+{
+	datas	0	:	*NEW_TEAMDUNGEON_BOSS_INFO
+}
+.NEW_TEAMDUNGEON_BOSS_INFO
+{
+	mapItemId	0	:	integer
+	mstId	1	:	integer
+	state	2	:	integer
+	liveCnt	3	:	integer
+	totalCnt	4	:	integer
+}
+.C2G_REFRESH_TEAMDUNGEON_BOSS
+{
+	
+}

@@ -1,0 +1,30 @@
+.MstAliveState{
+	mstId 0 : integer		#怪物Id
+	isBoss 1 : boolean  	#是否是Boss
+	remainCnt 2 : integer 	#剩余只数(如果是0只,Boss可能显示倒计时或/已击杀(flushTick为nil) | 小怪显示剩余0只)
+	flushTick 3 : integer	#预计刷新时间 UTC时刻,单位秒(只有Boss有这个字段,如果填充nil表示,这个Boss已经刷新过了)
+}
+
+# 怪物攻城玩法更新(首次收到这个消息等价于 '活动开始' )
+.G2C_BOSS_ATTACK_UPDATE{
+	mstList 0 : *MstAliveState 	# 怪物列表
+	finishTick 1 : integer 		# 玩法结束时刻 UTC时刻,单位秒 (如果中途Boss死亡,可能提前结束)
+}
+
+# 怪物攻城玩法结束(依赖这个消息关闭界面HUD,发送给地图内部玩家)
+.G2C_BOSS_ATTACK_FINISH{
+	
+}
+
+# 玩家申请传送到怪物攻城场景
+.C2G_BOSS_ATTACK_REQ_PORTAL{
+	
+}
+
+# 怪物攻城玩法结算消息(发送给全服玩家)
+.G2C_BOSS_ATTACK_RESULT{
+	result 0 : integer 		# 0:防守失败 1:胜利
+	buffId 1 : integer		# 获得奖励ID (只做结算界面展示,真正的Buff是由Buff系统增加,前端不用关注)
+}
+
+

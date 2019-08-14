@@ -1,0 +1,227 @@
+#国家建设协议
+#官员外观信息
+.Official_Surface
+{
+	hairId 0 : integer #头发ID
+	faceId 1 : integer #脸ID
+	wingId 2 : integer #翅膀ID
+	weaponId 3 : integer #武器ID
+	armorId  4 : integer #铠甲ID
+	dressId  5 : integer #衣服ID
+	fashionHairId 6 : integer #时装头发ID
+	fashionFaceId 7 : integer #时装脸ID
+}
+#获取国家信息
+.C2G_GET_COUNTRY_INFORMATION
+{
+}
+#官员信息
+.OFFICIALS_PER_COUNTRY
+{
+	id 				 0 : integer #职位ID
+	charId 		 1 : integer #角色ID
+	charName   2 : string  #角色名称
+	templateId 3 : integer #模板ID  对应角色属性表主键
+	surface    5 : Official_Surface #外观
+}
+#应答
+.G2C_GET_COUNTRY_INFORMATION
+{
+	countryPower  0 : integer 	#国力
+	cityNum				1 : integer 	#城市数量
+	foodNum 			2 : integer 	#国家粮草数量
+	payNum				3 : integer	  #可领取俸禄的次数
+	appointtime		4 : integer 	#皇帝任命时间戳
+	notice				5 : string		#当前国家公告
+	officials			6 : *OFFICIALS_PER_COUNTRY #官员信息
+	treasury 			7 : integer	 #国库资金
+}
+#领取俸禄
+.C2G_GET_OFFICIAL_PAY
+{
+}
+
+#发送国家公告
+.C2G_SEND_COUNTRY_NOTICE
+{
+	content 0 : string #公告内容
+}
+#应答
+.G2C_SEND_COUNTRY_NOTICE
+{
+	res 0 : integer #结果 0成功 1敏感词
+	content 1 : string #成功则返回content,有敏感词则返回替换敏感词的content
+}
+
+#向官员发送消息，询问是否参加登基大典
+.G2C_SEND_INVITATIONS_TO_OFFICIALS
+{
+}
+#官员确认
+.C2G_SEND_INVITATIONS_TO_OFFICIALS
+{
+	attend 0 : integer #0参加 1拒绝
+}
+#官员退出登基仪式
+.C2G_OFFICIALS_QUIT_CEREMONY
+{
+}
+
+#查看皇帝候选人
+.C2G_GET_EMPEROR_CANDIDATE
+{
+}
+.EMPEROR_CANDIDATE_INFO
+{
+	charId 0 : integer #角色ID
+	charName 1 : string #角色名称
+	level  2 : integer #等级
+	power  3 : integer #战力
+	peerages 4 : string #爵位
+	group  5 : string #帮会
+}
+#应答为当前国家排名前五位的帮会的帮主信息
+.G2C_GET_EMPEROR_CANDIDATE
+{
+	candidate 0 : *EMPEROR_CANDIDATE_INFO
+}
+
+#任命官员
+.C2G_APPOINT_OFFICIAL
+{
+	targetId 0 : integer #目标角色ID
+	position 1 : integer #职务
+}
+.G2C_APPOINT_OFFICIAL
+{
+	position 0 : integer #当前职务
+}
+#解除官员职务
+.C2G_RELEASE_APPOINT_OFFICIAL
+{
+	targetId 0 : integer #目标角色ID
+}
+#推送玩家职务有变化
+.G2C_OFFICIAL_UPDATE
+{
+	targetId 0 : integer #目标角色ID
+	position 1 : integer #职务
+}
+#任命指挥官
+.C2G_APPOINT_LEADER
+{
+	targetId 0 : integer #目标角色ID
+}
+#解除指挥官
+.C2G_RELEASE_APPOINT_LEADER
+{
+	targetId 0 : integer #目标角色ID
+}
+#通知玩家被任命或解除指挥官
+.G2C_LEADER_UPDATE
+{
+	targetId 0 : integer #目标角色ID
+	leader 1 : integer   #是否指挥官 0不是 1是
+}
+
+#获取国家排行
+.C2G_GET_COUNTRY_RANKLIST
+{
+	
+}
+.COUNTRY_RANK_INFO
+{
+	id 0 : integer #国家ID
+	kingName 1 : string #国王名字
+	power 2 : integer #国力
+	rate  3 : string #国战胜率，比如 50%
+	cityNum 4 : integer #城市数量
+}
+.G2C_GET_COUNTRY_RANKLIST
+{
+	rank 0 : *COUNTRY_RANK_INFO
+}
+
+#获取国民列表
+.C2G_GET_COUNTRY_PEOPLE
+{
+}
+#国民信息
+.COUNTRY_PEOPLE_INFO
+{
+	charId 0 : integer #角色ID
+	position 1 : integer #官职
+	charName 2 : string  #角色名称
+	level 3 : integer #等级
+	group 4 : string #帮会
+	credit 5 : integer #战功
+	job 6 : integer #职业
+	isOnline 7 : integer #是否在线
+	peerages 8 : integer #军衔
+}
+#应答
+.G2C_GET_COUNTRY_PEOPLE
+{
+	people 0 : *COUNTRY_PEOPLE_INFO
+}
+
+#base->db获取国家的国民
+.B2D_GET_COUNTRY_PEOPLE
+{
+	countryId 0 : integer #国家ID
+}
+.DB_COUNTRY_PEOPLE_INFO
+{
+	charId 0 : integer #角色ID
+	charName 1 : string  #角色名称
+	level 2 : integer #等级
+	group 3 : integer #帮会
+	credit 4 : integer #战功
+	job 5 : integer #职业
+	peerages 6 : integer #爵位
+	createTime 7 : integer #角色创建时间
+}
+#db->base应答
+.D2B_GET_COUNTRY_PEOPLE
+{
+	countryId 0 : integer
+	info 1 : *DB_COUNTRY_PEOPLE_INFO
+}
+#根据玩家名称搜索
+.C2G_SEARCH_IN_COUNTRY
+{
+	charName 0 : string #角色名称
+}
+.G2C_SEARCH_IN_COUNTRY
+{
+	result 0 : COUNTRY_PEOPLE_INFO
+}
+
+#从DB读取在计算国力的时候需要的数据，包括各个等级的玩家，官员战斗力
+.B2D_GET_PALYER_LOGIN_NDAY
+{
+	countryId 0 : integer #国家ID
+	startTime 1 :integer #开始计算的登录时间
+}
+.LOGIN_USER_INFO
+{
+	charId 0 : integer #角色ID
+	level 1 : integer #等级
+}
+.OFFICIAL_FIGHTVAL
+{
+	official 0 : integer #官职
+	fightVal 1 : integer #战斗力
+}
+.D2B_GET_PALYER_LOGIN_NDAY
+{
+	countryId 0 : integer #国家ID
+	loginUser 1 : *LOGIN_USER_INFO
+	fightVal 2 : *OFFICIAL_FIGHTVAL
+}
+#国家选择协议
+#国家选择请求
+.C2G_CHOOSE_COUNTRY
+{
+	camp 0 : integer      #选择的国家ID
+}

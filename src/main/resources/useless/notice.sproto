@@ -1,0 +1,58 @@
+#DB中公告数据
+.DBNotice
+{
+	noticeId 0 : integer	#公告id  
+	gotoType 1 : integer	#跳转类型 1	跳转到界面 2 寻路至Npc 
+	param1 2 : integer		#参数1
+	param2 3 : integer		#参数2
+	resName 4 : string      #资源名
+	startTime 5 : integer	#开始有效时间
+	endTime 6 : integer		#结算有效时间
+}
+
+#加载通知数据
+.D2B_NOTICE_QUERY
+{
+	noticeData 0: *DBNotice
+}
+
+#公告数据结构
+.Notice
+{
+	noticeId 0 : integer	#公告id  
+	gotoType 1 : integer	#跳转类型 1	跳转到界面 2 寻路至Npc 
+	param1 2 : integer		#参数1
+	param2 3 : integer		#参数2
+	resName 4 : string      #资源名
+}
+
+#客户端请求公告信息
+.C2G_REQUEST_NOTICE_DATA
+{	
+}
+
+#返回公告信息
+.G2C_REQUEST_NOTICE_DATA
+{
+	noticeData 0 : *Notice				# 公告数据 
+}
+
+#---------------------------------------------------------------- Gmt公告
+.WorldNotice
+{
+	id 0 : integer
+	title 1 : string
+	beginTime 2 : integer
+	endTime 3 : integer
+	priority 4 : integer
+	times 5 : integer
+	timeInterval 6 : integer
+	content 7 : string
+	type 8 : integer
+	tabType 9 : integer
+}
+#DB->Base | 返回符合条件的Gmt公告
+.D2B_GET_WORLD_NTF
+{
+	ntfList 0 : *WorldNotice		#符合条件的广播消息列表
+}

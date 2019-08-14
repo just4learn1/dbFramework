@@ -1,0 +1,550 @@
+#奖励信息
+.RewardItem
+{
+	resType 0 : integer 
+	resId 1 : integer 
+	resValue 2 : integer
+}
+#配置里的信息
+.RewardInfo
+{
+	goal 0 : integer            #目标，比如累计登陆几天
+	desc 1 : string             #运营配置的描述 可为空
+	reward 2 : *RewardItem      #奖励信息 | 兑换玩法中表示要获得的物品
+    cost 3 : *RewardItem        #兑换玩法专用 : 兑换消耗的物品
+    maxCnt 4 : integer          #兑换玩法专用 : 最大兑换次数
+}
+
+#天降好礼 | 的额外配置
+.MapGiftCfg
+{
+    startTick 0 : integer       # 开始时间|自当天0点的秒数
+    endTick 1 : integer         # 结束时间|自当天0点的秒数
+    ntfStartTick 2 : integer    # 滚屏公告的时间|开始时间|0点秒数
+    ntfEndTick 3 : integer      # 滚屏公告的时间|结束时间|0点秒数
+    ntfInterval 4 : integer     # 公告更新间隔|单位秒
+    ntfDes 5 : string           # 滚屏公告内容
+    isLoginShow 6 : integer     # 是否是登录公告提示 0:不提示 1:提示
+    giftSumCnt 7 : integer      # 宝箱总量 | 单个地图
+    giftPerCnt 8 : integer      # 宝箱同时存在的最大量
+    flushInterval 9 : integer   # 宝箱之间的刷新间隔
+    playerOpenMax 10 : integer  # 玩家单日开启宝箱的最大量
+    giftCfg 11 : *RewardItem    # 奖励组,解析后的格式,不在数据库中
+    # giftCfgStr 12 : string    # 奖励组 {type,id,cnt|type,id,cnt|type,id,cnt|} , 形如"2,0,10|3,0,1000|":表示掉落10绑定元宝 + 1000银币,最后一个物品也有有'|'
+}
+
+# 直冲玩法 | 的额外配置
+.OrpRewardInfo{
+    id 0 : integer              # 物品Id(本轮的直冲活动中各个商品项的id不可重复,多个直冲活动中id不限制要求)
+    name 1 : string             # 直冲商品名字
+    iconItemId 2 : integer      # 直冲显示的icon图表(对应道具主键Id,icon就用该道具的图标)
+    desc 3 : string             # 直冲商品项描述
+    reDesc 4 : string           # 直冲的限购频率_纯文字描述
+    reNum 5 : integer           # 直冲的限购频率_控制频率的字段,单位是天,计时以自然天为单位
+    reCnt 6 : integer           # 每个购买周期内,可直冲的次数
+    chargeId 7 : integer        # 对应的充值档位(充值表)
+    needStat 8 : integer        # 充值后是否统计纳入首冲逻辑中 0:不纳入 1:纳入
+    reward 9 : *RewardItem      # 该档位充值后的奖励信息
+}
+.OutrightPuchCfg{
+    # 直充礼包 专用配置
+    rewardInfo 0 : *OrpRewardInfo   # 直冲奖励项
+}
+# 权重奖励信息结构,比原有物品项目更加复杂些,在祈愿阁和
+.WeightRewardItemCfg{
+    id 0 : integer              # 奖励Id
+    resType 1 : integer         # 资源类型
+    resId 2 : integer           # 资源Id
+    resValue 3 : integer        # 单份奖励的资源数量
+    resCnt 4 : integer          # 奖励份数(祈愿阁使用,大转盘默认都是1)
+    weight 5 : integer          # 奖励命中权重
+    isRarity 6 : integer        # 是否是真贵道具(祈愿阁使用)
+    aDesc 7 : string            # 奖励项目描述
+}
+# 一项大转盘配置
+.BigWheelObjCfg
+{
+    rewardPool 0 : *WeightRewardItemCfg     # 奖品项
+    costResType 1 : integer                 # 抽奖所需资源类型
+    costResId 2 : integer                   # 抽奖所需的资源Id
+    costValueList 3 : *integer              # 每次抽奖所需要花费的资源数量(下标表示次数)
+    showIdx 4 : integer                     # 展示标记 1:左侧页签 2:右侧页签
+}
+# 所有项大转盘配置
+.BigWheelCfg
+{
+    roundCount 0 : integer                  # 所有项大转盘轮数
+    bigWheelObjCfg 1 : *BigWheelObjCfg	    # 所有大转盘数据
+}
+#祈愿阁奖励排名
+.WhRankReward{
+    rankStart 0 : integer                   # 排名起始
+    rankEnd 1 : integer                     # 排名终止
+    rewardList 2 : *RewardItem              # 奖励信息
+}
+.WhCntReward
+{
+    cntRewardId 0 : integer                 # 个人次数奖励的id
+    cnt 1 : integer                         # 要求的抽奖次数 >= 可领奖
+    rewardList 2 : *RewardItem              # 奖励信息
+}
+.WishHouseCfg{
+    # 祈愿阁专用配置
+    rewardPool 0 : *WeightRewardItemCfg     # 奖品项
+    rankReward 1 : *WhRankReward            # 祈愿阁排名奖励配置
+    cntReward 2 : *WhCntReward              # 祈愿阁个人抽奖次数奖励配置
+    wishCost 3 : RewardItem                 # 祈愿消耗
+    errStr 4 : string                       # 错误信息(服务器传输数据时专用,和业务逻辑无关,前端可忽略)
+}
+.MonsterGiftReward
+{
+	resType 			0 : integer 
+	resId 				1 : integer 
+	resValueUp 		2 : integer
+	resValueDown 	3 : integer
+	weight 				4 : integer 
+}
+.MstGiftCfg
+{
+    # 年兽闹新春,养怪杀怪专用配置
+    monsterCreateTime 	0 : integer  							#年兽出现的时间
+    monsterDeleteTime 	1 : integer  							#年兽消失的时间，如果未被击杀
+    fullProcess       	2 : integer  							#喂养满所需的进度点
+    normalProcessPoint 	3 : integer 							#普通喂养得到的进度点
+    normalCost 					4 : *RewardItem     			#普通喂养的花费
+    normalReward 				5 : *MonsterGiftReward 		#普通喂养的奖励
+    spendProcessPoint 	6 : integer 							#元宝喂养得到的进度点
+    spendCost 					7 : *RewardItem     			#元宝喂养的花费
+    spendReward 				8 : *MonsterGiftReward 		#元宝喂养的奖励
+    
+    boxLastTime					9 : integer								#宝箱持续时间
+    noticeLastTime		 10 : integer								#公告持续时间
+    noticeInterval 		 11 : integer								#公告更新间隔
+    noticeComment			 12 : string								#公告内容
+    boxSum	 					 13 : integer								#宝箱总数
+    boxCurSum					 14 : integer								#宝箱同时存在的最大数量
+    boxInterval				 15 : integer								#宝箱之间的刷新间隔
+    playerMaxSum			 16 : integer								#玩家单日开启宝箱的最大数量
+    boxReward					 17 :*RewardItem						#宝箱奖励
+    ruleDes						 18 : string								#规则描述
+}
+# 排行榜活动排名区间配置
+.ActRankIntervalCfg{
+    rankStart 0 : integer                   # 排名区间上限
+    rankEnd 1 : integer                     # 排名区间下限
+    limitNum 2 : integer                    # 限制额度
+    rewardList 3 : *RewardItem              # 奖励信息
+}
+# 消费和充值排行榜活动配置
+.ActRankCfg{
+    actRankIntervalCfg 0 : *ActRankIntervalCfg    # 排行榜活动奖励区间配置
+}
+
+#每日在线
+.OnlineCfg{
+	onlineMin	0 : integer		            # 在线分钟数
+	giftCfg 	1 : *RewardItem             # 奖励组,解析后的格式,不在数据库中
+}
+#帮派红利
+.GuildDividend{
+	totalCost		0 : integer					# 帮派成员累计消费元宝
+	dividendRate	1 : float					# 红利比率
+	guildNo			2 : integer					# 成员个数
+	prizeTime		3 : integer					# 奖励时间
+}
+#base同步给map
+.GuildDividendBM{
+	totalCost		0 : integer					# 帮派成员累计消费元宝
+	guildId			1 : integer					# 帮派id
+	guildNo			2 : integer					# 成员个数
+}
+.B2M_SYNC_GUILD_BONUS
+{
+	dividendRate	0 	: 	float					# 红利比率
+	prizeTime		1 	: 	integer					# 奖励时间
+	guildDividend	2	:	*GuildDividendBM
+}
+#帮派红利返回
+.C2G_GUILD_BONUS
+{
+
+}
+.G2C_GUILD_BONUS
+{
+	totalCost		0 : integer					# 帮派成员累计消费元宝
+	guildNo			1 : integer					# 成员个数
+}
+
+# 活动静态配置
+.ActivityInfo
+{
+    aId 0 : integer                 # 公用 | 活动实例Id
+    aType 1 : integer               # 公用 | 玩法类型
+    state 2 : integer               # 公用 | 活动当前状态 | 控制活动的开启和关闭(state为运行结束和强行关闭)
+    comments 3 : string             # 公用 | 活动注释(运营自己看的|程序不加载)
+    createTime 4 : integer          # 公用 | 录入时间
+    startTime 5 : integer           # 公用 | 活动开启时间
+    endTime 6 : integer             # 公用 | 活动结束时间
+    lastEditTime 7 : integer        # 公用 | 最后编辑时间
+    tabName 8 : string              # 公用 | 活动页签名称
+    level 9 : integer               # 公用 | 活动开启等级
+    rankWeight 10 : integer         # 公用 | 活动排序权重
+    isShowTime 11 : integer         # 公用 | 是否显示时间 0:不展示 1:展示
+    aDesc 12 : string               # 公用 | 活动的描述(不同玩法根据需求决定此描述的展示位置及是否使用此字段)
+    rewardInfo 13 : *RewardInfo     # 通用奖励
+    mapGiftCfg 14 : MapGiftCfg      # 专用配置 | 天降好礼
+	fundIngot	15 : integer	    # 基金元宝数
+    orpuchCfg 16 : OutrightPuchCfg  # 直冲玩法 专用配置
+    bigWheelCfg 17 : BigWheelCfg    # 大转盘玩法 专用配置
+    wishHouseCfg 18 : WishHouseCfg  # 祈愿阁玩法 专用配置
+    mstGiftCfg 19 : MstGiftCfg      # 养怪杀怪玩法 专用配置
+    actRankCfg 20 : ActRankCfg	    # 充值排行榜或消费排行榜玩法 专用配置	
+	guildDividend 21 : GuildDividend  #帮派红利
+}
+#累计登陆活动、每周签到、每日登陆
+.ActivityItem
+{
+	goal 0 : integer #领奖时需要满足的条件，比如累计第几天
+	isDone 1 : boolean #是否已达成  | 兑换玩法中不使用此字段
+	getCount 2 : integer #领取次数
+}
+
+# 唯一标识一个活动的结构
+.ActKey
+{
+    aId 0 : integer
+    aType 1 : integer
+}
+.OrData{
+    # 直充活动
+    id 0 : integer          # 商品Id
+    cnt 1 : integer         # 当前的购买次数
+}
+.BigWheelData{
+    # 大转盘玩法
+    curWave 0 : integer     # 玩家当前所处的轮次(第一轮是1)
+    chosenList 1 : *integer # 玩家在本轮次中已经命中的奖励Id(对应 ActivityInfo.bigWheelCfg.rewardPool.id)
+    # 转盘物品排序???
+}
+.WhRewardInfo{
+    pName 0 : string        # 抽奖角色名
+    pId 1 : integer         # 玩家Id
+    id 2 : integer          # 奖励物品Id
+    tick 3 : integer        # 奖品命中时刻    
+}
+.WhRankInfo
+{
+    rank 0 : integer            # 排名
+    pName 1 : string            # 排名角色名
+    pGuid 2 : integer           # 排名的角色id
+    cnt 3 : integer             # 当前祈愿次数
+    camp 4 : integer            # 阵营
+}
+.WishHouseData
+{
+    # 祈愿阁-自己的
+    selfCnt 0 : integer                 # 个人抽奖次数
+    selfReward 1 : *WhRewardInfo        # 个人全部所得 (个人全部所得)
+    selfAcceptedId 2 : *integer         # 个人已经领取的次数奖励(与ActivityInfo.wishHouseCfg.cntReward.cntRewardId对应) 0:没有领奖 1:已经领奖了
+    
+    # 祈愿阁-共享数据
+    remainCnt 3 : *integer              # 所有物品剩余数量,下标是id
+    gRewardRarity 4 : *WhRewardInfo     # 全服所得-真贵的物品 (2个稀有物品,如果命中稀有物品,立即发送全服推送消息)
+    gRewardrecently 5: *WhRewardInfo    # 全服所得-最近物品 (3条普通物品,有人抽奖,推送一次,每隔30秒至多推送一次)
+}
+
+# 排行榜玩家排名数据
+.ActRankPlayerData
+{
+    rankNum 0 : integer                 # 排名名次
+    charId 1 : integer                  # 排名的角色id
+    nickName 2 : string			# 排名角色名
+    camp 3 : integer			# 阵营
+    rankVal 4 : integer			# 排名数值
+}
+# 充值和消费排行榜数据
+.ActRankData
+{
+    myRank	0 : integer			                # 我的排名
+    myRankVal 1 : integer			            # 我的排行榜数值
+    actRankPlayerData 2 : *ActRankPlayerData	# 上榜玩家数据    
+}
+
+# 玩家活动的个人数据
+.PlayerActivtyInfo
+{
+    key 0 : ActKey          # 公用 | 活动Id
+    value 1 : integer 			    # 专用字段 | 当前进度()
+    step 2 : integer  			    # 当前阶段
+    activityItem 3 : *ActivityItem 	# 专用字段 |累计登陆、每周签到、每日登陆用这个	
+    mapGiftCnt 4 : integer          # 玩家当天已经领取采集的宝箱个数
+    orPuchData 5 : *OrData          # 直冲活动,处于购买CD状态的物品项Id(禁止购买) 
+    bigwheelData 6 : *BigWheelData   # 大转盘个人数据
+    wishHouseData 7: WishHouseData  # 祈愿阁个人数据
+    actRankData 8: ActRankData		# 充值或消费排行榜数据
+	guildDividend 9 : GuildDividend	# 帮派红利
+}
+
+# ---------------------------------------------------------------------------------------Server业务接口:
+#Base向DB读取活动数据
+.B2D_LOAD_ACTIVITY
+{
+    updateTick 0 : integer      #最后更新时间
+    # 筛选出来的活动满需 : 活动未结束 && 最后修改时间>最后更新时间 && 状态是开启|未开始
+}
+.D2B_LOAD_ACTIVITY
+{
+    aInfos 1 : *ActivityInfo    # 所有有变化的活动信息
+}
+
+#Base向Map同步活动信息 | 首次启动+活动状态有变化(新增,到达开启时间,结束,强行关闭)
+.B2M_SYNC_ACTIVITY
+{
+    aInfos 1 : *ActivityInfo    # 有更新的活动信息
+}
+
+# 排行榜玩家数值
+.ActRankPlayerValue
+{
+    charId	0 : integer			# 玩家id
+    rankVal 1 : integer			# 数值    
+}
+
+#Base向Map同步活动排行榜信息
+.B2M_SYNC_ACT_RANK
+{
+    rankType	0 : integer			# 排行榜类型
+	clearData	1 : integer			# 清除数据
+    actRankPlayerValue 2 : *ActRankPlayerValue					# 更新的玩家数值
+    actRankPlayerData 3 : *ActRankPlayerData					# 上榜玩家数据
+}
+
+#玩家行为入库
+#各个玩法自己写消息或走二进制
+
+#玩家领奖日志入库 - 不用网络消息了,走日志
+
+#各个活动玩家个人数据切图更新,自行处理,不体现在协议上
+
+# ---------------------------------------------------------------------------------------业务接口:
+#客户端主动获取活动信息(首次登录,不会立即请求,有玩家点击操作或者延时请求)
+.C2G_GET_ACTIVITY_CFG
+{
+    key 0 : *ActKey                   # 传入空,表示获取全部
+    # 服务器应答G2C_SYNC_ACTIVITY消息
+}
+# 活动信息的应答消息 | 这个消息中两个数组中活动不是一一对应的
+.G2C_GET_ACTIVITY_CFG
+{
+    aInfos 1 : *ActivityInfo            # 活动的静态配置(所有玩家公用的信息,如描述,奖励档位等)
+    pActInfos 2 : *PlayerActivtyInfo    # 玩家个人数据(玩家进入,领奖状态等)
+}
+
+
+#Server告知客户端有活动的状态变化(开启|结束),一般是BaseServer发送给客户端,客户端展示红点,点击后,走C2G_GET_ACTIVITY_CFG流程
+.G2C_NTF_ACTIVITY_STATE_CHANGE
+{
+    addKey 0 : *ActKey                  # 新增的活动
+    delKey 1 : *ActKey                  # 失效的活动
+}
+
+#客户端向Server请求玩家个人数据 | 客户端每次打开或切换页签时
+.C2G_GET_ACTIVITY_INFO
+{
+    key 0 : ActKey                      # 请求的活动Id
+}
+.G2C_GET_ACTIVITY_INFO
+{
+    key 0 : ActKey                      # 活动Id
+    state 1 : integer                   # 活动状态(可能已经关闭)    
+    clientReq 2 : integer               # 是否是客户端主动请求  1：是   其他：否
+    pActInfo 3 : PlayerActivtyInfo      # 玩家活动信息    
+}
+
+
+#Server告知玩家个人数据有关键更新(一般是有目标达成,可以领奖之类的,客户端一般会做红点展示)
+# 这个消息可以以两种模式使用 : 监视的数据有变化就发送 / 监视的数据变化到直到可以领奖后才去更新 
+# 两种方案,前后端针对具体玩法协商选择,两种的消息协议是一致的
+.G2C_NTF_ACTIVITY_NEW_INFO
+{
+    pActInfo 0 : *PlayerActivtyInfo      # 玩家活动数据
+}
+
+#服务器通知客户端活动层显示红点
+.G2C_NTF_ACTIVITY_RED_POINT{
+    containBigWheel 0 : integer          # 有效的活动玩法是否包含 大转盘 0/nil:不包含 1:包含 (包含时,必展示红点)
+    containWishHouse 1 : integer         # 有效的活动玩法是否包含 祈愿阁 0/nil:不包含 1:包含 (包含时,必展示红点)
+    normalHaveRed 2 : integer            # 其它玩法是否有红点提示 0:没有 1:有
+}
+
+#客户端请求领奖
+.C2G_GET_ACTIVITY_AWARD
+{
+    key 0 : ActKey
+    goal 1 : integer #要领取的目标
+    step 2 : integer #目标属于哪个阶段，如果有
+    # todo 各个玩法追加字段
+}
+#返回
+.G2C_GET_ACTIVITY_AWARD
+{
+	key 0 : ActKey
+    goal 1 : integer #要领取的目标
+    # 应答消息
+    # todo 各个玩法自行设计 , 
+    # 也可以不发送这个直接推送一下PlayerAcivtyInfo+物品变化信息
+}
+#通知客户端某个活动进入一个新的阶段，比如每周签到活动，进入新的一周
+.G2C_ACTIVITY_NEW_STEP
+{
+	key 0 : ActKey
+	step 1 : integer #新的阶段
+}
+
+#通用商业活动个人数据
+.COMACT_DATA
+{
+    charId 0 : integer
+    aId 1 : integer
+    aType 2 : integer
+    sum 3 : integer
+    goal 4 : string
+    done 5 : string
+    got 6 : string
+}
+.M2D_SAVE_COMACTS
+{
+	act_commondata 0 : *COMACT_DATA
+}
+.C2G_BUY_FUND
+{
+}
+.C2G_BUY_HOLIDAYFUND
+{
+}
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+# 客户端请求获得所有的日常活动信息
+.C2G_GET_ALL_DAILY_ACTIVITY_INFO
+{
+
+}
+
+# 日常活动信息
+.DailyActivityInfo
+{
+    activityId 0 : integer # 活动对应的Id
+    dailyInfo 1 : integer # 日常活动的信息
+}
+
+.G2C_GET_ALL_DAILY_ACTIVITY_INFO
+{
+    dailyActivityInfo 0 : *DailyActivityInfo # 所有的日常活动的信息
+}
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+# 静态福利活动数据初始化
+.G2C_STATIC_ACTIVITY_DATA
+{
+	dailyOnlineTime 0 : integer				# 今日在线时长(客户端收到后要自己在本地继续计时以演算合适可以领奖)
+	historyOnlineTime 1 : integer			# 历史总在线时长
+	sumLoginDayCnt 2 : integer				# 历史总登录登录天数(已经包含完今天)
+	dailyLevel 3 : integer					# 今日的等级基数,今日首次登录时确定,后续以此字段匹配在线时长礼包
+	receivedIdx_levelGift 4 : *integer		# 等级礼包 已领奖id
+	receivedIdx_sumLoginDay 5 : *integer	# 累计登录 已领奖id
+	receivedIdx_dailyOnline 6 : *integer	# 在线领奖 已领奖id(每日会重新刷新),客户端不用处理,跨天会给客户端重新发送.
+}
+# 玩家申请领取静态福利活动奖励
+.C2G_STATIC_ACTIVITY_TAKE_REWARD
+{
+	activityId 0 : integer 					# 活动类型 参见:SC_ActConst.Type
+	rewardIdx 1 : integer					# 要领奖的Id 表格主键
+}
+# 玩家申请上报意见反馈
+.C2G_FEEDBACK_REPORT
+{
+    info 0 : string             # 反馈意见字符串    
+}
+
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+# 客户端请求获得所有可以找回的回报活动的信息
+.C2G_GET_ALL_REGET_INFO
+{
+
+}
+
+# 日常活动信息
+.ReGetActivityInfo
+{
+    activityId 0 : integer # 活动对应的Id
+    regetInfo 1 : integer # 可以找回的信息，暂时用一个整数来做，后面不行再做修改
+}
+
+.G2C_GET_ALL_REGET_INFO
+{
+    reGetActivityInfo 0 : *ReGetActivityInfo # 所有的日常活动的信息
+}
+#申请进入矿区
+.C2G_ENTER_MINE_MAP
+{
+	mapId	0	:	integer
+}
+.MINE_ITEM_INFO
+{
+	itemType	0	:	integer
+	itemId	1	:	integer
+	itemCnt	2	:	integer
+}
+
+#玩家当此获取矿石信息
+.G2C_PLR_GAINED_MINE_INFO
+{
+	infos	0	:	*MINE_ITEM_INFO
+}
+.G2C_SYNC_FOR_LAST_TIMES
+{
+}
+#----------------------------------------------------------------------------------------------------------------------------------------------------------
+# 临时用来测试用的发送数据接口
+.C2G_TEST_APPLY_DAILY_ACTIVITY_FINISH
+{
+    activityId 0 : integer # 活动ID
+}
+
+
+#-------------------------------- 古墓夺宝协议 start -----------------------------------
+# 同步宝箱当前的状态
+.G2C_SYNC_TOMB_RAIDERS_STATE
+{
+    treasureState 0 : integer   # 宝箱状态
+    passedTime 1 : integer    # 活动已经过的时间
+    chestRestTime 2 : integer  # 宝箱剩余时间
+    chestRefreshNum 3 : integer  # 宝箱已经刷新的次数
+}
+
+# 传送到下一层的协议
+.C2G_TOMB_RAIDERS_REQUEST_NEXT_FLOOR
+{
+
+}
+
+#-------------------------------- 古墓夺宝协议 end -------------------------------------
+
+#------------------------------- 加Q群领取奖励 start ------------------------------------
+# 请求获得加入Q群领取的状态 
+.C2G_GET_ENTER_Q_GROUP_STATE
+{
+
+}
+
+# 服务器向客户端返回Q群的奖励领取状态
+.G2C_GET_ENTER_Q_GROUP_STATE
+{
+    state 0 : integer # 0未领取, 1已领取
+}
+
+# 客户端向服务器请求领取奖励
+.C2G_GET_ENTER_Q_GROUP_REWARD
+{
+
+}
+
+#------------------------------- 加Q群领取奖励 end ------------------------------------

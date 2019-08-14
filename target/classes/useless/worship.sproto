@@ -1,0 +1,32 @@
+#所有雕像数据
+.GWORSHIP_STATUEDATA
+{
+	statueType	0	:	integer	#雕像类型，对应 SC_EnumType.STATUETYPE
+	plrId	1	:	integer
+	plrName	2	:	string
+	onWeapon	3	:	integer		#装备武器id
+	onArmor	4	:	integer			#装备衣服id
+	weaponId	5	:	integer		#时装武器id
+	dressId	6	:	integer			#时装衣服id
+	wingRank	7	:	integer		#翅膀阶
+	genderClass	8	:	integer	#职业性别
+	fightVal	9	:	float	#战力
+	level	10	:	integer	#等级
+}
+
+.G2C_WORSHIP_ALL_STATUEDATAS
+{
+	datas	0	:	*GWORSHIP_STATUEDATA
+}
+.G2C_WORSHIP_START
+{
+	plrId	0	:	integer
+	statueType	1	:	integer
+	worshipType	2	:	integer
+}
+#膜拜
+.C2G_WORSHIP_START
+{
+	worshipType	0	:	integer
+	statueType	1	:	integer
+}

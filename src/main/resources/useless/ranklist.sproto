@@ -1,0 +1,87 @@
+#排行榜玩家数据
+.RankPlayerInfos
+{
+	rankType 0 : integer		   	#排行榜类型
+	id 1 : integer					#玩家id
+	rankVal 2 : integer				#排行榜的数值
+	onRankTime 3 : integer			#上榜时间
+	extraData 4 : string			#附加数据
+}
+
+#排行榜数据
+.RanklistInfo
+{
+	rankType 0 : integer
+	nextSettleTime 1 : integer
+}
+
+#查询排行数据的返回
+.D2B_RANK_LIST_QUERY
+{
+	ranklistInfo 0 : *RanklistInfo
+	ranklistData 1 : *RankPlayerInfos
+}
+
+#保存排行榜数据
+.B2D_NORMAL_RANKLIST_SAVE
+{
+	rankType 0 : integer
+	id 1 : integer
+	rankVal 2 : integer
+	onRankTime 3 : integer
+}
+
+#C->G 请求排行榜数据
+.C2G_REQUEST_RANKLIST
+{
+	startRanknum 0 : integer		#请求开始名次
+	endRanknum 1 : integer			#请求结束名次
+	rankType 2 : integer
+}
+
+#玩家数据
+.rPlayerInfo 
+{
+	playerId 0 : integer			#角色Id
+	nickName 1 : string				#昵称
+	level	2 : integer				#等级
+	fightVal 3 : integer			#战力
+	camp 4 : integer				#阵营
+	job 5 : integer					#职业
+	praiseTotal 6 : integer			#累计点赞数
+	guildName 7 : string   			#帮会名称
+	svlTop1 9 : integer				#吃鸡玩法top1的次数
+	svlTop5Rate 10 : float			#吃鸡玩法top5的几率
+}
+
+#帮会榜
+.rGuildData
+{
+	guildName 0 : string			#帮会名字
+	guildLeader 1 : string			#帮主名字	
+	guildCamp 2 : integer			#帮会阵营
+	guildLv 3: integer				#帮会等级
+	guildFightVal 4 : integer		#帮会战力
+}
+
+
+#排行榜数据
+.Ranklist
+{
+	
+	ranknum 0 : integer				#排名
+	rankVal 1 : integer				#排行榜的数值
+	playerInfo 2 : rPlayerInfo		#玩家信息
+	guildData 4 : rGuildData		#帮会信息	
+}
+
+#C->G 请求排行榜数据
+.G2C_REQUEST_RANKLIST
+{
+	myRank	0 : integer			#我的排名
+	myRankVal 1 : integer		#我的排行榜数值
+	mySvlTop1 2 : integer		#吃鸡玩法top1次数
+    mySvlTop5Rate 3: float		#吃鸡玩法top5的几率
+	rankType 4 : integer		#排行榜类型
+	rankInfo 5 : *Ranklist		#玩家排行的数据
+}

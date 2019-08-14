@@ -1,0 +1,45 @@
+#domo工作室
+
+#3761 进入domo场景
+.C2G_ENTER_DOMO
+{
+	domoMapId 0 : integer           #domo场景ID
+}
+
+#3762 离开domo场景
+.C2G_LEAVE_DOMO
+{
+
+}
+
+#3763 进入domo副本场景
+.C2G_ENTER_DOMO_DUNGEON
+{
+	domoDungeonMapId 0 : integer           #domo副本场景ID
+}
+
+#3764 离开domo副本场景
+.C2G_LEAVE_DOMO_DUNGEON
+{
+
+}
+
+#3765 客户端请求domo玩法的信息
+.C2G_GET_DOMO_PLAY_INFO
+{
+
+}
+
+#各个Domo副本当天已经的挑战次数
+.DungeonCnt
+{
+	mapId 0 : integer		# 副本Id
+	cnt 1 : integer			# 今天的挑战次数
+}
+
+#3766 返回domo玩法的剩余次数
+.G2C_GET_DOMO_PLAY_INFO
+{
+	domoCnt 0 : *DungeonCnt 	# 各个domo的挑战次数信息
+	domoResidueCnt 1 : integer 	# 今天的总计剩余挑战次数
+}

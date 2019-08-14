@@ -1,0 +1,20 @@
+3001: G2C_RESULT
+-- 游戏服务器返回客户端的通用结果
+  uint16 result      --错误码，0表示成功
+  uint16 opCode      --表示是那个协议返回的结果
+  string params      --客户端需要的一些参数信息
+
+3052: C2G_REVIVE
+-- 客户端发送复活请求
+  uint32 reviveType  --proto实现，整形，表示复活类型，0表示原地复活，1表示复活点复活
+  返回3001
+  
+3053: C2G_CarryPet
+-- 客户端发送携带宠物的消息
+  uint16 petId       --客户端要携带的宠物ID，非0表示携带宠物，0表示卸下宠物
+  返回3001
+  
+3054: G2C_CarryPet
+-- 服务器广播携带宠物信息
+  uint32 playerId    --要携带宠物的玩家ID
+  uint16 petId       --要携带的宠物ID

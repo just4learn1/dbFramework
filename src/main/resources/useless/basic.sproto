@@ -1,0 +1,25 @@
+
+#------------------------------------------------- 移动存活相关的协议
+#强制设置玩家自己的坐标,并发送给周围其它玩家
+.G2C_SYNC_SET_POSITION
+{
+    objId     0 : integer    #同步位置的对象id
+    objType   1 : integer    #同步位置的对象类型
+    x         2 : float      #坐标x
+    y         3 : float      #坐标y      
+    reason    4 : integer    #同步位置原因
+    ctrlSeq   5 : integer    #变化后的 ctrlSeq
+}
+
+#主动通知客户端 ctrlSeq 发生变化
+#.G2C_SYNC_CTRL_SEQ
+#{
+#    ctrlSeq   0 : integer    #变化后的 ctrlSeq
+#}
+
+#玩家入场时如果是等待复活状态,同步一下自己的死亡状态信息
+.G2C_SYNC_ALIVE_INFO
+{
+    isRevive 0 : boolean        # 是否选择了复活方式(如果为true,客户端就不需要弹出复活框了)        
+    deadTick 1 : integer        # 点击'复活点复活'的时刻(用户客户端展示倒计时)
+}

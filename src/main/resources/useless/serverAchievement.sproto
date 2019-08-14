@@ -1,0 +1,57 @@
+#天下大势服务器成就
+
+#天下大势服务器成就单项数据
+.s_WSServerAchievementItem
+{
+	achievementId 0 : integer          #服务器成就ID
+	finishStatus 1 : integer           #服务器成就是否完成，0：未完成，1：已完成
+}
+
+#天下大势服务器成就个人领奖数据
+.s_WSServerAchievementAward
+{
+	achievementId 0 : integer          #服务器成就ID
+	awardStatus 1 : integer            #服务器成就奖励是否已领取，0：未领取，1：已领取
+}
+
+#天下大势服务器成就功能锁状态
+.s_WSServerAchievementFunc
+{
+	neutralCityBattleLock 0 : integer     #中立城市宣战功能锁，0：未解锁，1：已解锁
+	playerBattleLock 1 : integer          #玩家宣战功能，0：未解锁，1：已解锁
+	borderBattleLock 2 : integer          #边境战功能，0：未解锁，1：已解锁
+	countryChangeLock 3 : integer         #阵营转换功能，0：未解锁，1：已解锁
+}
+
+#3821 同步天下大势服务器成就数据
+.G2C_SERVER_ACHIEVEMENT_SYNC_DATA
+{
+	achievementData 0 : *s_WSServerAchievementItem           #服务器成就数据
+	awardsStatus 1 : *s_WSServerAchievementAward             #服务器成就个人奖励数据
+	funcLock 2 : s_WSServerAchievementFunc                   #服务器成就功能锁数据
+}
+
+#3822 客户端领取服务器成就奖励请求
+.C2G_SERVER_ACHIEVEMENT_GET_AWARD_REQ
+{
+	achievementId 0 : integer          #服务器成就ID
+}
+
+#3823 领取服务器成就奖励回应
+.G2C_SERVER_ACHIEVEMENT_GET_AWARD_RESP
+{
+	achievementId 0 : integer          #服务器成就ID
+	awardStatus 1 : integer            #服务器成就奖励是否已领取，0：未领取，1：已领取
+}
+
+#901 base同步服务器成就数据到map
+.B2M_SYNC_SERVER_ACHIEVEMENT_DATA
+{
+	serverAchievementData 0 : *s_WSServerAchievementItem           #服务器成就数据
+}
+
+#262 db回应base加载服务器成就数据
+.D2B_LOAD_SERVER_ACHIEVEMENT
+{
+	serverAchievementStr 0 : string          #服务器成就数据
+}

@@ -1,0 +1,8 @@
+package netty;
+option java_package = "com.mzc.nettyTest.protobuf.msg";
+option java_outer_classname = "SubscribReqProto";
+
+message SubscribReq{
+    required int32 subReqID = 1;
+    required string address = 2;
+}

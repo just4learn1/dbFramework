@@ -1,0 +1,49 @@
+#坐骑驯服相关的协议
+
+#客户端申请开始驯服
+.C2G_MOUNT_TAME_START
+{
+	mountId 0 : integer #坐骑ID
+}
+#客户端确认驯服结果
+.C2G_MOUNT_TAME_END
+{
+	mountId 0 : integer #坐骑ID
+}
+#客户端通知后端驯服被打断，比如玩家移动，攻击和被攻击等
+.C2G_MOUNT_TAME_DISTURBED
+{
+	mountId 0 : integer #坐骑ID
+}
+
+#同步坐骑驯服的状态
+.G2C_MONUT_TAME_SYNC
+{
+	mountId 0 : integer #坐骑ID
+	charId  1 : integer #正在驯服的玩家ID
+	state   2 : integer #坐骑状态 1待驯服（坐骑出现时、或者驯服被打断） 2正在被驯服（其他玩家不能再驯服） 3已经被驯服（被驯服后坐骑消失）
+	endtime 3 : integer #坐骑驯服结束时间戳，达到后坐骑消失
+	templateId 4 : integer #坐骑模板ID
+}
+
+#客户端请求定住怪物，或者恢复怪物移动
+.C2G_CHANGE_MOUNT_STATE
+{
+	mountId 0 : integer #坐骑ID
+	state 1 : integer #0站立 1移动
+}
+#请求坐骑刷新时间
+.C2G_MOUNT_FLUSHTIME
+{
+}
+.MOUNTTAME_FLUSH_TIME
+{
+	id 0 : integer #驯服表主键ID
+	starttime 1 : integer #开始时间戳
+	endtime 2 : integer #结束时间戳
+}
+#应答
+.G2C_MOUNT_FLUSHTIME
+{
+	flushtime 0 : *MOUNTTAME_FLUSH_TIME
+}

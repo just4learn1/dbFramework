@@ -1,0 +1,213 @@
+########################
+#将小系统的协议放于此处#
+########################
+
+#########################################################
+#限制次数的信息
+.s_LimitData
+{
+	limitType 0 : integer			#限制类型
+	param	1 : integer				#参数
+	triggerNum 2 : integer 			#剩余次数
+}
+
+#3420 更新限制次数通知
+.G2C_UPDATE_LIMIT
+{
+	limitData 0: s_LimitData
+}
+#3422购买限制次数
+.C2G_BUY_LIMIT_TIMES
+{
+	limitType 0 : integer		#限制类型 SC_EnumType.LimitType
+	buyTimes 1 : integer
+}
+
+#########################################################
+#3470 请求爵位晋升
+.C2G_PEERAGES_PROMOTE
+{
+}
+#3471 请求领取俸禄
+.C2G_RECEIVE_SALARY
+{
+}
+#########################################################
+#活跃度任务数据
+.s_ActiveTaskData
+{
+	activeId 0 : integer				#活跃度任务ID
+	activeState 1 : integer 			#活跃度任务状态
+	activeCircle 2 : integer 			#活跃度任务循环次数
+	triggerValue 3 : integer			#活跃度任务触发值
+	finishTimes 4 : integer				#活跃度任务完成的次数
+}
+
+#3476 活跃度任务的更新
+.G2C_UPDATE_ACTIVE_TASK
+{
+	activeTaskData 0 : s_ActiveTaskData	#活跃度任务数据更新
+}
+
+#3475 请求活跃度领奖
+.C2G_RECEIVE_ACTIVE_PRIZE
+{
+	prizeGrade 0 : integer 		# SC_EnumType.ActivePrizeGrade
+}
+
+#关联任务的活跃度任务数据
+.RelationQuestData
+{
+	activeId 0 : integer
+	questId 1 : integer
+	questFinshCircle 2 : integer
+}
+
+#通知与任务关联的活跃度任务的数据
+.G2C_RELATION_QUEST_ACTIVE_TASK
+{
+	relationQuestData 0 : *RelationQuestData
+}
+
+#请求非活跃度任务的次数（特殊处理 策划需求）
+.C2G_REQUEST_INACTIVE_TASK_DATA
+{
+
+}
+
+#特殊任务的次数
+.SpecialActive
+{
+	specialActiveId 0 : integer     #前端配置表中的ID
+	finshCircle 1 : integer			#非活跃度任务的次数
+}
+
+#返回非活跃度任务的次数（特殊处理 策划需求）
+.G2C_REQUEST_INACTIVE_TASK_DATA
+{
+	specialActive 0 : *SpecialActive
+}
+
+#########################################################
+#key-value存储
+.KeyValueTagData
+{
+	keyType 0 : integer
+	keyParam 1 : integer
+	keyValue 2 : string
+}
+
+.D2B_KEY_VALUE_TAG_QUERY
+{
+	keyValueTagData 0 : *KeyValueTagData
+}
+
+#########################################################
+#改名字
+.C2G_MODIFY_NICK_NAME
+{
+	nickName 0 : string
+}
+
+#改名字
+.G2C_MODIFY_NICK_NAME
+{
+	charId 0 : integer
+	charName 1 : string
+}
+
+#map to base 检测重名
+.M2B_CHECK_REPEAT_NAME
+{
+	nickName 0 : string
+}
+
+#base to map 检测重名的返回
+.B2M_CHECK_REPEAT_NAME_RETURN
+{
+	result 0 : string
+	nickName 1 : string
+}
+#########################################################
+#通知资源获得已到上限
+.G2C_NOTICE_RES_VALUE_TO_MAX
+{
+	resType 0 : integer			#资源类型
+}
+#########################################################
+#点击玩家头像弹窗 获取玩家简要信息
+.C2G_PLAYER_SIMPLE_INFO
+{
+	playerId 0 : integer
+}
+.G2C_PLYAER_SIMPLE_INFO
+{
+	playerId 0 : integer		#玩家Id
+	playerNick 1 : string		#昵称
+	camp 2 : integer			#阵营
+	level 3 : integer			#等级
+	guildId 4 : integer			#帮会Id
+	guildName 5 : string		#帮会名称
+	signature 6 : string		#个性签名
+	job 7 : integer				#职业
+	official 8 : integer		#官职
+	isCommander 9 : boolean		#是否是指挥官 
+	vipLv 10 : integer			#vip等级
+}
+#########################################################
+#同步战力变化
+.G2C_NOTICE_POWER_CHG
+{
+	curPower 0 : float		#当前战力 
+	newPower 1 : float		#最新战力	
+}
+
+#同步变强模块战力变化
+.G2C_NOTICE_MODULE_POWER_CHG
+{
+	sourceId 0 : integer		#模块ID
+	power 1 : integer			#最新战力	
+}
+
+#模块战力
+.ModulePower
+{
+	sourceId 0 : integer		#模块ID
+	power 1 : integer			#最新战力
+}
+
+#初始化模块战力
+.G2C_NOTICE_MODULE_POWER_INIT
+{
+	modulePower 0 : *ModulePower
+}
+
+
+#########################################################
+#领取离线经验
+.C2G_RECEIVE_OFFLINE_EXP
+{
+	receiveGrade 0 : integer	#领取品质 
+}
+
+#########################################################
+#转换阵营
+.C2G_TRANSFORM_CAMP
+{
+	camp 0 : integer
+}
+
+#请求转换阵营消耗的元宝
+.C2G_GET_TRANSFORM_CAMP_COST
+{
+	camp 0 : integer
+}
+
+#请求转换阵营消耗的元宝
+.G2C_GET_TRANSFORM_CAMP_COST
+{
+	costIngot 0 : integer
+}
+
+
+#########################################################

@@ -1,0 +1,169 @@
+# SurvivalGame (SVLGM): 大逃杀玩法 
+
+
+# 奖励的物品信息
+.ItemInfo
+{
+	resType 0 : integer 
+	resId 1 : integer 
+	resValue 2 : integer
+}
+
+.AreaState
+{
+    waveIdx 0 : integer             #当前是配置文件的第几个状态 0:表示首个安全区尚未刷新时的
+    pcX 1 : float                   #毒圈圆心X
+    pcY 2 : float                   #毒圈圆心Y
+    scX 3 : float                   #安全区圆心X
+    scY 4 : float                   #安全区圆心Y
+    waveStartTick 5 : integer       #当前状态的开始时间(客户端可以本地计算出毒圈的位置) wave=0时为玩法开始时刻
+    waveEndTick 6 : integer         #轮次结束时刻
+}
+
+.PlayerInfo
+{
+    guid 0 : integer                # 玩家的guid
+    cEntry 1 : integer              # 玩家的载具模型Id
+    cGuid 2 : integer               # 玩家的载具guid
+    grassItemId 3 : integer         # nil表示不在任何草丛中
+    rank 4 : integer                # 玩家的排名 , nil 表示还没有结束(没有死亡) 
+}
+
+#--------------------------------------------------------------------------------------- 业务消息
+
+# 请求进入玩法(大世界指定NPC交互,或指定界面交互后可进入)
+.C2G_SVLGM_SIGNUP
+{
+    joinType 0 : integer     # 1:单人 2:双人 3:四人组队 对应枚举:SC_SurvivalConst.JoinType
+}
+
+# 请求离开玩法(准备房间是离开 , 战斗房间是申请结束退出)
+.C2G_SVLGM_SIGN_OUT
+{
+    
+}
+
+# Base告知MapServer的大逃杀地图(准备地图)的场景信息
+# .B2M_SVLGM_CREATE_WAITROOM (二进制 | waitingRoomId,line,joinType)
+
+# Base告知MapServer的大逃杀地图(战斗地图)的场景信息
+.B2M_SVLGM_CREATE_FIGHTROOM
+{
+    
+}
+
+# Base告知MapServer的准备地图战斗开始
+.B2M_SVLGM_FIGHT_START
+{
+    # 战斗地图创建了就是开始,不需要发送消息
+}
+
+# MapServer告知Base有人进出准备地图
+# .M2B_PLAYER_IN_OUT_WAITROOM (二进制 | battleId,in,out) "I3"
+
+.M2B_PLAYER_IN_OUT_FIGHTROOM
+{
+    
+}
+
+
+# 准备房间信息更新(首次进入准备场景和有状态更新时发送)
+.G2C_SVLGM_WAITINGINFO{
+    curPlayerCnt 0 : integer #当前人数
+    createTime 1 : integer #等待房间的创建时间
+    
+    #前端展示时
+    #SC_SurvivalConst.MaxWaitTime + createTime是强制开启/解散的时刻
+    #curPlayerCnt 是否达到 SC_SurvivalConst.OpenNeedPlrNum_TimeOutMin 决定了要开启/解散
+}
+
+# 战斗开启(在准备房间中发送)
+.G2C_SVLGM_FIGHT_START{
+    #这个消息直接附带了"即将开启的信息"
+    #客户端收到此消息时,传送门不会立即开启,会延时4秒中
+    #客户端用这个时间差,播放'倒计时321开战'的动画
+    fightStartTime 0 : integer              # 真实开战时刻(传送门开启的时刻)
+}
+
+
+# 开战后玩家选择传送门的逻辑不需要附加消息,服务器直接监听传送门的碰撞就可以
+
+############################################## 上面是局外 , 下面是局内 ##############################################
+
+# 战斗场景初始化(首次进入和断线重连会发送)
+.G2C_SVLGM_GAME_INIT_INFO
+{
+    areaState 0 : AreaState     # 毒圈-安全区状态
+    remainCount 1 : integer     # 剩余存活玩家数据量
+    plrKillCnt 2 : integer      # 玩家击杀数量
+    createTick 3 : integer      # 地图创建时间(玩法开启时间)
+}
+
+# 战斗场景玩法更新(局内定时发送)
+.G2C_SVLGM_GAME_UPDATE
+{   
+    areaState 0 : AreaState     # 毒圈更新
+    remainCount 1 : integer     # 剩余存活玩家数据量
+}
+
+# 玩家击杀通知
+.G2C_SVLGM_KILL_NTF{
+    killerGuid 0 : integer      #击杀者guid
+    killerName 1 : string       #击杀着名字
+    killerJob 2 : integer       #击杀者模型Id(去怪物表可以查询到名字)
+    deadGuid 3 : integer        #死者guid
+    deadName 4 : string         #死者名字
+    deadJob 5 : integer         #死者模型Id
+    residueLiveCnt 6 : integer  #本次击杀后,剩余存活数量
+    killerKillCnt 7 : integer   #击杀者杀人数量
+    
+    # 如果玩家不是被玩家击杀,比如掉线 离开场景 中毒等操作导致的玩家死亡
+    # 对应3个killer字段不会填充,客户端检测没有3个dead相关字段后
+    # 进行特殊的展示,初步和策划沟通,不区分死亡原因.统一展示类似"玩家中毒身亡"这样的话
+}
+
+# 交互结果(服务器返回收获的物品)
+.G2C_SVLGM_REQ_FINISH_SEEKING
+{
+    buffIds 0 : *integer     # 拾取到的Buff(拾取到的Buff已经吃到身上了,这里就是发给客户端做个提示,如果UI上不需要展示,那这个字段没用)
+    modelId 1 : integer      # 拾取到的模型(客户端可以决定是否要替换)
+}
+
+# 玩家选择新的职业
+.C2G_SVLGM_USE_NEW_JOB
+{
+    modelId 0 : integer      # 选择的新模型
+}
+
+# 玩家更换职业广播
+.G2C_SVLGM_PLAYER_CHANGE_JOB_NTF
+{
+    
+}
+# 大逃杀-大逃杀战场结果
+.G2C_SVLGM_FIGHT_RESULT
+{
+    rank 0 : integer
+    killCnt 1: integer
+    reward 2 : *ItemInfo
+    scoreChange 3 : integer         # 本轮结算导致的积分变化
+    scoreNew 4 : integer            # 最新积分情况(已经包含本轮的变化)
+}
+
+#大逃杀-玩家进出毒圈        
+.C2G_SVLGM_IO_POSION
+{
+    isSafe 0 : boolean    # 当前玩家的状态 true:当前在安全区 false:当前在毒圈
+}
+
+#大逃杀-玩法开启失败(等待房间中发送) 
+.G2C_SVLGM_OPEN_FAIL
+{
+    
+}
+
+#大逃杀-同步玩家的状态信息(是一个增量数据,增量发送时是数据更新)
+.G2C_SVLGM_PLAYER_INFO_SYNC
+{
+    playerInofs 0 : *PlayerInfo         # 玩家的信息列表
+}

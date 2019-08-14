@@ -1,0 +1,284 @@
+#组队副本协议
+
+#队长请求进入副本
+.C2G_CHIEF_ENTER_TEAM_DUNGEON
+{
+	teamID       0 : integer          #队伍ID
+}
+#队长请求进入副本后，队伍中的成员来确认或取消进入副本
+.C2G_MEMBER_ENTER_TEAM_DUNGEON
+{
+	teamID       0 : integer          #队伍ID
+	confirm      1 : integer					#0取消 1确定
+}
+
+
+#队伍中的成员请求离开副本（挑战过程中可以离开，结算后也有一个离开）
+.C2G_LEAVE_TEAM_DUNGEON
+{
+	
+}
+
+#组队副本中的操作提示
+.G2C_OPERATE_TEAM_DUNGEON
+{
+	charId 0 : integer #角色ID
+	charName 1 : string #角色名
+	dungeonId 2 : integer #副本ID
+	opType 3 : integer #提示类型  1等级不足 2人数不足 3队员在挑战过程中离开副本 4队员取消进入副本 5队长已选择开战 6队员确认进入副本 7队员未开启前置副本 8有玩家处于死亡状态
+}
+#购买副本次数
+.C2G_BUY_DUNGEON_COUNT
+{
+	count 0 : integer #购买次数
+	targetType 1 : integer #组队目标类型
+}
+#返回当前副本剩余挑战次数
+.G2C_BUY_DUNGEON_COUNT
+{
+	total 0 : integer
+	targetType 1 : integer #组队目标类型
+}
+#结算时选择领取奖励
+.C2G_OPEN_JEWEL_BOX
+{
+	type 0 : integer  #0普通宝箱(默认开启) 1高级宝箱(消耗物品)
+	targetType 1 : integer #组队目标类型
+}
+
+#请求各个副本的当前最高评分和挑战次数等信息
+.C2G_TEAM_DUNGEON_INFO
+{
+	targetType 0 : integer #组队目标类型
+}
+.TEAM_DUNGEON_INFO
+{
+	id 		0 : integer #副本ID
+	score 1 : integer #当前玩家在此副本中的最高评分
+}
+.G2C_TEAM_DUNGEON_INFO
+{
+	count 0 : integer 						#剩余挑战次数
+	info  1 : *TEAM_DUNGEON_INFO	#各个副本的信息
+	targetType 2 : integer #组队目标类型
+}
+
+.CompleteRankInfo
+{
+	charId 0 : integer    #角色ID
+	charName 	1 :string		#玩家名字
+	score		2 :integer		#战斗评分
+	job 3 : integer				#职业
+	level 4 : integer     #等级
+}
+#副本结算信息
+.G2C_TEAM_DUNGEON_COMPLETE
+{
+	result    0 : integer						#挑战结果 0成功 1失败 失败时后面几个字段都没有
+	star		  1 : integer						#通关星级
+	count     2 : integer 					#剩余挑战次数
+	rankList	3 : *CompleteRankInfo	#通关排名，这个排行是队伍中五个人的排行
+	completeAward 4 : integer				#副本结算奖励的银币数量
+	peopleAward 5 : integer				  #根据队伍中真人数量来奖励的银币
+	targetType 6 : integer #组队目标类型
+	isHell 7 : integer #是否地狱模式
+	isFirst 8 : integer #通关次数，1代表首次通关，只在地狱模式下通关有 
+}
+#-----------排行榜相关--------------------
+#获取组队副本排行
+.C2G_GET_TEAM_DUNGEON_RANKLIST
+{
+	targetType 0 : integer #组队目标类型
+}
+#排行中每个玩家需要展示的详细信息
+.TEAM_DUNGEON_PLAYERINFO
+{
+  charId 1 : integer  #角色ID
+	charName 2 : string #角色名
+	score 3 : integer   #战斗评分
+	job 4 : integer     #职业
+	level 5 : integer   #等级
+	camp 6 : integer    #阵营
+	praiseTotal 7 : integer #点赞数
+	guildName 8 : string #帮会名称
+}
+#每个副本下的排行信息
+.TEAM_DUNGEON_RANKLIST
+{
+	id 0 : integer       #副本ID
+	rank 1 : integer     #当前玩家在此副本中的排行，0代表没进榜
+	maxscore 2 : integer #当前玩家在此副本中的最高战斗评分
+	ranklist 3 : *TEAM_DUNGEON_PLAYERINFO #此副本下的排行
+}
+#应答
+.G2C_GET_TEAM_DUNGEON_RANKLIST
+{
+	info 0 : *TEAM_DUNGEON_RANKLIST
+	targetType 1 : integer #组队目标类型
+}
+#读取各个副本的前100名
+.B2D_GET_TEAM_DUNGEON_RANKLIST
+{
+	id 0 : *integer #组队副本ID
+}
+.DB_TEAM_DUNGEON
+{
+	id 0 : integer #副本ID
+	ranklist 1 : *TEAM_DUNGEON_PLAYERINFO #此副本下的排行，最多只取100名
+}
+#应答
+.D2B_GET_TEAM_DUNGEON_RANKLIST
+{
+	info 0 : *DB_TEAM_DUNGEON
+}
+
+#重连回来，需要一个副本剩余时间
+.G2C_RECONNECT_TEAM_DUNGEON
+{
+	remaintime 0 : integer #剩余秒数
+	dungeonType 1 : integer #副本类型
+	reduceCount 2 : integer #扣除次数 0没扣 1扣一次
+	remainDelayTime 3 : integer #剩余延迟时间
+}
+######################################
+# 以下为地狱副本
+######################################
+
+#请求当前已经解锁的副本
+.C2G_GET_HELL_DUNGEON
+{
+}
+.HELL_DUNGEON
+{
+	baseDungeonId 0 : integer #基础副本ID
+	hellDungeonId 1 : *integer #解锁的副本ID，包括基础副本和地狱副本ID
+}
+#应答
+.G2C_GET_HELL_DUNGEON
+{
+	hellDungeon 0 : *HELL_DUNGEON
+}
+
+#地狱模式结算时选择领取奖励，只在第一次挑战成功时可以领取
+.C2G_OPEN_JEWEL_BOX_HELL
+{
+	baseDungeonId 0 : integer #基础副本ID
+	hellDungeonId 1 : integer #地狱副本ID
+}
+
+#保存地狱副本的数据
+.B2D_SAVE_HELL_DUNGEON
+{
+	id 0 : integer #组队副本ID
+	hellDungeonStr 1 : string #下属的地狱副本信息
+}
+#切图时组织下地狱副本的通关次数
+.HellDungeonInfo
+{
+	id 0 : integer #地狱副本ID
+	count 1 : integer #挑战成功的次数
+}
+.SYNC_HELL_DUNGEON_INFO
+{
+	hellDungeon 0: *HellDungeonInfo
+}
+
+#读取各个副本的排名
+.B2D_GET_HELL_DUNGEON_RANKLIST
+{
+	id 0 : *integer #组队副本ID
+}
+.HELL_DUNGEON_PLAYERINFO
+{
+	charId 0 : integer  #角色ID
+	occurtime 1 : integer #发生时间
+	score 2 : integer   #战斗评分
+	hellDungeonId 3 : integer     #星级最高的地狱副本ID
+}
+.DB_HELL_DUNGEON
+{
+	id 0 : integer #副本ID
+	ranklist 1 : *HELL_DUNGEON_PLAYERINFO #此副本下的排行
+}
+#应答
+.D2B_GET_HELL_DUNGEON_RANKLIST
+{
+	info 0 : *DB_HELL_DUNGEON
+	packetSum 1 : integer #拆包后的总数
+}
+
+#获取组队副本排行
+.C2G_GET_HELL_DUNGEON_RANKLIST
+{
+}
+#排行中每个玩家需要展示的详细信息
+.HELLDUNGEON_PLAYERINFO
+{
+  charId 1 : integer  #角色ID
+	charName 2 : string #角色名
+	score 3 : integer   #战斗评分
+	job 4 : integer     #职业
+	level 5 : integer   #等级
+	camp 6 : integer    #阵营
+	praiseTotal 7 : integer #点赞数
+	guildName 8 : string #帮会名称
+	occurtime 9 : integer #发生时间
+	star 10 : integer #星级
+	fightVal 11 : integer #战力
+}
+#每个副本下的排行信息
+.HELL_DUNGEON_RANKLIST
+{
+	id 0 : integer       #副本ID
+	rank 1 : integer     #当前玩家在此副本中的排行，0代表没进榜
+	ranklist 2 : *HELLDUNGEON_PLAYERINFO #此副本下的排行
+}
+#应答
+.G2C_GET_HELL_DUNGEON_RANKLIST
+{
+	info 0 : *HELL_DUNGEON_RANKLIST
+}
+
+#玩家信息
+.PlayerSyncData
+{
+    guid 0 : integer
+    x 1 : integer
+    y 2 : integer
+    isFighting 3 : boolean
+    hp 4 : integer
+    maxhp 5 : integer 
+    #charName level job 等相对在局内战斗中不频繁变化的信息不同步
+}
+#广播地图内玩家状态
+.G2C_DUNGEON_PLAYER_STATE_NTF
+{
+    plrList 0 : *PlayerSyncData
+}
+
+#通知前端副本当前进度
+.G2C_DUNGEON_PROCESS
+{
+		mapId 0 : integer #副本ID
+    process 1 : integer #几号boss
+    bossId 2: integer #boss的id
+    chiefId 3 : integer #邀请人即队长
+}
+#前端二次确认，是否进入队伍，同时进入副本
+.C2G_ENTER_TEAM_IN_DUNGEON
+{
+		confirm 0 : integer					#0取消 1确定
+		chiefId 1 : integer 				#邀请人即队长
+}
+#应答里加上个剩余时间
+.G2C_ENTER_TEAM_IN_DUNGEON
+{
+	dungeonType 0 : integer #副本类型
+	remainTime 1 : integer #剩余时间
+}
+#通知前端被扣除次数
+.G2C_REDUCE_TEAM_DUNGEON_COUNT
+{
+	dungeonType 0 : integer #副本类型
+	reduceCount 1 : integer #扣除次数 1扣一次
+}

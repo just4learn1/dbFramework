@@ -1,0 +1,10 @@
+3021. G2C_ATTR_SYNC
+	玩家属性同步到客户端
+	uint16 count               //标示本消息带有多少个属性同步的kv
+	repeated:
+		uint32 playerId        //玩家ID
+		uint16 attrCount       //该玩家有多少个需要同步的kv
+		repeated:
+			uint16 attrType    //属性的类型
+			int8   attrValType //属性的值的类型，参见SC_DataType
+			type   attrVal     //属性的值，这个类型根据上边的attrValType来进行确定

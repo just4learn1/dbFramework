@@ -1,0 +1,63 @@
+#天下大势个人成就
+
+#天下大势个人成就单项数据
+.s_WSPersonalAchievementItem
+{
+	achievementId 0 : integer          #个人成就ID
+	recordValue 1 : integer            #个人成就记录值
+	finishStatus 2 : integer           #个人成就是否完成，0：未完成，1：已完成
+	awardStatus 3 : integer            #个人成就奖励是否已领取，0：未领取，1：已领取
+}
+
+#天下大势个人成就阶段领奖数据
+.s_WSPersonalAchievementLevelAward
+{
+	levelId 0 : integer                #个人成就阶段ID
+	awardStatus 1 : integer            #个人成就阶段奖励是否已领取，0：未领取，非零：已领取的奖励(第二主键) , 之前的(包含自身)都已经领奖, 之后的都没有领奖
+}
+
+#3811 同步天下大势个人成就数据
+.G2C_PERSONAL_ACHIEVEMENT_SYNC_DATA
+{
+	achievementData 0 : *s_WSPersonalAchievementItem           #个人成就数据
+	levelAwardStatus 1 : *s_WSPersonalAchievementLevelAward    #个人成就阶段奖励数据
+}
+
+#3812 更新天下大势个人成就信息
+.G2C_PERSONAL_ACHIEVEMENT_UPDATE_INFO
+{
+	achievementItem 0 : s_WSPersonalAchievementItem       #成就数据信息
+}
+
+#3813 客户端领取个人成就奖励请求
+.C2G_PERSONAL_ACHIEVEMENT_GET_AWARD_REQ
+{
+	achievementId 0 : integer          #个人成就ID
+}
+
+#3814 领取个人成就奖励回应
+.G2C_PERSONAL_ACHIEVEMENT_GET_AWARD_RESP
+{
+	achievementId 0 : integer          #个人成就ID
+	awardStatus 1 : integer            #个人成就奖励是否已领取，0：未领取，1：已领取
+}
+
+#3815 客户端领取个人成就阶段奖励请求
+.C2G_PERSONAL_ACHIEVEMENT_GET_LEVEL_AWARD_REQ
+{
+	levelId 0 : integer                 # 所属成就组
+	cnt 1 : integer 					# 成就个数(第二主键)
+}
+
+#3816 领取个人成就阶段奖励回应
+.G2C_PERSONAL_ACHIEVEMENT_GET_LEVEL_AWARD_RESP
+{
+	levelId 0 : integer                #阶段奖励阶段ID
+	awardStatus 1 : integer            #个人成就阶段奖励是否已领取，0：未领取，1：已领取
+}
+
+#3817 客户端通知服务器聊天计数
+.C2G_PERSONAL_ACHIEVEMENT_CHAT_NOTIFY
+{
+	chatSubType 0 : integer            #聊天子类型
+}

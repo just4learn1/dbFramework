@@ -1,0 +1,268 @@
+#好友系统协议
+
+#基本信息
+.MEMBER_INFO
+{
+	charId   0 : integer #角色ID
+	charName 1 : string  #角色名称
+	level    2 : integer #等级
+	job      3 : integer #职业
+	gang     4 : string #帮会
+	note     5 : string  #个性签名
+	teamId   6 : integer #队伍ID
+	friendliness 7 : integer #亲密度
+	hatred   8 : integer     #仇恨值
+	occurtime 9 : integer    #发生时间
+	online		10 : integer   #是否在线 1在线 0不在
+	relation  11 : integer   #社交关系 0无关系 1好友 2好友申请 3黑名单 4仇敌 
+	camp 12 : integer #所属国家
+	vip 13 : integer #vip等级
+	fightVal 14 : integer #战斗力
+	tag 15 : *integer #标签
+}
+
+#1、获取所有好友 黑名单 仇敌
+.C2G_GET_ALL_RELATION_PLAYERS
+{
+}
+#登录时会推给客户端所有与其有社交关系的玩家列表
+.G2C_GET_ALL_RELATION_PLAYERS
+{
+	list     0 : *MEMBER_INFO	 
+}
+#当数据有增加或修改时会给客户端发这个，删除数据客户端直接在删除的应答中处理
+.G2C_FRESH_MEMBER_INFO
+{
+	list     0 : *MEMBER_INFO 
+	source   1 : integer #来源 1代表客户端请求 后端主动推送的不填
+}
+
+
+#2、请求推荐的好友列表，包括几种获取好友列表的方式
+.C2G_GET_RECOMMEND_FRIEND_LIST
+{
+	opType 0 : integer #类型  0搜索好友；1系统推荐；2同城交友；3LBS 
+	content 1 : string #搜索好友的角色ID或者角色名字
+}
+#返回推荐的玩家列表
+.G2C_GET_RECOMMEND_FRIEND_LIST
+{
+	friendlist 0 : *APPLY_INFO 
+}
+
+#3、送花，返回通用的消息结果
+.C2G_SEND_FLOWER
+{
+	charId 0 : integer 		#目标ID
+	itemId 1 : integer 		#道具ID 几种鲜花道具中的一种
+	itemCount 2 : integer 	#道具数量
+}
+#通知收到花的玩家
+.G2C_SEND_FLOWER
+{
+	charId 0 : integer 		#发送鲜花的玩家ID
+	itemId 1 : integer 		#道具ID
+	itemCount 2 : integer 	#道具数量
+	relationNum 3 : integer #与该好友的当前亲密度(非好友的话,该值为零)
+}
+
+#4、好友操作
+#请求添加好友
+.C2G_FRIEND_ADD
+{
+	charId 0 : integer #要添加的玩家ID
+}
+#请求删除好友
+.C2G_FRIEND_DELETE
+{
+	charId 0 : integer #要删除的玩家ID
+}
+#通知被删除好友、删除黑名单，仇敌，都发这个
+.G2C_FRIEND_DELETE
+{
+	charId 0 : *integer #被玩家ID删除
+	relation 1 : integer #表示是哪种关系
+}
+#通知有人请求添加好友
+.G2C_FRIEND_ADD
+{
+	charId 0 : integer #源ID
+}
+#是否同意添加好友
+.C2G_AGREE_FRIENDAPPLY
+{
+	agree 0 : integer #1同意 2拒绝
+	charId 1 : integer #角色ID
+}
+#全部同意，或者全部忽略
+.C2G_AGREE_FRIENDAPPLY_ALL
+{
+	agree 0 : integer #1同意 2拒绝
+}
+#5、仇敌操作
+#删除仇敌
+.C2G_ENEMY_DELETE
+{
+	charId 9 : integer #目标ID
+}
+#添加仇敌
+.C2G_ENEMY_ADD
+{
+	charId 9 : integer #目标ID
+}
+#定位仇敌
+.C2G_ENEMY_POSITION
+{
+	charId 9 : integer #目标ID
+}
+#定位仇敌返回位置信息
+.G2C_ENEMY_POSITION
+{
+	charId 0 : integer				#仇敌角色ID
+	pixelX 1 : string					#X坐标
+	pixelY 2 : string					#Y坐标
+	mapId  3 : integer				#地图ID
+}
+#6、黑名单操作
+#加入黑名单
+.C2G_BLACKLIST_ADD
+{
+	charId 0 : integer #目标ID
+}
+#移除黑名单
+.C2G_BLACKLIST_DELETE
+{
+	charId 1 : integer #目标ID
+}
+.B2D_QUERY_FRIEND_DATA
+{
+	charId 0 : integer  #角色ID
+	relation 1 : integer #好友、黑名单、等关系
+}
+.RELATION_DATA
+{
+	charId 				0 : integer 
+	occurtime 		1 : integer #发生时间
+	hatred 				2 : integer #仇恨值
+	friendliness  3 : integer #亲密度
+	helpcount     4 : integer #助战次数
+}
+.D2B_QUERY_FRIEND_DATA
+{
+	charId 0 : integer  #角色ID
+	relation 1 : integer
+	data 2 : *RELATION_DATA
+}
+#同步数据到map
+.B2M_SYNC_RELATION_DATA
+{
+	list     0 : *MEMBER_INFO 
+}
+
+#请求最近联系人信息
+.C2G_GET_RECENT_PLAYERS_INFO
+{
+	charId 0 : *integer
+}
+.G2C_GET_RECENT_PLAYERS_INFO
+{
+	info  0 : *MEMBER_INFO 
+}
+#map通知base增加亲密度
+.M2B_ADD_FRIENDLINESS
+{
+	charId 0 : *integer #角色ID
+	num 	 1 : integer  #增加数
+}
+
+#单独获取所有好友 或者黑名单 或者仇敌
+.C2G_GET_ONE_RELATION_PLAYERS
+{
+	relation 0 : integer # 1好友 3黑名单 4仇敌，不填则获取所有
+}
+#应答
+.G2C_GET_ONE_RELATION_PLAYERS
+{
+	list     0 : *MEMBER_INFO 
+}
+.APPLY_INFO
+{
+	charId   0 : integer #角色ID
+	charName 1 : string  #角色名称
+	level    2 : integer #等级
+	job      3 : integer #职业
+	camp 4 : integer #所属国家
+	vip 5 : integer #vip等级
+	tag 6 : *integer #标签
+	occurtime 7 : integer  #发生时间
+}
+#推送当前收到的好友申请
+.G2C_GET_ALL_APPLY
+{
+	applys 0 :*APPLY_INFO
+}
+#有新的申请到来
+.G2C_GET_NEW_APPLY
+{
+	newapply 1 : APPLY_INFO
+}
+
+#被某人击杀
+.G2C_BE_KILLED
+{
+	charId 0 : integer #击杀者ID
+}
+#去DB读取好友互赠的信息
+.B2D_GET_FRIENDS_PRESENT
+{
+}
+.D2B_GET_FRIENDS_PRESENT
+{
+	present 0 : *FRIENDS_PRESENT 
+}
+#好友互赠信息
+.FRIENDS_PRESENT
+{
+	charId 		0 : integer 					#已发送或者已收到赠送的角色ID
+	type 			1 : integer   				#1收到的 2发送的
+	num 			2 : integer 					#当时的亲密度
+	occurtime 3 : integer 					#发生时间
+	getAward 	4 : integer 					#领奖次数
+}
+#获取祝福和领奖信息
+.C2G_GET_FRIEND_SEND_INFO
+{
+}
+.G2C_GET_FRIEND_SEND_INFO
+{
+	sendNum 0 : integer #可祝福次数
+	recieveNum 1 : integer #可领奖次数
+	sendList 2 : *FRIENDS_PRESENT #已祝福的charId，当时的亲密度
+	recieveList 3 : *FRIENDS_PRESENT #收到的祝福的charId,武将之尘的数量(当时的亲密度)，领奖次数，所有的charId必须是当时的好友
+}
+#祝福
+.C2G_CREATE_FRIEND_SEND
+{
+	charId 0 : integer #好友ID
+}
+
+#领奖
+.C2G_FRIEND_SEND_GET_AWARD
+{
+	charId 0 : integer #好友ID
+}
+#有新的祝福到来
+.G2C_NEW_FRIEND_SEND
+{
+	charId 0 : integer #好友ID
+	num 1 : integer  #发送成功时的亲密度
+}
+#查询社交关系成员详情
+.C2G_QUERY_RELATION_MEMBER_DETAIL
+{
+	charId 0 : integer #好友ID
+}
+.G2C_QUERY_RELATION_MEMBER_DETAIL
+{
+	info  0 : MEMBER_INFO 
+}
