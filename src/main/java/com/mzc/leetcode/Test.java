@@ -955,8 +955,7 @@ public class Test {
                 l++;
             }
         }
-//        return maxArea;
-        return 0;
+        return maxArea;
     }
 
     /**
