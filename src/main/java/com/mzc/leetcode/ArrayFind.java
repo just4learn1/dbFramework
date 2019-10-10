@@ -12,7 +12,7 @@ public class ArrayFind {
      * solution： m = nums1.length, n=nums2.length  -> i{0, m}, j{0, n}
      * 将nums1和nums2都分为两部分  {0, i-1}->{i, m}   {0, j-1}->{j, n}， 因此只要 （左边总数等于右边总数）i+j = m-i + n-j 且 （左边数都小于右边）nums1[i-1]<nums2[j] && nums2[j-1]=nums1[i] （因为本来有序所以这个条件就可以了）
      * 如果n>=m, j=(m+n+1)/2 - i          //+1主要是为了实现如果(m+n)%2==1时保证maxLeft就是所需的中位数
-     *
+     *tt
      * @param nums1
      * @param nums2
      * @return
