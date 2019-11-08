@@ -281,7 +281,7 @@ public class NumSum {
      */
     public static void nextPermutation(int[] nums) {
         int i = nums.length - 2;
-        while (i >= 0 && nums[i + 1] <= nums[i]) {          //找出第i位到第length-1位最大的数
+        while (i >= 0 && nums[i + 1] <= nums[i]) {          //逆序查找最大的数
             i--;
         }
         if (i >= 0) {

@@ -610,7 +610,7 @@ public class Test {
          */
         int start = 0;
         int end = nums.length - 1;
-        while (start < end) {
+        while (start <= end) {
             if (target < nums[start] && target > nums[end]) { //超出区间
                 return -1;
             }

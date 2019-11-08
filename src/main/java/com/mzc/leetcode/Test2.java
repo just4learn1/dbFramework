@@ -10,25 +10,117 @@ import java.util.*;
 public class Test2 {
 
     public static void main(String[] args) {
-        ListNode l = new ListNode(1);
-        l.next = new ListNode(2);
-        l.next.next = new ListNode(3);
-        l.next.next.next = new ListNode(4);
+        int a = search(new int[]{6,7,8,9,10,2,3,4,5}, 9);
+        System.out.println(a);
+    }
 
-        ListNode result = reverseKGroup(l, 3);
-        while (result != null) {
-            System.out.println(result.val);
-            result = result.next;
+    /**
+     * 原本有序的数组被从中切分为两部分并交换位置，从转换后的数组中查找target值所在的索引位置
+     *
+     * @param nums
+     * @param target
+     * @return
+     */
+    public static int search(int[] nums, int target) {
+        int start = 0;
+        int end = nums.length - 1;
+        int mid;
+        while (start <= end) {
+            mid = (start + end + 1) / 2;
+            if (nums[mid] == target) {
+                return mid;
+            }
+            if (nums[start] < nums[mid]) {      //[start, mid]有序
+                if (target >= nums[start] && target <= nums[mid]) {
+                    end = mid - 1;
+                } else {
+                    start = mid + 1;
+                }
+            } else {            //[mid, end]有序
+                if (target >= nums[mid] && target <= nums[end]) {
+                    start = mid + 1;
+                } else {
+                    end = mid - 1;
+                }
+            }
         }
+        return -1;
+    }
+
+    /**
+     * 找出最长合法括号的字符串长度
+     *
+     * @param s
+     * @return
+     */
+    public static int longestValidParentheses(String s) {
+        int max = 0;
+        int count = 0;
+        int validLen = 0;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (c == '(') {
+                count++;
+                validLen++;
+            } else {
+                if (count <= 0) {
+                    validLen = 0;
+                } else {
+                    count--;
+                    validLen++;
+                    if (count == 0) {
+                        max = Math.max(validLen, max);
+                    }
+                }
+            }
+        }
+        count = 0;
+        validLen = 0;
+        for (int i = s.length() - 1; i > 0; i--) {
+            char c = s.charAt(i);
+            if (c == ')') {
+                count++;
+                validLen++;
+            } else {
+                if (count <= 0) {
+                    validLen = 0;
+                } else {
+                    count--;
+                    validLen++;
+                    if (count == 0) {
+                        max = Math.max(max, validLen);
+                    }
+                }
+            }
+        }
+        return max;
+    }
+
+
+    public static void reverse(int[] arr) {
+        int l = 0;
+        int r = arr.length - 1;
+        while (l < r) {
+            swap(arr, l, r);
+            l++;
+            r--;
+        }
+    }
+
+    public static void swap(int[] arr, int l, int r) {
+        int tmp = arr[l];
+        arr[l] = arr[r];
+        arr[r] = tmp;
     }
 
     /**
      * 按照给定数字反转链表
      * Given this linked list: 1->2->3->4->5
-     *
+     * <p>
      * For k = 2, you should return: 2->1->4->3->5
-     *
+     * <p>
      * For k = 3, you should return: 3->2->1->4->5
+     *
      * @param head
      * @param k
      * @return
