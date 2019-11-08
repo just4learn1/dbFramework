@@ -1,13 +1,11 @@
 package com.mzc.nettyTest;
 
-import com.sun.xml.internal.fastinfoset.stax.factory.StAXOutputFactory;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 public class TimerClientHandler extends ChannelHandlerAdapter {
     @Override

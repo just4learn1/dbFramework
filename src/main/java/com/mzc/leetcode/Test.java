@@ -7,18 +7,33 @@ import java.util.*;
 
 public class Test {
 
-    public static void main(String[] args) {
-        insert(new int[][]{{1,2},{3,5},{6,7},{8,10},{12,16}}, new int[]{7,8});
+    /**
+     * 求二进制中1的个数
+     *
+     * @param n 整数
+     * @return
+     */
+    public static int bitCount(int n) {
+        int c = 0;
+        while (n > 0) {
+            n = n >> 1;
+            System.out.println(n);
+            if ((n & 1) == 0) {
+                c++;
+            }
+        }
+        return c;
     }
 
     /**
      * 给定一个二维数组intervals作为数值区间（以区间最小值排序），及newInterval，将newInterval插入到intervals，并且合并区间
-     *
+     * <p>
      * Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
      * Output: [[1,5],[6,9]]
-     *
+     * <p>
      * Input: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
      * Output: [[1,2],[3,10],[12,16]]
+     *
      * @param intervals
      * @param newInterval
      * @return
@@ -30,7 +45,7 @@ public class Test {
         int startIndex = binarySearch(intervals, newInterval[0]);
         int endIndex = binarySearch(intervals, newInterval[1]);
         int tmpCnt = startIndex + intervals.length - endIndex;
-        int[][] result = new int[startIndex+intervals.length-endIndex][2];
+        int[][] result = new int[startIndex + intervals.length - endIndex][2];
         for (int i = 0; i < startIndex; i++) {
             result[i] = intervals[i];
         }
@@ -41,7 +56,7 @@ public class Test {
 
     public static int binarySearch(int[][] intervals, int target) {
         int start = 0;
-        int end = intervals.length-1;
+        int end = intervals.length - 1;
         while (start < end) {
             int mid = (start + end) / 2 + 1;
             if (intervals[mid][0] == target) {
@@ -52,7 +67,7 @@ public class Test {
                 end = mid - 1;
             }
         }
-        return start-1<0?0:start-1;
+        return start - 1 < 0 ? 0 : start - 1;
     }
 
     /**
@@ -90,12 +105,7 @@ public class Test {
         if (intervals == null || intervals.length < 2) {
             return intervals;
         }
-        Arrays.sort(intervals, new Comparator<int[]>() {
-            @Override
-            public int compare(int[] i1, int[] i2) {
-                return i1[0] - i2[0];
-            }
-        });
+        Arrays.sort(intervals, (i1, i2) -> i1[0] - i2[0]);
         int[] res = new int[intervals.length * 2];
         int idx = 0;
         int i = 0;
@@ -187,14 +197,14 @@ public class Test {
             startIndex++;
         }
         int tmpMaxSum = 0;
-        int maxSum = 0;
+        int maxSum = max;
         for (int i = startIndex; i < nums.length; i++) {
             tmpMaxSum = Math.max(0, tmpMaxSum + nums[i]);
             maxSum = Math.max(maxSum, tmpMaxSum);
         }
-        if (maxSum == 0) {
-            maxSum = max;
-        }
+//        if (maxSum == 0) {
+//            maxSum = max;
+//        }
         return maxSum;
     }
 
@@ -281,7 +291,7 @@ public class Test {
         }
         List<List<Integer>> list = new ArrayList<>();
         genUnique(list, new int[nums.length], digits, counts, 0);
-        list.forEach(System.out::println);
+        list.forEach(System.out :: println);
         return list;
     }
 
@@ -324,7 +334,7 @@ public class Test {
          */
         List<List<Integer>> list = new ArrayList<>();
         testGen(list, nums, 0);
-        list.forEach(System.out::println);
+        list.forEach(System.out :: println);
         return list;
     }
 
@@ -416,7 +426,6 @@ public class Test {
                 }
             }
         }
-        System.out.println(Arrays.toString(nums));
         for (int j = 0; j < nums.length; j++) {
             if (nums[j] != j + 1) {
                 return j + 1;
@@ -602,7 +611,7 @@ public class Test {
         int start = 0;
         int end = nums.length - 1;
         while (start < end) {
-            if (target < nums[start] && target > nums[end]) { //
+            if (target < nums[start] && target > nums[end]) { //超出区间
                 return -1;
             }
             int mid = (start + end) / 2;
@@ -737,7 +746,7 @@ public class Test {
     }
 
     /**
-     * 合并两个有序单向链表,生产一个有序的单向链表
+     * 合并两个有序单向链表,生成一个有序的单向链表
      *
      * @param l1
      * @param l2
@@ -844,7 +853,7 @@ public class Test {
 
     public static List<String> letterCombinations(String digits) {
         List<String> result = new ArrayList<>();
-        test(result, digits, 0, "");
+//        test(result, digits, 0, "");
         return result;
     }
 
@@ -933,6 +942,22 @@ public class Test {
             }
         }
         return result;
+
+
+    }
+
+    /**
+     * 四个数和为0
+     *
+     * @param nums
+     * @param target
+     * @return
+     */
+    public List<List<Integer>> fourSum(int[] nums, int target) {
+        /**
+         * 可以借助三个数相加和为0的运算逻辑，使三个数的和等于第四个数的负值，也就是说先用for循环固定一个数，然后对 (i, length-1)找出三个数的和等于-nums[i]
+         */
+        return null;
     }
 
     /**
@@ -941,21 +966,24 @@ public class Test {
      * @param height
      * @return
      */
-    public int maxArea(int[] height) {
-        /**
-         * 解题思路：
-         */
-        int l = 0, r = height.length - 1;
-        int maxArea = 0;
-        while (l < r) {
-            maxArea = Math.max(maxArea, Math.min(height[l], height[r]) * (r - l));
-            if (height[l] > height[r]) {
-                r--;
+    public static int maxArea(int[] height) {
+        int max = 0;
+        int start = 0;
+        int end = height.length - 1;
+        while (start < end) {
+            int tmp = Math.min(height[end], height[start]);
+            max = Math.max(max, tmp * (end - start));
+            if (height[start] < height[end]) {
+                do {
+                    start++;
+                } while (start < end && height[start] < tmp);
             } else {
-                l++;
+                do {
+                    end--;
+                } while (start < end && height[end] < tmp);
             }
         }
-        return maxArea;
+        return max;
     }
 
     /**
@@ -966,11 +994,22 @@ public class Test {
      * @return
      */
     public boolean isMatch(String s, String p) {
-        /**
-         *解题思路： 创建一个二维boolean数组  [s.length+1][p.length+1] 设置 [s.length][p.length] = true
-         *           倒序遍历   需要判断如果是*需要判断前一个是否匹配
-         */
-        return false;
+        String text = s;
+        String pattern = p;
+        boolean[][] dp = new boolean[text.length() + 1][pattern.length() + 1];
+        dp[text.length()][pattern.length()] = true;
+
+        for (int i = text.length(); i >= 0; i--) {
+            for (int j = pattern.length() - 1; j >= 0; j--) {
+                boolean first_match = (i < text.length() && (pattern.charAt(j) == text.charAt(i) || pattern.charAt(j) == '.'));
+                if (j + 1 < pattern.length() && pattern.charAt(j + 1) == '*') {
+                    dp[i][j] = dp[i][j + 2] || first_match && dp[i + 1][j];
+                } else {
+                    dp[i][j] = first_match && dp[i + 1][j + 1];
+                }
+            }
+        }
+        return dp[0][0];
     }
 
     /**
@@ -985,20 +1024,19 @@ public class Test {
      * @param x
      * @return
      */
-    public int reverse(int x) {
-        long result = 0;                //由于使用了negative变量，所以占用空间会大一些，可以不用新的空间，不过这样就得在循环中对result进行合法性判定，大于最大/小于最小等
-        boolean negative = x < 0;
-        int tmp = Math.abs(x);
-        while (tmp > 0) {
-            int num = tmp % 10;
-            result = result * 10 + num;
-            tmp = tmp / 10;
+    public static int reverse(int x) {
+        boolean nagtive = x < 0;
+        int n = Math.abs(x);
+        long l = 0;
+        while (n > 0) {
+            l *= 10;
+            l += n % 10;
+            n /= 10;
         }
-        if (result > Integer.MAX_VALUE) {
+        if (l > Integer.MAX_VALUE) {
             return 0;
         }
-        int r = (int) (negative ? -result : result);
-        return r;
+        return (int) (nagtive ? -l : l);
     }
 
     /**
@@ -1012,28 +1050,27 @@ public class Test {
      * @param s
      * @return
      */
-    public String longestPalindrome(String s) {
-        if (s.length() <= 1) {
-            return s;
-        }
-        int startIndex = 0;
-        int endIndex = 0;
-        for (int i = 0; i < s.length(); i++) {
+    public static String longestPalindrome(String s) {
+        int minIndex = 0, maxIndex = 0;
+        for (int i = 0; i < s.length() - 1; i++) {
             int len1 = maxLen(s, i, i);
             int len2 = maxLen(s, i, i + 1);
-            int tmpMaxLen = Math.max(len1, len2);
-            if ((endIndex - startIndex) < tmpMaxLen) {
-                startIndex = i - (tmpMaxLen - 1) / 2;
-                endIndex = i + tmpMaxLen / 2;
+            int tmpL = Math.max(len1, len2);
+            if ((maxIndex - minIndex) < tmpL) {
+                minIndex = i - ((tmpL - 1) / 2);
+                maxIndex = i + (tmpL / 2);
+            }
+            while (i < s.length() - 2 && s.charAt(i) == s.charAt(i + 1)) {
+                i++;
             }
         }
-        return s.substring(startIndex, endIndex + 1);
+        return s.substring(minIndex, maxIndex + 1);
     }
 
     public static int maxLen(String s, int left, int right) {
         int L = left;
         int R = right;
-        while (L >= 0 && R < s.length() && s.charAt(R) == s.charAt(L)) {
+        while (L >= 0 && R < s.length() && s.charAt(L) == s.charAt(R)) {
             L--;
             R++;
         }
@@ -1057,57 +1094,81 @@ public class Test {
      * @param nums2
      * @return
      */
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        /**
-         * 1.将nums1分为 {0, i-1}->{i, m} 两段
-         * 2.将nums2分为 {0, j-1}->{j, n} 两段
-         * 3.其中nums1的{0, i-1} 与 nums2的{0, j-1}段组成左边的， 剩下的组成右边的， 既 leftLen=i+j   rightLen=m-i+n-j(或者m-i+n-j+1)    +1是为了保证(m+n)%2==1时，max(left)就是需要的中位数
-         * 4.如果可以找到(i, j)满足 leftLen==rightLen  && max(left) <= min(right)，此时两段有序数组的中位数就是 ((max(left)+min(right))/2
-         *
-         * P：需要n>=m   因为根据以上条件 i+j=m-i+n-j+1  ->  j=(m+n+1)/2 - i  ，如果n<m，此时获取到的j可能会出现负数
+    public static double findMedianSortedArrays(int[] nums1, int[] nums2) {
+        /**  m=nums1.length   n=nums2.length
+         * 将数组num1分为{0, i-1} {i, m}  num2分为{0, j-1} {j, n}
+         * 只需要满足i-1+j-1=m-i + n-j且nums1[i-1]<nums2[j] or nums2[j-1] < nums1[i] 等价于 j = (m + n + 1)/2 - i
+         * 中位数就是Math.max(nums1[i-1], nums2[j-1]) + Math.min(nums1[i], nums2[j]) / 2
+         * 需要额外考虑m+n如果是奇数，则就是中间数
+         * 需要考虑边界问题  既 i=0 or m   j=0 or n
+         * 对于 j = (m+n-1)/2 - i  因为j的取值范围是[0, n] 如果m>n则有可能导致j>n，从而需要额外考虑越界问题，所以使用前需要根据m和n的大小交换数组
          */
-        int[] A = nums1;
-        int[] B = nums2;
+        int[] A = nums1, B = nums2;
         int m = A.length, n = B.length;
-        if (n < m) {                //交换A和B，为了达到 n>=m的条件
+        if (m > n) {
             int[] tmp = A;
             A = B;
             B = tmp;
-            m = A.length;
-            n = B.length;
+            int tmpLen = m;
+            m = n;
+            n = tmpLen;
         }
         int iMin = 0, iMax = m, halfLen = (m + n + 1) / 2;
         while (iMin <= iMax) {
             int i = (iMin + iMax) / 2;
             int j = halfLen - i;
-            if (i > iMin && A[i - 1] > B[j]) {        //i太大
-                iMax = i - 1;
-            } else if (i < iMax && B[j - 1] > A[i]) {   //i太小
+            if (i < iMax && A[i] < B[j - 1]) {
                 iMin = i + 1;
-            } else {            //满足条件
-                int mxLeft = 0;
+            } else if (i > iMin && A[i - 1] > B[j]) {
+                iMax = i - 1;
+            } else {
+                int maxLeft = 0;
                 if (i == 0) {
-                    mxLeft = B[j - 1];
+                    maxLeft = B[j - 1];
                 } else if (j == 0) {
-                    mxLeft = A[i - 1];
+                    maxLeft = A[i - 1];
                 } else {
-                    mxLeft = Math.max(A[i - 1], B[j - 1]);
+                    maxLeft = Math.max(A[i - 1], B[j - 1]);
                 }
                 if ((m + n) % 2 == 1) {
-                    return mxLeft;
+                    return maxLeft;
                 }
                 int minRight = 0;
-                if (i == m) {
+                if (i >= m) {
                     minRight = B[j];
-                } else if (j == n) {
+                } else if (j >= n) {
                     minRight = A[i];
                 } else {
                     minRight = Math.min(A[i], B[j]);
                 }
-                return (mxLeft + minRight) / 2;
+                return (minRight + maxLeft) / 2d;
             }
         }
-        return 0;
+        return 0d;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(longestValidParentheses("())()"));
+    }
+
+    /**
+     * Given a linked list, swap every two adjacent nodes and return its head.
+     * <p>
+     * You may not modify the values in the list's nodes, only nodes itself may be changed.
+     * <p>
+     * <p>
+     * <p>
+     * Example:
+     * <p>
+     * Given 1->2->3->4, you should return the list as 2->1->4->3.
+     *
+     * @param head
+     * @return
+     */
+    public static ListNode swapPairs(ListNode head) {
+        ListNode root = head;
+
+        return null;
     }
 
     /**
@@ -1120,15 +1181,15 @@ public class Test {
      * @return
      */
     public static int lengthOfLongestSubstring(String s) {
-        int result = 0;
-        int[] tmpIndexs = new int[128];
+        int[] tmp = new int[128];           //因为ASCII码至今共定义了128个字符
+        int maxLen = 0;
         for (int i = 0, j = 0; i < s.length(); i++) {
             char c = s.charAt(i);
-            j = Math.max(tmpIndexs[c], j);      //因为后面重复的字符串索引可能是在当前记录的之前   比如  abba， 循环到最后一个a的时候获取到的索引会是1
-            result = Math.max(result, i - j + 1);
-            tmpIndexs[c] = i + 1;
+            j = Math.max(tmp[c], j);
+            maxLen = Math.max(maxLen, i - j + 1);
+            tmp[c] = i + 1;             //此处设置为 i+1是为了方便 上一行代码（上一行+1主要是为了兼容只有一个字符的情况，否则需要在设置maxLen时根据s是否为空串设置为0或者1）
         }
-        return result;
+        return maxLen;
     }
 
     /**
@@ -1142,28 +1203,25 @@ public class Test {
      * @return
      */
     public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
-        int num = l1.val + l2.val;
-        int carry = num / 10;
-        num = num - carry * 10;
-        ListNode result = new ListNode(0);
-        ListNode tmp = new ListNode(num);
-        result.next = tmp;
-        while (l1.next != null || l2.next != null || carry != 0) {
-            num = carry;
-            if (l1.next != null) {
-                num += l1.next.val;
+        int extraNum = 0;
+        ListNode root = new ListNode(0);
+        ListNode tmp = root;
+        while (l1 != null || l2 != null || extraNum > 0) {
+            int num = extraNum;
+            if (l1 != null) {
+                num += l1.val;
                 l1 = l1.next;
             }
-            if (l2.next != null) {
-                num += l2.next.val;
+            if (l2 != null) {
+                num += l2.val;
                 l2 = l2.next;
             }
-            carry = num / 10;
-            num = num - carry * 10;
+            extraNum = num / 10;
+            num %= 10;
             tmp.next = new ListNode(num);
             tmp = tmp.next;
         }
-        return result.next;
+        return root.next;
     }
 
     /**
@@ -1172,13 +1230,10 @@ public class Test {
      * 你可以假设每种输入只会对应一个答案。但是，你不能重复利用这个数组中同样的元素。
      */
     public int[] twoSum(int[] nums, int target) {
-        if (nums == null || nums.length == 0) {
-            return new int[0];
-        }
         Map<Integer, Integer> map = new HashMap<>();
         for (int i = 0; i < nums.length; i++) {
-            int left = target - nums[i];
-            Integer index = map.get(left);
+            int tmpNum = target - nums[i];
+            Integer index = map.get(tmpNum);
             if (index != null) {
                 return new int[]{index, i};
             }

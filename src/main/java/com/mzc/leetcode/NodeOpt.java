@@ -116,7 +116,7 @@ public class NodeOpt {
         }
         ListNode dummy = new ListNode(0);
         ListNode first = dummy;
-        list.sort((a, b)->a-b);
+        list.sort((a, b) -> a - b);
         for (Integer a : list) {
             first.next = new ListNode(a);
             first = first.next;
@@ -126,43 +126,43 @@ public class NodeOpt {
 
     /**
      * Given a linked list, swap every two adjacent nodes and return its head.
-     *
+     * <p>
      * You may not modify the values in the list's nodes, only nodes itself may be changed.
-     *
+     * <p>
      * Given 1->2->3->4, you should return the list as 2->1->4->3.
+     *
      * @param head
      * @return
      */
     public static ListNode swapPairs(ListNode head) {
-        if(head==null) return null;
-        ListNode pre=head.next;
-        ListNode hind=new ListNode(-1);
-        hind.next=head;
-        while(pre!=null){
-            hind.next.next=pre.next;
-            pre.next=hind.next;
-            if(hind.next==head) head=pre;
-            hind.next=pre;
-            if(pre.next.next!=null){
-                if(pre.next.next.next!=null){
-                    hind=pre.next;
-                    pre=pre.next.next.next;
-                }
-                else pre=null;
-            }
-            else pre=null;
+        if (head == null) return null;
+        ListNode pre = head.next;       //保存第二个节点
+        ListNode hind = new ListNode(-1);
+        hind.next = head;       //保存第一个节点
+        while (pre != null) {
+            hind.next.next = pre.next;
+            pre.next = hind.next;
+            if (hind.next == head) head = pre;      //当第一次循环时设置head=pre相当于head设置为传入listnode的第二个数据（转换后的第一个数据）
+            hind.next = pre;
+            if (pre.next.next != null) {
+                if (pre.next.next.next != null) {
+                    hind = pre.next;            //由于循环体第一行使用的是hind.next.next，因此这儿hind设置为pre.next就行了
+                    pre = pre.next.next.next;
+                } else pre = null;
+            } else pre = null;
         }
         return head;
     }
 
     /**
      * 给定单向链表及数字n，以n为周期反转链表  (// TODO: 2019/5/9  还没看懂怎么解的)
-     *
+     * <p>
      * Given this linked list: 1->2->3->4->5
-     *
+     * <p>
      * For k = 2, you should return: 2->1->4->3->5
-     *
+     * <p>
      * For k = 3, you should return: 3->2->1->4->5
+     *
      * @param head
      * @param k
      * @return
@@ -174,7 +174,7 @@ public class NodeOpt {
             temp = temp.next;
         }
         //判断节点的数量是否能够凑成一组
-        if(temp == null) {
+        if (temp == null) {
             return head;
         }
 
@@ -186,13 +186,31 @@ public class NodeOpt {
         head.next = reverseKGroup(t2, k);       //递归将head.next设置位逆序后的前k位链表，
         return result;
     }
-    private static ListNode reverseList(ListNode head) {
+
+    /**
+     * 此方法占用的内存会更少，因为完全不需要创建额外的listNode引用，但是递归调用会比while循环效率低一些
+     * @param head
+     * @return
+     */
+    /*private static ListNode reverseList(ListNode head) {
         if(head == null || head.next == null)
             return head;
         ListNode result = reverseList(head.next);
         head.next.next = head;
         head.next = null;
         return result;
+    }*/
+
+    private static ListNode reverseList(ListNode head) {
+        ListNode pre = null;
+        ListNode next = null;
+        while (head != null) {
+            next = head.next;        //保存当前头结点的下个节点
+            head.next = pre;        //将当前头结点的下一个节点指向“上一个节点”，这一步是实现了反转
+            pre = head;             //上一个节点设置为当前的头节点
+            head = next;            //头节点设置为下一个节点
+        }
+        return pre;
     }
 
     public static void main(String[] args) {
