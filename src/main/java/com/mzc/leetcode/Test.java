@@ -1148,7 +1148,7 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        System.out.println(longestValidParentheses("())()"));
+        System.out.println(jump(new int[]{1,1,0,3}));
     }
 
     /**
