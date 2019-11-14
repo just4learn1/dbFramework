@@ -194,27 +194,27 @@ public class ArrayOpt {
      * @return
      */
     public static String getPermutation(int n, int k) {
-        if(n == 1){
+        if (n == 1) {
             return String.valueOf(n);
-        } else if (n ==0) {
+        } else if (n == 0) {
             return new String();
         }
         int[] arr = new int[n];
         List<Integer> list = new ArrayList<>();
-        for(int i = 1; i <= n; i++) {
+        for (int i = 1; i <= n; i++) {
             list.add(i);
         }
         k--;
-        for(int i = 0; i < n-2; i++) {
+        for (int i = 0; i < n - 2; i++) {
             //没有看明白div的计算算法
-            int div = k/ factorial(n-i-1);
-            k = k % factorial(n-i-1);
+            int div = k / factorial(n - i - 1);
+            k = k % factorial(n - i - 1);
             arr[i] = list.remove(div);
         }
-        arr[n-2] = list.remove(k%2);
-        arr[n-1] = list.remove(0);
-        String ret ="";
-        for(int i: arr) {
+        arr[n - 2] = list.remove(k % 2);
+        arr[n - 1] = list.remove(0);
+        String ret = "";
+        for (int i : arr) {
             ret += String.valueOf(i);
         }
         return ret;
