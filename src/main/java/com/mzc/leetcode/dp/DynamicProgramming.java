@@ -13,6 +13,27 @@ package com.mzc.leetcode.dp;
 public class DynamicProgramming {
 
     /**
+     * 爬楼，每一次可以爬一个或者两个台阶，求有多少种唯一的走法可以到n阶
+     * Input: 3
+     * Output: 3
+     * Explanation: There are three ways to climb to the top.
+     * 1. 1 step + 1 step + 1 step
+     * 2. 1 step + 2 steps
+     * 3. 2 steps + 1 step
+     * @param n
+     * @return
+     */
+    public static int climbStairs(int n) {
+        int[] tmp = new int[n+1];
+        tmp[0] = 1;
+        tmp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            tmp[i] = tmp[i-2] + tmp[i-1];
+        }
+        return tmp[n];
+    }
+
+    /**
      * 假设有一个机器人，站在一个m*n的格子地图上，求其从地图的左上角走到右下角有多少种唯一走法
      * 假定机器人只能向右和下方向行走
      * Input: m = 3, n = 2
