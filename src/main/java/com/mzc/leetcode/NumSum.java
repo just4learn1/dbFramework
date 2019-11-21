@@ -305,7 +305,6 @@ public class NumSum {
      * @param start
      */
     public static void reverse(int[] nums, int start) {
-        System.out.println(Arrays.toString(nums));
         int i = start, j = nums.length - 1;
         while (i < j) {
             swap(nums, i, j);

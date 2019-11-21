@@ -593,7 +593,7 @@ public class Test {
     }
 
     /**
-     * 给定一个部分有序数组（将原本有序的数组分为两部分并反转），并给定一个目标值，返回target在数组中的位置，不存在返回-1
+     * 给定一个部分有序且没有重复值的数组（将原本有序的数组分为两部分并反转），并给定一个目标值，返回target在数组中的位置，不存在返回-1
      * <p>
      * 例：Input: nums = [4,5,6,7,0,1,2], target = 0
      * Output: 4
@@ -604,7 +604,7 @@ public class Test {
      * @param target
      * @return
      */
-    public int search(int[] nums, int target) {
+    public static int search(int[] nums, int target) {
         /**
          * 使用二分法，将数组分为 {start, mid} {mid, end}两部分，可以确定至少有一部分是有序的（每次使用二分法都符合此条件）
          */
@@ -1148,7 +1148,7 @@ public class Test {
     }
 
     public static void main(String[] args) {
-        System.out.println(jump(new int[]{1,1,0,3}));
+        System.out.println(search(new int[]{3,1}, 1));
     }
 
     /**
