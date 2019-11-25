@@ -1,10 +1,9 @@
 package com.mzc.leetcode.second;
 
+import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.mzc.leetcode.inst.ListNode;
 import com.mzc.leetcode.inst.TreeNode;
-import com.sun.xml.internal.bind.v2.TODO;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -486,7 +485,7 @@ public class FirstTry {
         result.add(new ArrayList<>());
         List<List<Integer>> tmp = new ArrayList<>();
         for (int i = 0; i < nums.length; i++) {
-            if (i > 0 && nums[i] == nums[i-1]) {            //由于此处的判断是与前一位进行比较，所以nums必须是有序的，否则类似于 [4,4,1,4]这种间隔重复的情况会出错
+            if (i > 0 && nums[i] == nums[i - 1]) {            //由于此处的判断是与前一位进行比较，所以nums必须是有序的，否则类似于 [4,4,1,4]这种间隔重复的情况会出错
                 List<List<Integer>> dupAdd = new ArrayList<>(tmp);
                 tmp.clear();
                 for (List<Integer> t : dupAdd) {
@@ -513,28 +512,28 @@ public class FirstTry {
      * Output: 1->4->3->2->5->NULL
      */
     public static ListNode reverseBetween(ListNode head, int m, int n) {
-        if(head == null){
+        if (head == null) {
             return null;
         }
         ListNode firstList = null;
         ListNode temp = head;
         Stack<ListNode> st = new Stack<>();     //存储链表中第m至n位元素
         int count = 0;
-        while(count < m-1){
+        while (count < m - 1) {
             firstList = temp;
             temp = temp.next;
             count++;
         }
-        while(count >=m-1 && count<=n-1){
+        while (count >= m - 1 && count <= n - 1) {
             st.add(temp);
             temp = temp.next;
             count++;
         }
-        while(!st.isEmpty()){
+        while (!st.isEmpty()) {
             System.out.println(firstList);
-            if(firstList!=null){
+            if (firstList != null) {
                 firstList.next = new ListNode(st.pop().val);
-            }else{
+            } else {
                 firstList = head;       //此处仅为了让firstList不等于null，new一个值也可以，不过空间会多用一点
 //                firstList = new ListNode(-1);
                 firstList.next = new ListNode(st.pop().val);
@@ -542,7 +541,7 @@ public class FirstTry {
             }
             firstList = firstList.next;
         }
-        if(firstList!=null){            //连接第三段链表
+        if (firstList != null) {            //连接第三段链表
             firstList.next = temp;
         }
         return head;
@@ -573,8 +572,8 @@ public class FirstTry {
 
     /**
      * 给定一个二叉树，返回其节点值的有序遍历
-     * @param root
-     * @return
+     * <p>
+     * P： 有序遍历指先遍历所有左子树，然后从叶子节点开始找是否有右子树；最后再按照相同的逻辑将右子树看作是root，继续相同的方式遍历
      */
     public static List<Integer> inorderTraversal(TreeNode root) {
         ArrayDeque<TreeNode> stack = new ArrayDeque<>();
@@ -598,13 +597,154 @@ public class FirstTry {
         return list;
     }
 
+    /**
+     * 给定非负整数，求对应的杨辉三角
+     * Input: 5
+     * Output:
+     * [
+     * [1],
+     * [1,1],
+     * [1,2,1],
+     * [1,3,3,1],
+     * [1,4,6,4,1]
+     * ]
+     */
+    public List<List<Integer>> generate(int numRows) {
+        List<List<Integer>> result = new ArrayList<>();
+        if (numRows == 0) {
+            return result;
+        }
+        result.add(new ArrayList<>(Arrays.asList(1)));
+        for (int i = 1; i < numRows; i++) {
+            List<Integer> newAdd = new ArrayList<>();
+            newAdd.add(1);
+            for (int j = 1; j < i; j++) {
+                newAdd.add(result.get(i - 1).get(j) + result.get(i - 1).get(j - 1));
+            }
+            newAdd.add(1);
+            result.add(newAdd);
+        }
+        return result;
+    }
+
+    /**
+     * 给定一个价格数组，其中每个元素代表一天的价格，每天只能进行买或者卖的操作，求购买一次和卖出一次的最大利润
+     * Input: [7,1,5,3,6,4]
+     * Output: 5
+     * Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+     * Not 7-1 = 6, as selling price needs to be larger than buying price.
+     * <p>
+     * Input: [7,6,4,3,1]
+     * Output: 0
+     * Explanation: In this case, no transaction is done, i.e. max profit = 0.
+     */
+    public int maxProfit(int[] prices) {
+        if (prices == null || prices.length <= 1) {
+            return 0;
+        }
+        int minS = prices[0];
+        int maxP = 0;
+        for (int p : prices) {
+            minS = Math.min(minS, p);
+            maxP = Math.max(maxP, p - minS);
+        }
+        return maxP;
+    }
+
+    /**
+     * 给定一个价格数组，其中每个元素代表一天的价格，每天只能操作买或者卖一次，可以有无限次交易，求最大利润
+     * Input: [7,1,5,3,6,4]
+     * Output: 7
+     * Explanation: Buy on day 2 (price = 1) and sell on day 3 (price = 5), profit = 5-1 = 4.
+     * Then buy on day 4 (price = 3) and sell on day 5 (price = 6), profit = 6-3 = 3.
+     */
+    public static int maxProfit2(int[] prices) {
+        int start = 0;
+        int end = 0;
+        int profit = 0;
+        while (start < prices.length) {
+            while (start < prices.length - 1) {
+                if (prices[start] < prices[start + 1]) {
+                    break;
+                }
+                start++;
+            }
+            end = start + 1;
+            if (end >= prices.length) {
+                break;
+            }
+            int min = prices[start];
+            while (end < prices.length - 1) {
+                if (prices[end] > prices[end + 1]) {
+                    break;
+                }
+                end++;
+            }
+            profit += prices[end] - min;
+            start = end + 1;
+        }
+        return profit;
+    }
+
+    /**
+     * 给定数组，其中每个元素代表一天的价格，每天至多只能操作一次买卖，而且买之前必须卖掉之前买的，现可以进行两次买卖，求最大利润
+     * Input: [3,3,5,0,0,3,1,4]
+     * Output: 6
+     * Explanation: Buy on day 4 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
+     * Then buy on day 7 (price = 1) and sell on day 8 (price = 4), profit = 4-1 = 3.
+     * P：此题的设定是两次交易利润最大化，因此如果有多次可以考虑存储多次交易记录，然后使其两次交易最大化
+     */
+    public static int maxProfit3(int[] prices) {
+        int start = 0;
+        int end = 0;
+        List<TmpTrade> profits = new ArrayList<>();
+        while (start < prices.length) {
+            while (start < prices.length - 1) {
+                if (prices[start] < prices[start + 1]) {
+                    break;
+                }
+                start++;
+            }
+            end = start + 1;
+            if (end >= prices.length) {
+                break;
+            }
+            while (end < prices.length - 1) {
+                if (prices[end] > prices[end + 1]) {
+                    break;
+                }
+                end++;
+            }
+            profits.add(new TmpTrade(prices[start], prices[end]));
+            start = end + 1;
+        }
+        System.out.println(profits);
+        if (profits.size() == 0) {
+            return 0;
+        }
+        if (profits.size() == 1) {
+            return profits.get(0).getProfit();
+        }
+        int maxPrice = 0;
+        // TODO: 2019/11/25  尝试合并多次交易记录为两次最大利润的交易---理论上应该可以，没实现
+        return maxPrice;
+    }
+
+    static class TmpTrade {
+        public int buyPrice;
+        public int sellPrice;
+
+        public TmpTrade(int buyPrice, int sellPrice) {
+            this.buyPrice = buyPrice;
+            this.sellPrice = sellPrice;
+        }
+
+        public int getProfit() {
+            return this.sellPrice - this.buyPrice;
+        }
+    }
+
     public static void main(String[] args) {
-        ListNode node = new ListNode(1);
-        node.next = new ListNode(2);
-        node.next.next = new ListNode(3);
-        node.next.next.next = new ListNode(4);
-        node.next.next.next.next = new ListNode(5);
-        ListNode rev = reverseBetween(node, 0, 3);
-        printListnode(rev);
+        System.out.println(maxProfit3(new int[]{1, 2, 4, 2, 5, 7, 2, 4, 9, 0}));
     }
 }
