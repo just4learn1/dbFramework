@@ -145,31 +145,39 @@ public class NumSum {
      * @return
      */
     public static List<List<Integer>> threeSum(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
         Arrays.sort(nums);
-        List<List<Integer>> list = new LinkedList<>();
-
-        for (int i = 0; i < nums.length; i++) {
-            if (i == 0 || (i > 0 && nums[i] != nums[i - 1])) {
-                int sum = 0 - nums[i];
-                int l = i + 1;
-                int h = nums.length - 1;
-
-                while (l < h) {
-                    if (nums[l] + nums[h] == sum) {
-                        list.add(Arrays.asList(nums[i], nums[l], nums[h]));
-                        while ((l < h) && (nums[l] == nums[l + 1])) l++;
-                        while ((l < h) && (nums[l] == nums[h - 1])) h--;
-                        l++;
-                        h--;
-                    } else if (nums[l] + nums[h] < sum) {
-                        l++;
-                    } else {
-                        h--;
-                    }
+        int len = nums.length;
+        for (int i = 0; i < len; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int left = 0 - nums[i];
+            int start = i + 1;
+            int end = len - 1;
+            if (left >= 0 && nums[end] < 0) {
+                break;
+            }
+            if (left <= 0 && nums[start] > 0) {
+                break;
+            }
+            while (start < end) {
+                if (nums[start] + nums[end] < left) {
+                    start++;
+                } else if (nums[start] + nums[end] > left) {
+                    end--;
+                } else {
+                    result.add(new ArrayList<>(Arrays.asList(nums[i], nums[start], nums[end])));
+                    do {
+                        start++;
+                    } while (start < end && nums[start] == nums[start - 1]);
+                    do {
+                        end--;
+                    } while (start < end && nums[end] == nums[end + 1]);
                 }
             }
         }
-        return list;
+        return result;
     }
 
     /**
