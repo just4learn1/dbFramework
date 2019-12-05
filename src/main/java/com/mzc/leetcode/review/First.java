@@ -895,9 +895,9 @@ public class First {
      * Input: ["eat", "tea", "tan", "ate", "nat", "bat"],
      * Output:
      * [
-     *   ["ate","eat","tea"],
-     *   ["nat","tan"],
-     *   ["bat"]
+     * ["ate","eat","tea"],
+     * ["nat","tan"],
+     * ["bat"]
      * ]
      */
     public List<List<String>> groupAnagrams(String[] strs) {
@@ -927,7 +927,7 @@ public class First {
         }
         int tmp = 0;
         for (int i = start; i < nums.length; i++) {
-            tmp = Math.max(0, tmp+nums[i]);
+            tmp = Math.max(0, tmp + nums[i]);
             maxSum = Math.max(tmp, maxSum);
         }
         return maxSum;
@@ -938,12 +938,12 @@ public class First {
      */
     public boolean canJump(int[] nums) {
         int position = nums.length;
-        for (int i = nums.length-1; i >= 0; i--) {
+        for (int i = nums.length - 1; i >= 0; i--) {
             if (nums[i] + i >= position) {
                 position = i;
             }
         }
-        return position==0;
+        return position == 0;
     }
 
     /**
@@ -953,33 +953,278 @@ public class First {
      * Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
      */
     public static int[][] merge(int[][] intervals) {
-        int[] tmp = new int[intervals.length*2];
-        Arrays.sort(intervals, (a1, a2)->a1[0]-a2[0]);
+        int[] tmp = new int[intervals.length * 2];
+        Arrays.sort(intervals, (a1, a2) -> a1[0] - a2[0]);
         int cnt = 0;
         for (int i = 0; i < intervals.length; i++) {
-            if (cnt == 0 || intervals[i][0] > tmp[cnt-1]) {
+            if (cnt == 0 || intervals[i][0] > tmp[cnt - 1]) {
                 tmp[cnt++] = intervals[i][0];
                 tmp[cnt++] = intervals[i][1];
             } else {
-                tmp[cnt-1] = Math.max(intervals[i][1], tmp[cnt-1]);
+                tmp[cnt - 1] = Math.max(intervals[i][1], tmp[cnt - 1]);
             }
         }
-        int[][] result = new int[cnt/2][2];
+        int[][] result = new int[cnt / 2][2];
         for (int i = 0; i < result.length; i++) {
-            result[i][0] = tmp[i*2];
-            result[i][1] = tmp[i*2+1];
+            result[i][0] = tmp[i * 2];
+            result[i][1] = tmp[i * 2 + 1];
         }
         return result;
     }
 
     /**
-     * 给定按照区间起始位置有序的数组以及一个新的区间范围，将其插入到原区间数组中并合并
+     * 给定数字n以及索引k，返回[1,n]n个数字唯一组合出来的串按照升序排序后第k位字符串
+     * "123"
+     * "132"
+     * "213"
+     * "231"
+     * "312"
+     * "321"
+     * 给定 n=3，k=3  返回 "213"
      */
-    public int[][] insert(int[][] intervals, int[] newInterval) {
+    public static String getPermutation(int n, int k) {
+        //关键在于规律，对于n位数字组合升序，确定高位以后，低位总共有factorial(k-1)种组合
+        if (n == 1) {
+            return String.valueOf(n);
+        } else if (n == 0) {
+            return new String();
+        }
+        List<Integer> list = new ArrayList<>();
+        for (int i = 1; i <= n; i++) {
+            list.add(i);
+        }
+        String result = "";
+        k--;        //因为程序从0开始计数？ 所以第k位等价于k-1位
+        for (int i = 0; i < n - 2; i++) {
+            int f = factorial(n-i-1);
+            int div = k / f;
+            k = k % f;
+            result += list.remove(div);
+        }
+        result += list.remove(k%2);
+        result += list.remove(0);
+        return result;
+    }
 
+    public static int factorial(int n) {
+        int result = n;
+        for (int i = n-1; i > 0; i--) {
+            result *= i;
+        }
+        return result;
+    }
+
+    /**
+     * 转移单向链表k此
+     * Input: 1->2->3->4->5->NULL, k = 2
+     * Output: 4->5->1->2->3->NULL
+     * Explanation:
+     * rotate 1 steps to the right: 5->1->2->3->4->NULL
+     * rotate 2 steps to the right: 4->5->1->2->3->NULL
+     */
+    public ListNode rotateRight(ListNode head, int k) {
+        //此题关键点在于确定链表移动的有效步数，正序(多轮转换属于无效操作)，然后找到节点，将最后的末尾节点的next指向原头节点，将第step位节点的next设置为null
+        int len = 0;
+        ListNode f = head;
+        ListNode last = null;
+        while (f != null) {
+            last = f;
+            f = f.next;
+            len++;
+        }
+        if (len == 0) {
+            return head;
+        }
+        if (k % len == 0) {
+            return head;
+        }
+        int step = len - k % len - 1;
+        f = head;
+        while (--step >= 0) {
+            f = f.next;
+        }
+        ListNode res = f.next;      //新的头部节点
+        f.next = null;
+        last.next = head;
+        return res;
+    }
+
+    /**
+     * 给定m*n大小的地图，假设一个机器人从地图左上角要走到右下角，每次只能向前或者向下移动，求总共有多少种唯一的走法
+     * Input: m = 3, n = 2
+     * Output: 3
+     */
+    public static int uniquePaths(int m, int n) {
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            dp[i][0] = 1;
+        }
+        for (int i = 0; i < n; i++) {
+            dp[0][i] = 1;
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = dp[i][j-1] + dp[i-1][j];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+    /**
+     * 给定机器人，每次只能向下或者向右行走，给定格子，其中1代表有阻挡，求机器人从左上角移动到右下角有多少种唯一走法
+     * Input:
+     * [
+     *   [0,0,0],
+     *   [0,1,0],
+     *   [0,0,0]
+     * ]
+     * Output: 2
+     */
+    public int uniquePathsWithObstacles(int[][] obstacleGrid) {
+        int m = obstacleGrid.length;
+        int n = obstacleGrid[0].length;
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            if (i > 0) {
+                dp[i][0] = obstacleGrid[i][0] == 1 ? 0 : dp[i - 1][0];
+            } else {
+                dp[i][0] = obstacleGrid[i][0] == 1 ? 0 : 1;
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (i > 0) {
+                dp[0][i] = obstacleGrid[0][i] == 1 ? 0 : dp[0][i-1];
+            } else {
+                dp[0][i] = obstacleGrid[0][i] == 1 ? 0 : 1;
+            }
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (obstacleGrid[i][j] == 1) {
+                    dp[i][j] = 0;
+                } else {
+                    dp[i][j] = dp[i-1][j] + dp[i][j-1];
+                }
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+    /**
+     * 给定一个矩阵，求出从左上角走到右下角和最小的路径，并返回其和
+     * Input:
+     * [
+     *   [1,3,1],
+     *   [1,5,1],
+     *   [4,2,1]
+     * ]
+     * Output: 7
+     */
+    public int minPathSum(int[][] grid) {
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            if (i > 0) {
+                dp[i][0] = dp[i - 1][0] + grid[i][0];
+            } else {
+                dp[i][0] = grid[i][0];
+            }
+        }
+        for (int i = 0; i < n; i++) {
+            if (i > 0) {
+                dp[0][i] = dp[0][i-1] + grid[0][i];
+            } else {
+                dp[0][i] = grid[0][i];
+            }
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = Math.min(dp[i-1][j], dp[i][j-1]) + grid[i][j];
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+    /**
+     * 爬楼，每次只能走一个或者两个台阶，求走到n阶有多少种唯一的走法
+     *Input: 2
+     * Output: 2
+     * Explanation: There are two ways to climb to the top.
+     * 1. 1 step + 1 step
+     * 2. 2 steps
+     */
+    public static int climbStairs(int n) {
+        int[] dp = new int[n+1];            //空间可以优化，因为只用到前两位数，没必要在存储那么多数据，所以需要3个int数就可以了
+        dp[0] = 1;
+        dp[1] = 1;
+        for (int i = 2; i <= n; i++) {
+            dp[i] = dp[i-1] + dp[i-2];
+        }
+        return dp[n];
+    }
+
+    /**
+     * 给定两个字符串word1和word2，每次只能进行增删改操作，求最少步数将word1转换为word2
+     * Input: word1 = "horse", word2 = "ros"
+     * Output: 3
+     * Explanation:
+     * horse -> rorse (replace 'h' with 'r')
+     * rorse -> rose (remove 'r')
+     * rose -> ros (remove 'e')
+     */
+    public int minDistance(String word1, String word2) {
+        int m = word1.length();
+        int n = word2.length();
+        int[][] dp = new int[m+1][n+1];
+        for (int i = 1; i <= m; i++) {
+            dp[i][0] = i;
+        }
+        for (int i = 0; i <= n; i++) {
+            dp[0][i] = i;
+        }
+        for (int i = 1; i <= m; i++) {
+            for (int j = 1; j <= n; j++) {
+                if (word1.charAt(i-1) == word2.charAt(j-1)) {
+                    dp[i][j] = dp[i-1][j-1];
+                } else {
+                    dp[i][j] = Math.min(dp[i-1][j], Math.min(dp[i-1][j-1], dp[i][j-1])) + 1;
+                }
+            }
+        }
+        return dp[m][n];
+    }
+
+    /**
+     * 给定一个矩阵，每行或者列都是升序排序的，求target是否存在于矩阵中
+     * Input:
+     * matrix = [
+     *   [1,   3,  5,  7],
+     *   [10, 11, 16, 20],
+     *   [23, 30, 34, 50]
+     * ]
+     * target = 3
+     * Output: true
+     */
+    public static boolean searchMatrix(int[][] matrix, int target) {
+        if (matrix.length == 0) {
+            return false;
+        }
+        int i = 0;
+        int j = matrix[0].length - 1;
+        while (i < matrix.length &&  j >= 0) {
+            if (target == matrix[i][j]) {
+                return true;
+            } else if (target > matrix[i][j]) {
+                i++;
+            } else {
+                j--;
+            }
+        }
+        return false;
     }
 
     public static void main(String[] args) {
-        merge(new int[][]{{1,3}, {2,6}, {8,10}, {15,18}});
+        System.out.println(uniquePaths(4,3));
     }
 }

@@ -30,9 +30,10 @@ public class NeedReview {
     public static String longestPalindrome(String s) {
         return null;
     }
+
     /**
      * 在不改变链表元素值只交换ListNode的前提下两两交换链表元素
-     *Given 1->2->3->4, you should return the list as 2->1->4->3.
+     * Given 1->2->3->4, you should return the list as 2->1->4->3.
      */
     public static ListNode swapPairs(ListNode head) {
         return null;
@@ -40,7 +41,7 @@ public class NeedReview {
 
     /**
      * 给定升序排序的有序数组，找出target在数组中首次和最后一次出现的位置
-     *Input: nums = [5,7,7,8,8,10], target = 8
+     * Input: nums = [5,7,7,8,8,10], target = 8
      * Output: [3,4]
      */
     public static int[] searchRange(int[] nums, int target) {
@@ -49,7 +50,7 @@ public class NeedReview {
 
     /**
      * 给定一个排序好的数组和一个数字，如果查找到返回在数组中的索引，否则返回其插入索引，且插入后数组还保持有序
-     *Input: [1,3,5,6], 5
+     * Input: [1,3,5,6], 5
      * Output: 2
      */
     public static int searchInsert(int[] nums, int target) {
@@ -90,6 +91,32 @@ public class NeedReview {
      * Explanation: Since intervals [1,3] and [2,6] overlaps, merge them into [1,6].
      */
     public static int[][] merge(int[][] intervals) {
+        return null;
+    }
+
+    /**
+     * 给定数字n以及索引k，返回[1,n]n个数字唯一组合出来的串按照升序排序后第k位字符串
+     * "123"
+     * "132"
+     * "213"
+     * "231"
+     * "312"
+     * "321"
+     * 给定 n=3，k=3  返回 "213"
+     */
+    public static String getPermutation(int n, int k) {
+        return null;
+    }
+
+    /**
+     * 转移单向链表k此
+     * Input: 1->2->3->4->5->NULL, k = 2
+     * Output: 4->5->1->2->3->NULL
+     * Explanation:
+     * rotate 1 steps to the right: 5->1->2->3->4->NULL
+     * rotate 2 steps to the right: 4->5->1->2->3->NULL
+     */
+    public ListNode rotateRight(ListNode head, int k) {
         return null;
     }
 }
