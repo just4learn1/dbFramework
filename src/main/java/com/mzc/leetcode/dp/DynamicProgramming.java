@@ -1,7 +1,11 @@
 package com.mzc.leetcode.dp;
 
+import com.mzc.leetcode.inst.TreeNode;
+
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * create by zhencai.ma on 2019/11/14
@@ -14,11 +18,6 @@ import java.util.Arrays;
  * 因此如果求出了f(4) f(10) f(14)的组合个数，进行比较就可以得到最优解
  */
 public class DynamicProgramming {
-
-    public static void main(String[] args) {
-        int t = minDistance("abe", "abce");
-        System.out.println(t);
-    }
 
     /**
      * 给定两个字符串，求最少几步可以将word1转换为word2，每一步只能对一个字符执行insert/delete/replace
@@ -237,5 +236,44 @@ public class DynamicProgramming {
                 dp[i][j] = dp[i - 1][j] && (s1.charAt(i - 1) == s3.charAt(i + j - 1)) || dp[i][j - 1] && (s2.charAt(j - 1) == s3.charAt(i + j - 1));
         }
         return dp[dp.length - 1][dp[0].length - 1];
+    }
+
+    private static List<TreeNode> nullTreeNode = new ArrayList<>();
+    static {
+        nullTreeNode.add(null);
+    }
+
+    public static void main(String[] args) {
+        generateTrees(3).stream().forEach(System.out::println);
+    }
+
+    public static List<TreeNode> generateTrees(int n) {
+        List<TreeNode> dp[][] = new List[n + 1][n + 1];
+        for (int i = 1; i <= n; i++) {
+            dp[i][i] = Arrays.asList(new TreeNode(i));
+        }
+        for (int l = 2; l <= n; l++) {
+            for (int start = 1; start <= n - l + 1; start++) {
+                int end = l + start - 1;
+                dp[start][end] = new ArrayList<>();
+                for (int root = start; root <= end; root++) {
+                    combine(root == start ? null : dp[start][root - 1], root == end ? null : dp[root + 1][end], dp[start][end], root);
+                }
+            }
+        }
+        return dp[1][n];
+    }
+
+    private static void combine(List<TreeNode> lefts, List<TreeNode> rights, List<TreeNode> ret, int val) {
+        if (lefts == null) lefts = nullTreeNode;
+        if (rights == null) rights = nullTreeNode;
+        for (TreeNode left : lefts) {
+            for (TreeNode right : rights) {
+                TreeNode node = new TreeNode(val);
+                node.left = left;
+                node.right = right;
+                ret.add(node);
+            }
+        }
     }
 }

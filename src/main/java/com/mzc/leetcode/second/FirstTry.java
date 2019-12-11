@@ -530,7 +530,7 @@ public class FirstTry {
             count++;
         }
         while (!st.isEmpty()) {
-            System.out.println(firstList);
+//            System.out.println(firstList);
             if (firstList != null) {
                 firstList.next = new ListNode(st.pop().val);
             } else {

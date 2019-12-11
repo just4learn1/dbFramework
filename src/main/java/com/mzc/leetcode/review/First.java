@@ -2,6 +2,8 @@ package com.mzc.leetcode.review;
 
 import com.mzc.leetcode.NumSum;
 import com.mzc.leetcode.inst.ListNode;
+import com.mzc.leetcode.inst.TreeNode;
+import com.sun.xml.internal.bind.v2.TODO;
 
 import java.sql.SQLOutput;
 import java.util.*;
@@ -664,7 +666,7 @@ public class First {
     }
 
     /**
-     * 给定一组无重复候选数字及targer，从候选数字中找出所有组合使其和等于target
+     * 给定一组无重复候选数字及target，从候选数字中找出所有组合使其和等于target
      * Input: candidates = [2,3,6,7], target = 7,
      * A solution set is:
      * [
@@ -996,19 +998,19 @@ public class First {
         String result = "";
         k--;        //因为程序从0开始计数？ 所以第k位等价于k-1位
         for (int i = 0; i < n - 2; i++) {
-            int f = factorial(n-i-1);
+            int f = factorial(n - i - 1);
             int div = k / f;
             k = k % f;
             result += list.remove(div);
         }
-        result += list.remove(k%2);
+        result += list.remove(k % 2);
         result += list.remove(0);
         return result;
     }
 
     public static int factorial(int n) {
         int result = n;
-        for (int i = n-1; i > 0; i--) {
+        for (int i = n - 1; i > 0; i--) {
             result *= i;
         }
         return result;
@@ -1064,19 +1066,19 @@ public class First {
         }
         for (int i = 1; i < m; i++) {
             for (int j = 1; j < n; j++) {
-                dp[i][j] = dp[i][j-1] + dp[i-1][j];
+                dp[i][j] = dp[i][j - 1] + dp[i - 1][j];
             }
         }
-        return dp[m-1][n-1];
+        return dp[m - 1][n - 1];
     }
 
     /**
      * 给定机器人，每次只能向下或者向右行走，给定格子，其中1代表有阻挡，求机器人从左上角移动到右下角有多少种唯一走法
      * Input:
      * [
-     *   [0,0,0],
-     *   [0,1,0],
-     *   [0,0,0]
+     * [0,0,0],
+     * [0,1,0],
+     * [0,0,0]
      * ]
      * Output: 2
      */
@@ -1093,7 +1095,7 @@ public class First {
         }
         for (int i = 0; i < n; i++) {
             if (i > 0) {
-                dp[0][i] = obstacleGrid[0][i] == 1 ? 0 : dp[0][i-1];
+                dp[0][i] = obstacleGrid[0][i] == 1 ? 0 : dp[0][i - 1];
             } else {
                 dp[0][i] = obstacleGrid[0][i] == 1 ? 0 : 1;
             }
@@ -1103,20 +1105,20 @@ public class First {
                 if (obstacleGrid[i][j] == 1) {
                     dp[i][j] = 0;
                 } else {
-                    dp[i][j] = dp[i-1][j] + dp[i][j-1];
+                    dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
                 }
             }
         }
-        return dp[m-1][n-1];
+        return dp[m - 1][n - 1];
     }
 
     /**
      * 给定一个矩阵，求出从左上角走到右下角和最小的路径，并返回其和
      * Input:
      * [
-     *   [1,3,1],
-     *   [1,5,1],
-     *   [4,2,1]
+     * [1,3,1],
+     * [1,5,1],
+     * [4,2,1]
      * ]
      * Output: 7
      */
@@ -1133,33 +1135,33 @@ public class First {
         }
         for (int i = 0; i < n; i++) {
             if (i > 0) {
-                dp[0][i] = dp[0][i-1] + grid[0][i];
+                dp[0][i] = dp[0][i - 1] + grid[0][i];
             } else {
                 dp[0][i] = grid[0][i];
             }
         }
         for (int i = 1; i < m; i++) {
             for (int j = 1; j < n; j++) {
-                dp[i][j] = Math.min(dp[i-1][j], dp[i][j-1]) + grid[i][j];
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
             }
         }
-        return dp[m-1][n-1];
+        return dp[m - 1][n - 1];
     }
 
     /**
      * 爬楼，每次只能走一个或者两个台阶，求走到n阶有多少种唯一的走法
-     *Input: 2
+     * Input: 2
      * Output: 2
      * Explanation: There are two ways to climb to the top.
      * 1. 1 step + 1 step
      * 2. 2 steps
      */
     public static int climbStairs(int n) {
-        int[] dp = new int[n+1];            //空间可以优化，因为只用到前两位数，没必要在存储那么多数据，所以需要3个int数就可以了
+        int[] dp = new int[n + 1];            //空间可以优化，因为只用到前两位数，没必要在存储那么多数据，所以需要3个int数就可以了
         dp[0] = 1;
         dp[1] = 1;
         for (int i = 2; i <= n; i++) {
-            dp[i] = dp[i-1] + dp[i-2];
+            dp[i] = dp[i - 1] + dp[i - 2];
         }
         return dp[n];
     }
@@ -1176,7 +1178,7 @@ public class First {
     public int minDistance(String word1, String word2) {
         int m = word1.length();
         int n = word2.length();
-        int[][] dp = new int[m+1][n+1];
+        int[][] dp = new int[m + 1][n + 1];
         for (int i = 1; i <= m; i++) {
             dp[i][0] = i;
         }
@@ -1185,10 +1187,10 @@ public class First {
         }
         for (int i = 1; i <= m; i++) {
             for (int j = 1; j <= n; j++) {
-                if (word1.charAt(i-1) == word2.charAt(j-1)) {
-                    dp[i][j] = dp[i-1][j-1];
+                if (word1.charAt(i - 1) == word2.charAt(j - 1)) {
+                    dp[i][j] = dp[i - 1][j - 1];
                 } else {
-                    dp[i][j] = Math.min(dp[i-1][j], Math.min(dp[i-1][j-1], dp[i][j-1])) + 1;
+                    dp[i][j] = Math.min(dp[i - 1][j], Math.min(dp[i - 1][j - 1], dp[i][j - 1])) + 1;
                 }
             }
         }
@@ -1199,9 +1201,9 @@ public class First {
      * 给定一个矩阵，每行或者列都是升序排序的，求target是否存在于矩阵中
      * Input:
      * matrix = [
-     *   [1,   3,  5,  7],
-     *   [10, 11, 16, 20],
-     *   [23, 30, 34, 50]
+     * [1,   3,  5,  7],
+     * [10, 11, 16, 20],
+     * [23, 30, 34, 50]
      * ]
      * target = 3
      * Output: true
@@ -1212,7 +1214,7 @@ public class First {
         }
         int i = 0;
         int j = matrix[0].length - 1;
-        while (i < matrix.length &&  j >= 0) {
+        while (i < matrix.length && j >= 0) {
             if (target == matrix[i][j]) {
                 return true;
             } else if (target > matrix[i][j]) {
@@ -1224,7 +1226,764 @@ public class First {
         return false;
     }
 
+    /**
+     * 给定颜色数组，0,1,2分别代表红色、白色和蓝色  对其排序
+     * Input: [2,0,2,1,1,0]
+     * Output: [0,0,1,1,2,2]
+     */
+    public static void sortColors(int[] nums) {
+        int redIndex = 0;
+        int blueIndex = nums.length - 1;
+        int start = 0;
+        while (start < nums.length && start <= blueIndex) {
+            if (nums[start] == 0) {
+                swapArr(nums, start, redIndex);
+                redIndex++;
+                start++;
+            } else if (nums[start] == 2) {
+                swapArr(nums, start, blueIndex);
+                blueIndex--;
+            } else {
+                start++;
+            }
+        }
+    }
+
+    /**
+     * 给定字符串s和t，从s中找出最短的子串使其包含所有的t中的字符
+     * Input: S = "ADOBECODEBANC", T = "ABC"
+     * Output: "BANC"
+     */
+    public static String minWindow(String s, String t) {
+        int[] cnt = new int[128];
+        for (int i = 0; i < t.length(); i++) {
+            cnt[t.charAt(i)]++;
+        }
+        int count = t.length();
+        int first = 0;
+        int second = 0;
+        int left = -1;
+        int right = -1;
+        while (first < s.length()) {
+            if (cnt[s.charAt(first++)]-- > 0) {
+                count--;
+            }
+            while (count == 0) {
+                if (left == -1 || first - second < right - left) {
+                    left = second;
+                    right = first;
+                }
+                if (cnt[s.charAt(second++)]++ == 0) {
+                    count++;
+                }
+            }
+        }
+        if (left == -1) {
+            return "";
+        }
+        return s.substring(left, right);
+    }
+
+    /**
+     * 给定两个正整数n和k，从1...n中找出k个元素的所有不同组合
+     * nput: n = 4, k = 2
+     * Output:
+     * [
+     * [2,4],
+     * [3,4],
+     * [2,3],
+     * [1,2],
+     * [1,3],
+     * [1,4],
+     * ]
+     */
+    public static List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> result = new ArrayList<>();
+        geneCombine(result, new ArrayList<>(), n, k, 1);
+        return result;
+    }
+
+    public static void geneCombine(List<List<Integer>> result, List<Integer> tmp, int n, int k, int start) {
+        if (k == 0) {
+            result.add(new ArrayList<>(tmp));
+            return;
+        }
+        for (int i = start; i <= n - k + 1; i++) {
+            tmp.add(i);
+            geneCombine(result, tmp, n, k - 1, i + 1);
+            tmp.remove(tmp.size() - 1);
+        }
+    }
+
+    /**
+     * 给定整数数组，找出其所有唯一的子串
+     * Input: nums = [1,2,3]
+     * Output:
+     * [
+     * [3],
+     * [1],
+     * [2],
+     * [1,2,3],
+     * [1,3],
+     * [2,3],
+     * [1,2],
+     * []
+     * ]
+     */
+    public static List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> result = new ArrayList<>();
+        result.add(new ArrayList<>());
+        for (int num : nums) {
+            List<List<Integer>> tmp = new ArrayList<>();
+            for (List<Integer> l : result) {
+                List<Integer> list = new ArrayList<>(l);
+                list.add(num);
+                tmp.add(list);
+            }
+            result.addAll(tmp);
+        }
+        return result;
+    }
+
+    /**
+     * 给定二维字符数组，判断给定字符串是否可以在数组中查到，每个字符只能查找到其相邻的字符(上下左右)
+     * board =
+     * [
+     * ['A','B','C','E'],
+     * ['S','F','C','S'],
+     * ['A','D','E','E']
+     * ]
+     * <p>
+     * Given word = "ABCCED", return true.
+     * Given word = "SEE", return true.
+     * Given word = "ABCB", return false.
+     */
+    public static boolean[][] visited;
+    public static int m;
+    public static int n;
+
+    public static boolean exist(char[][] board, String word) {
+        m = board.length;
+        n = board[0].length;
+        visited = new boolean[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (board[i][j] == word.charAt(0)) {
+                    if (exist2(board, word, 0, i, j)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean exist2(char[][] board, String word, int index, int i, int j) {
+        if (index == word.length()) {
+            return true;
+        }
+        if (i < 0 || i >= m) {
+            return false;
+        }
+        if (j < 0 || j >= n) {
+            return false;
+        }
+        if (visited[i][j] || word.charAt(index) != board[i][j]) {
+            return false;
+        }
+        visited[i][j] = true;
+        if (exist2(board, word, index + 1, i - 1, j) || exist2(board, word, index + 1, i, j - 1) ||
+                exist2(board, word, index + 1, i + 1, j) || exist2(board, word, index + 1, i, j + 1)) {
+            return true;
+        }
+        visited[i][j] = false;
+        return false;
+    }
+
+    /**
+     * 删除升序排序的数组中多余的重复元素，保证每个元素最多出现2次，并返回修改后的数组长度，
+     * Given nums = [1,1,1,2,2,3],
+     * <p>
+     * Your function should return length = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.
+     * <p>
+     * It doesn't matter what you leave beyond the returned length.
+     */
+    public int removeDuplicates(int[] nums) {
+        if (nums == null || nums.length == 0) return 0;
+
+        int j = 1, i = 2;
+        while (i < nums.length) {
+            if (nums[j] == nums[i] && nums[j - 1] == nums[i]) i++;
+            else nums[++j] = nums[i++];
+        }
+
+        return j + 1;
+    }
+
+    /**
+     * 在可能有重复元素的经过翻转的有序数组中判断target是否存在于数组中
+     * Input: nums = [2,5,6,0,0,1,2], target = 0
+     * Output: true
+     */
+    public boolean search33(int[] nums, int target) {
+        if (nums.length == 0)
+            return false;
+        int start = 0;
+        int end = nums.length - 1;
+        while (start + 1 < end) {
+            int mid = start + (end - start) / 2;
+            if (nums[start] < nums[mid]) {
+                if (target >= nums[start] && target <= nums[mid])
+                    end = mid;
+                else
+                    start = mid;
+            } else if (nums[start] > nums[mid]) {
+                if (target >= nums[mid] && target <= nums[end])
+                    start = mid;
+                else
+                    end = mid;
+            } else {
+                if (nums[start] == target)
+                    return true;
+                start++;
+                // actually bad as O(n) in the case {search 5 in [1,1,1,5]}, no way to improve
+            }
+        }
+        if (nums[start] == target || nums[end] == target)
+            return true;
+        return false;
+    }
+
+    // TODO: 2019/12/10
+    public ListNode deleteDuplicates(ListNode head) {
+        /* If head is null or there is only one node */
+        if (head == null || head.next == null) {
+            return head;
+        }
+
+        ListNode prev = null;
+        ListNode curr = head;
+        /*  Keep track of the value of node before curr node */
+        int prevVal = (head.val == Integer.MIN_VALUE) ? Integer.MIN_VALUE + 1 : Integer.MIN_VALUE;
+
+        while (curr != null) {
+            ListNode tmp = curr.next;
+            /*  If val of node ahead of curr is same as curr OR val of curr node is same as val of prevVal */
+            if ((tmp != null && curr.val == tmp.val) || curr.val == prevVal) {
+                prevVal = curr.val;
+                curr.next = null;
+                curr = tmp;
+                /*  Head node deleted, need to move head to curr */
+                if (prev == null) {
+                    head = curr;
+                } else {
+                    prev.next = curr;
+                }
+                continue;
+            }
+            prev = curr;
+            prevVal = curr.val;
+            curr = curr.next;
+        }
+        return head;
+    }
+
+    /**
+     * 删除链表中重复元素
+     * Input: 1->1->2
+     * Output: 1->2
+     */
+    public ListNode deleteDuplicates2(ListNode head) {
+        ListNode root = new ListNode(0);
+        root.next = head;
+        ListNode pre = root;
+        ListNode tmp = head;
+        while (tmp != null) {
+            while (tmp != null && tmp.next != null && tmp.val == tmp.next.val) {
+                tmp = tmp.next;
+            }
+            pre.next = tmp;
+            pre = pre.next;
+            tmp = tmp.next;
+        }
+        return root.next;
+    }
+
+    /**
+     * 给定矩阵，其中元素为"0"或者"1"，求由"1"组成的矩形的最大面积
+     * Input:
+     * [
+     * ["1","0","1","0","0"],
+     * ["1","0","1","1","1"],
+     * ["1","1","1","1","1"],
+     * ["1","0","0","1","0"]
+     * ]
+     * Output: 6
+     */
+    public int maximalRectangle(char[][] matrix) {
+        if (matrix.length == 0) {
+            return 0;
+        }
+        int m = matrix.length;
+        int n = matrix[0].length;
+        int maxRange = 0;
+        int[][] dp = new int[m][n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == 0) {
+                    dp[i][j] = matrix[i][j] == '1' ? 1 : 0;
+                } else {
+                    dp[i][j] = matrix[i][j] == '1' ? dp[i - 1][j] + 1 : 0;
+                }
+                int min = dp[i][j];
+                for (int k = j; k >= 0; k--) {
+                    if (min == 0) {
+                        break;
+                    }
+                    min = Math.min(min, dp[i][k]);
+                    maxRange = Math.max(maxRange, min * (j - k + 1));
+                }
+            }
+        }
+        return maxRange;
+    }
+
+    /**
+     * 给定链表，和数字x，将所有小于x的元素都放大于等于x的元素之前
+     * Input: head = 1->4->3->2->5->2, x = 3
+     * Output: 1->2->2->4->3->5
+     */
+    public static ListNode partition(ListNode head, int x) {
+        ListNode list1 = null, list2 = null, p = head, p1 = list1, p2 = list2;
+        while (p != null) {
+            int tmp = p.val;
+            if (tmp < x) {
+                if (list1 == null) {
+                    list1 = p;
+                    p1 = p;
+                } else {
+                    p1.next = p;
+                    p1 = p1.next;
+                }
+            } else {
+                if (list2 == null) {
+                    list2 = p;
+                    p2 = p;
+                } else {
+                    p2.next = p;
+                    p2 = p2.next;
+                }
+            }
+            p = p.next;
+        }
+        if (list1 != null) {
+            p1.next = list2;
+            if (p2 != null) {
+                p2.next = null;
+            }
+            return list1;
+        } else return list2;
+    }
+
+    /**
+     * 给定升序排序的数组nums1和nums2，以及m和n，其中m和n代表nums1和nums2中的有效元素，合并两个数组为一个有序数组
+     * 假定nums1中有足够的空间可以容纳所有nums2中的元素
+     * Input:
+     * nums1 = [1,2,3,0,0,0], m = 3
+     * nums2 = [2,5,6],       n = 3
+     * <p>
+     * Output: [1,2,2,3,5,6]
+     */
+    public static void merge(int[] nums1, int m, int[] nums2, int n) {
+        //解题思路：因为给定的nums1的长度刚好是nums1和nums2有效数组的总长度，而且两个数组都是有序的
+        //所以可以直接从最大的数开始比较，也就是说nums1[nums1.length-1]和nums2[nums2.length-1]逆序
+        //比较，将大的数放在末位(选出一个就需要末位减1)，复杂度为O(nums1.length)----等价于选择排序的方法解决问题
+        int i = nums1.length - 1;
+        m--;
+        n--;
+        while (i >= 0) {
+            if (n < 0 || (m >= 0 && nums1[m] >= nums2[n])) {
+                nums1[i--] = nums1[m--];
+            } else {
+                nums1[i--] = nums2[n--];
+            }
+        }
+    }
+
+    /**
+     * 给定有重复数字的数组，求出所有的数字唯一组合
+     * Input: [1,2,2]
+     * Output:
+     * [
+     * [2],
+     * [1],
+     * [1,2,2],
+     * [2,2],
+     * [1,2],
+     * []
+     * ]
+     */
+    public static List<List<Integer>> subsetsWithDup(int[] nums) {
+        Arrays.sort(nums);          //由于之后实现的逻辑是基于相同的元素都处于相邻的位置的，因此必须先对数组进行排序
+        List<List<Integer>> result = new ArrayList<>();
+        result.add(new ArrayList<>());
+        List<List<Integer>> newAdd = null;
+        for (int i = 0; i < nums.length; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                List<List<Integer>> t = new ArrayList<>(newAdd);
+                newAdd = new ArrayList<>();
+                for (List<Integer> l : t) {
+                    List<Integer> tt = new ArrayList<>(l);
+                    tt.add(nums[i]);
+                    newAdd.add(tt);
+                }
+            } else {
+                newAdd = new ArrayList<>();
+                for (List<Integer> l : result) {
+                    List<Integer> tmp = new ArrayList<>(l);
+                    tmp.add(nums[i]);
+                    newAdd.add(tmp);
+                }
+            }
+            result.addAll(newAdd);
+        }
+        return result;
+    }
+
+    /**
+     * 反转链表的第m到n位元素
+     * Input: 1->2->3->4->5->NULL, m = 2, n = 4
+     * Output: 1->4->3->2->5->NULL
+     */
+    public static ListNode reverseBetween(ListNode head, int m, int n) {
+        ListNode list1 = null;
+        int cnt = 0;
+        ListNode temp = head;
+        while (cnt < m - 1) {
+            list1 = temp;       //需要在之前
+            temp = temp.next;
+            cnt++;
+        }
+        Stack<ListNode> stack = new Stack<>();
+        while (cnt < n) {
+            stack.push(temp);
+            temp = temp.next;
+            cnt++;
+        }
+        while (!stack.isEmpty()) {
+            if (list1 != null) {
+                list1.next = new ListNode(stack.pop().val);
+            } else {
+                list1 = head;
+                list1.next = new ListNode(stack.pop().val);
+                head = list1.next;
+            }
+            list1 = list1.next;
+        }
+        if (list1 != null) {
+            list1.next = temp;
+        }
+        return head;
+    }
+
+    /**
+     * 中序遍历(inorder traversal)，等价于遍历的顺序是 “左根右”
+     * <p>
+     * P：二叉树遍历： 先序(preorder travelsal)：根左右   后序(postorder travelsal)：左右根
+     *
+     * P：二叉搜索树：左子树上所有的节点都小于其根节点的数， 右子树上所有的节点都大于其根节点的数， 其所有子树也是二叉搜索树
+     * Input: [1,null,2,3]
+     * 1
+     * \
+     * 2
+     * /
+     * 3
+     * <p>
+     * Output: [1,3,2]
+     */
+    public static List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> list = new ArrayList<>();
+        genInorderT(list, root);
+        return list;
+    }
+
+    public static void genInorderT(List<Integer> list, TreeNode node) {
+        if (node == null) {
+            return;
+        }
+        genInorderT(list, node.left);
+        list.add(node.val);
+        genInorderT(list, node.right);
+    }
+
+    /**
+     * 给定数字n，构建出所有由1...n组成的唯一可能的二叉查找树(BST's)
+     * Input: 3
+     * Output:
+     * [
+     * [1,null,3,2],
+     * [3,2,null,1],
+     * [3,1,null,null,2],
+     * [2,1,3],
+     * [1,null,2,null,3]
+     * ]
+     * Explanation:
+     * The above output corresponds to the 5 unique BST's shown below:
+     * <p>
+     * 1         3     3      2      1
+     * \       /     /      / \      \
+     * 3     2     1      1   3      2
+     * /     /       \                 \
+     * 2     1         2                 3
+     */
+    public static List<TreeNode> generateTrees(int n) {
+        return generate(1, n);
+    }
+
+    public static List<TreeNode> generate(int left, int right) {
+        List<TreeNode> result = new ArrayList<>();
+        if (right - left == 0) {
+            result.add(new TreeNode(left));
+            return result;
+        }
+
+        List<TreeNode> leftNodes, rightNodes;
+        for (int i = left; i <= right; i++) {
+            leftNodes = new ArrayList<>();
+            rightNodes = new ArrayList<>();
+            if (left <= i - 1) {
+                leftNodes = generate(left, i - 1);
+            }
+            if (i + 1 <= right) {
+                rightNodes = generate(i + 1, right);
+            }
+            List<TreeNode> temp = new ArrayList<>();
+            for (int j = 0; j < leftNodes.size(); j++) {
+                TreeNode node = new TreeNode(i);
+                TreeNode leftChild = leftNodes.get(j);
+                node.left = leftChild;
+                if (rightNodes.size() > 0) {
+                    temp.add(node);
+                } else {
+                    result.add(node);
+                }
+            }
+
+            for (int j = 0; j < rightNodes.size(); j++) {
+                TreeNode rightChild = rightNodes.get(j);
+                if (temp.size() == 0) {
+                    TreeNode node = new TreeNode(i);
+                    node.right = rightChild;
+                    result.add(node);
+                } else {
+                    for (int k = 0; k < temp.size(); k++) {
+                        TreeNode node = cloneTree(temp.get(k));
+                        rightChild = cloneTree(rightChild);
+                        node.right = rightChild;
+                        result.add(node);
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+
+    public static TreeNode cloneTree(TreeNode node) {
+        if (node == null)
+            return null;
+        TreeNode nodeCopy = new TreeNode(node.val);
+        nodeCopy.left = cloneTree(node.left);
+        nodeCopy.right = cloneTree(node.right);
+        return nodeCopy;
+    }
+
+    private Map<Integer, Integer> m2 = new HashMap<>();
+
+    public int numTrees(int n) {
+        //从2到n依次以每个数字作为根节点，先决条件是n<=1时只有一种组合。 大于1时，可以依次将n分为[1,i]和[i, n]两边，
+        //等价于F(1,n) = G(1,i) * G(i,n)---------这样做是因为以i为根节点，[1,i]肯定是其左子树，[i,n]组成其右子树,
+        //而且所有的左子树也可以添加在其所有的右子树下，因此最终结果集为左右子树的笛卡尔积，等价于G(1,i)*G(i,n)，使用dp记录每次计算出来的值，减少重复计算
+        if (n <= 1) return 1;
+        if (m2.containsKey(n)) return m2.get(n);
+        int res = 0;
+        for (int i = 1; i <= n; i++) {
+            res += (numTrees(i - 1) * numTrees(n - i));
+        }
+        m2.put(n, res);
+        return res;
+    }
+
+    /**
+     * 给定二叉树，判断其是否为二叉查找树
+     *    2
+     *    / \
+     *   1   3
+     *
+     * Input: [2,1,3]
+     * Output: true
+     * [10,5,15,null,null,6,20]  -----因为又子节点7小于根节点10，所以这不是二叉搜索树
+     */
+    public static boolean isValidBST(TreeNode root) {
+        /*if (root == null) {               //这种做法会将[10,5,15,null,null,6,20]这样的二叉树判定为二叉搜索树，是错误的
+            return true;
+        }
+        if (root.left != null && root.left.val >= root.val) {
+            return false;
+        }
+        if (root.right != null &&root.right.val <= root.val) {
+            return false;
+        }
+        return isValidBST(root.left) && isValidBST(root.right);*/
+        return isValidBST(root, Long.MIN_VALUE, Long.MAX_VALUE);    //因为TreeNode的val定义是int类型，此处使用Long就是为了防止传入参数是Integer.MAX_VALUE的情况
+    }
+
+    public static boolean isValidBST(TreeNode node, long min, long max) {
+        if (node == null) {
+            return true;
+        }
+        if (node.val > min && node.val < max) {
+            return isValidBST(node.left, min, node.val) && isValidBST(node.right, node.val, max);
+        }
+        return false;
+    }
+
+    /**
+     * 给定二叉搜索树，可是其中有一个元素位置有错，在不改变结构体的前提下修复二叉搜索树
+     * Input: [1,3,null,null,2]
+     *
+     *    1
+     *   /
+     *  3
+     *   \
+     *    2
+     *
+     * Output: [3,1,null,null,2]
+     *
+     *    3
+     *   /
+     *  1
+     *   \
+     *    2
+     */
+    TreeNode prev, first, second;
+    public void recoverTree(TreeNode root) {
+        // TODO: 2019/12/11 没看懂
+        recoverTreeHelper(root);
+        int tmp = first.val;
+        first.val = second.val;
+        second.val = tmp;
+    }
+    private void recoverTreeHelper(TreeNode cur) {
+        if (cur != null) {
+            recoverTreeHelper(cur.left);
+            if (prev != null && prev.val > cur.val) {
+                if (first == null) {
+                    first = prev;
+                    second = cur;
+                } else second = cur;
+            }
+            prev = cur;
+            recoverTreeHelper(cur.right);
+        }
+    }
+
+    /**
+     * 判断两个树是否为相同的树
+     * Input:     1         1
+     *           / \       / \
+     *          2   3     2   3
+     *
+     *         [1,2,3],   [1,2,3]
+     *
+     * Output: true
+     */
+    public boolean isSameTree(TreeNode p, TreeNode q) {
+        if (p != null && q != null) {
+            if (p.val != q.val) {
+                return false;
+            }
+            return isSameTree(p.left, q.left) && isSameTree(p.right, q.right);
+        }
+        return p == null && q == null;
+    }
+
+    /**
+     * 判断树是否为镜面对称
+     *     1
+     *    / \
+     *   2   2
+     *  / \ / \
+     * 3  4 4  3  true
+     */
+    public boolean isSymmetric(TreeNode root) {
+        if (root == null) return true;
+        return isSymmetric(root.left, root.right);
+    }
+
+    public boolean isSymmetric(TreeNode left, TreeNode right) {
+        if (left != null && right != null) {
+            if (left.val != right.val) {
+                return false;
+            }
+            return isSymmetric(left.left, right.right) && isSymmetric(left.right, right.left);
+        }
+        return left == null && right == null;
+    }
+
+    /**
+     * 给定二叉树，按照层级遍历，从左到右列出每层的数据
+     *    3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * return its level order traversal as:
+     * [
+     *   [3],
+     *   [9,20],
+     *   [15,7]
+     * ]
+     */
+    public List<List<Integer>> levelOrder(TreeNode root) {
+        List<List<Integer>> result = new ArrayList<>();
+        levelOrderTraversal(result, 0, root);
+        return result;
+    }
+
+    public void levelOrderTraversal(List<List<Integer>> result, int level, TreeNode node) {
+        if (node == null) {
+            return ;
+        }
+        if (result.size() == level) {
+            result.add(new ArrayList<>());
+        }
+        result.get(level).add(node.val);
+        levelOrderTraversal(result, level+1, node.left);
+        levelOrderTraversal(result, level+1, node.right);
+    }
+
+    /**
+     * 之字形层级遍历
+     * Given binary tree [3,9,20,null,null,15,7],
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * return its zigzag level order traversal as:
+     * [
+     *   [3],
+     *   [20,9],
+     *   [15,7]
+     * ]
+     */
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        return null;
+    }
+
     public static void main(String[] args) {
-        System.out.println(uniquePaths(4,3));
+        List<List<Integer>> result = subsetsWithDup(new int[]{1, 2, 2});
+        result.stream().forEach(l -> System.out.println(l));
     }
 }
