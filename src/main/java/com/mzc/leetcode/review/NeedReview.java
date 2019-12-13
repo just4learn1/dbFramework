@@ -1,22 +1,17 @@
 package com.mzc.leetcode.review;
 
 import com.mzc.leetcode.inst.ListNode;
+import com.mzc.leetcode.inst.TreeNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * create by zhencai.ma on 2019/12/2
  */
 public class NeedReview {
-
-    public static void main(String[] args) {
-        int[] a1 = new int[]{2,4,8,0,0,0,0};
-        int[] a2 = new int[]{3,6,7};
-        merge(a1, 3, a2, 3);
-        System.out.println(Arrays.toString(a1));
-    }
 
     /**
      * 求两个有序数组的中位数
@@ -235,7 +230,30 @@ public class NeedReview {
      * ]
      */
     public static List<List<Integer>> subsetsWithDup(int[] nums) {
-        return null;
+        Arrays.sort(nums);
+        List<List<Integer>> ans = new ArrayList<>();
+        ans.add(new ArrayList<>());
+        List<List<Integer>> newAdd = null;
+        for (int i = 0; i < nums.length; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                List<List<Integer>> list = new ArrayList<>(newAdd);
+                newAdd = new ArrayList<>();
+                for (List<Integer> l : list) {
+                    List<Integer> tmp = new ArrayList<>(l);
+                    tmp.add(nums[i]);
+                    newAdd.add(tmp);
+                }
+            } else {
+                newAdd = new ArrayList<>();
+                for (List<Integer> l : ans) {
+                    List<Integer> tmp = new ArrayList<>(l);
+                    tmp.add(nums[i]);
+                    newAdd.add(tmp);
+                }
+            }
+            ans.addAll(newAdd);
+        }
+        return ans;
     }
 
     /**
@@ -244,6 +262,74 @@ public class NeedReview {
      * Output: 1->4->3->2->5->NULL
      */
     public static ListNode reverseBetween(ListNode head, int m, int n) {
+        ListNode list1 = null;
+        ListNode tmp = head;
+        int cnt = 0;
+        while (cnt < m - 1) {
+            list1 = tmp;
+            tmp = tmp.next;
+            cnt++;
+        }
+        Stack<ListNode> stack = new Stack<>();
+        while (cnt < n) {
+            stack.add(tmp);
+            tmp = tmp.next;
+            cnt++;
+        }
+        while (!stack.isEmpty()) {
+            if (list1 != null) {
+                list1.next = new ListNode(stack.pop().val);
+            } else {
+                list1 = head;
+                list1.next = new ListNode(stack.pop().val);
+                head = list1.next;
+            }
+            list1 = list1.next;
+        }
+        if (list1 != null) {
+            list1.next = tmp;
+        }
+        return head;
+    }
+
+    /**
+     * 给定二叉树的前序和中序遍历数组，构建二叉树(给定遍历数组中没有重复元素)
+     * preorder = [3,9,20,15,7]
+     * inorder = [9,3,15,20,7]
+     * Return the following binary tree:
+     * <p>
+     * 3
+     * / \
+     * 9  20
+     * /  \
+     * 15   7
+     */
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
         return null;
+    }
+
+    /**
+     * 给定二叉树的中序和后序遍历数组，构建二叉树
+     * inorder = [9,3,15,20,7]
+     * postorder = [9,15,7,20,3]
+     * Return the following binary tree:
+     *
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     */
+    public TreeNode buildTree2(int[] inorder, int[] postorder) {
+        return null;
+    }
+    public static void main(String[] args) {
+        ListNode head = new ListNode(1);
+        head.next = new ListNode(2);
+        head.next.next = new ListNode(3);
+        head.next.next.next = new ListNode(4);
+        head.next.next.next.next = new ListNode(5);
+        ListNode node = reverseBetween(head, 2, 4);
+        System.out.println(node);
     }
 }

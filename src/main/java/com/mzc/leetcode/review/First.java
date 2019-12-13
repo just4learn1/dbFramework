@@ -1690,7 +1690,7 @@ public class First {
      * 中序遍历(inorder traversal)，等价于遍历的顺序是 “左根右”
      * <p>
      * P：二叉树遍历： 先序(preorder travelsal)：根左右   后序(postorder travelsal)：左右根
-     *
+     * <p>
      * P：二叉搜索树：左子树上所有的节点都小于其根节点的数， 右子树上所有的节点都大于其根节点的数， 其所有子树也是二叉搜索树
      * Input: [1,null,2,3]
      * 1
@@ -1802,8 +1802,7 @@ public class First {
 
     public int numTrees(int n) {
         //从2到n依次以每个数字作为根节点，先决条件是n<=1时只有一种组合。 大于1时，可以依次将n分为[1,i]和[i, n]两边，
-        //等价于F(1,n) = G(1,i) * G(i,n)---------这样做是因为以i为根节点，[1,i]肯定是其左子树，[i,n]组成其右子树,
-        //而且所有的左子树也可以添加在其所有的右子树下，因此最终结果集为左右子树的笛卡尔积，等价于G(1,i)*G(i,n)，使用dp记录每次计算出来的值，减少重复计算
+        //等价于F(1,n) = G(1,i) * G(i,n)------这是因为每一种左子树都可以和任意右子树组合成为二叉查找树，所以需要使用笛卡尔积
         if (n <= 1) return 1;
         if (m2.containsKey(n)) return m2.get(n);
         int res = 0;
@@ -1816,10 +1815,10 @@ public class First {
 
     /**
      * 给定二叉树，判断其是否为二叉查找树
-     *    2
-     *    / \
-     *   1   3
-     *
+     * 2
+     * / \
+     * 1   3
+     * <p>
      * Input: [2,1,3]
      * Output: true
      * [10,5,15,null,null,6,20]  -----因为又子节点7小于根节点10，所以这不是二叉搜索树
@@ -1851,22 +1850,23 @@ public class First {
     /**
      * 给定二叉搜索树，可是其中有一个元素位置有错，在不改变结构体的前提下修复二叉搜索树
      * Input: [1,3,null,null,2]
-     *
-     *    1
-     *   /
-     *  3
-     *   \
-     *    2
-     *
+     * <p>
+     * 1
+     * /
+     * 3
+     * \
+     * 2
+     * <p>
      * Output: [3,1,null,null,2]
-     *
-     *    3
-     *   /
-     *  1
-     *   \
-     *    2
+     * <p>
+     * 3
+     * /
+     * 1
+     * \
+     * 2
      */
     TreeNode prev, first, second;
+
     public void recoverTree(TreeNode root) {
         // TODO: 2019/12/11 没看懂
         recoverTreeHelper(root);
@@ -1874,6 +1874,7 @@ public class First {
         first.val = second.val;
         second.val = tmp;
     }
+
     private void recoverTreeHelper(TreeNode cur) {
         if (cur != null) {
             recoverTreeHelper(cur.left);
@@ -1891,11 +1892,11 @@ public class First {
     /**
      * 判断两个树是否为相同的树
      * Input:     1         1
-     *           / \       / \
-     *          2   3     2   3
-     *
-     *         [1,2,3],   [1,2,3]
-     *
+     * / \       / \
+     * 2   3     2   3
+     * <p>
+     * [1,2,3],   [1,2,3]
+     * <p>
      * Output: true
      */
     public boolean isSameTree(TreeNode p, TreeNode q) {
@@ -1910,10 +1911,10 @@ public class First {
 
     /**
      * 判断树是否为镜面对称
-     *     1
-     *    / \
-     *   2   2
-     *  / \ / \
+     * 1
+     * / \
+     * 2   2
+     * / \ / \
      * 3  4 4  3  true
      */
     public boolean isSymmetric(TreeNode root) {
@@ -1933,16 +1934,16 @@ public class First {
 
     /**
      * 给定二叉树，按照层级遍历，从左到右列出每层的数据
-     *    3
-     *    / \
-     *   9  20
-     *     /  \
-     *    15   7
+     * 3
+     * / \
+     * 9  20
+     * /  \
+     * 15   7
      * return its level order traversal as:
      * [
-     *   [3],
-     *   [9,20],
-     *   [15,7]
+     * [3],
+     * [9,20],
+     * [15,7]
      * ]
      */
     public List<List<Integer>> levelOrder(TreeNode root) {
@@ -1953,37 +1954,209 @@ public class First {
 
     public void levelOrderTraversal(List<List<Integer>> result, int level, TreeNode node) {
         if (node == null) {
-            return ;
+            return;
         }
         if (result.size() == level) {
             result.add(new ArrayList<>());
         }
         result.get(level).add(node.val);
-        levelOrderTraversal(result, level+1, node.left);
-        levelOrderTraversal(result, level+1, node.right);
+        levelOrderTraversal(result, level + 1, node.left);
+        levelOrderTraversal(result, level + 1, node.right);
     }
 
     /**
      * 之字形层级遍历
      * Given binary tree [3,9,20,null,null,15,7],
+     * 3
+     * / \
+     * 9  20
+     * /  \
+     * 15   7
+     * return its zigzag level order traversal as:
+     * [
+     * [3],
+     * [20,9],
+     * [15,7]
+     * ]
+     */
+    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+        List<List<Integer>> ans = new ArrayList<>();
+        generatZigzaglo(ans, root, 0);
+        return ans;
+    }
+
+    public static void generatZigzaglo(List<List<Integer>> ans, TreeNode node, int level) {
+        if (node == null) {
+            return;
+        }
+        if (ans.size() == level) {
+            ans.add(new ArrayList<>());
+        }
+        if (level % 2 == 0) {
+            ans.get(level).add(node.val);
+        } else {
+            ans.get(level).add(0, node.val);
+        }
+        generatZigzaglo(ans, node.left, level + 1);
+        generatZigzaglo(ans, node.right, level + 1);
+    }
+
+    /**
+     * Given binary tree [3,9,20,null,null,15,7],
+     * <p>
+     * 3
+     * / \
+     * 9  20
+     * /  \
+     * 15   7
+     * return its depth = 3.
+     * 给定二叉树，求其最大深度 (根节点到最远叶子节点的距离)
+     */
+    public int maxDepth(TreeNode root) {
+        return maxDepth(root, 1);
+    }
+
+    public static int maxDepth(TreeNode node, int level) {
+        if (node == null) {
+            return level - 1;
+        }
+        return Math.max(maxDepth(node.left, level + 1), maxDepth(node.right, level + 1));
+    }
+
+    /**
+     * 给定二叉树的前序和中序遍历数组，构建二叉树(给定遍历数组中没有重复元素)
+     * preorder = [3,9,20,15,7]
+     * inorder = [9,3,15,20,7]
+     * Return the following binary tree:
+     * <p>
+     * 3
+     * / \
+     * 9  20
+     * /  \
+     * 15   7
+     */
+    public TreeNode buildTree(int[] preorder, int[] inorder) {
+        //解题思路在于理解前序和中序遍历的原理，前序为根左右，中序为左根右
+        if (preorder == null || preorder.length == 0) {
+            return null;
+        }
+        TreeNode tree = new TreeNode(preorder[0]);
+        Stack<TreeNode> stack = new Stack<>();
+        stack.push(tree);
+        for (int i = 1, j = 0; i < preorder.length; i++) {
+            TreeNode node = new TreeNode(preorder[i]);
+            TreeNode parent = stack.peek();
+            if (stack.peek().val != inorder[j]) {
+                parent.left = node;
+            } else {
+                while (!stack.isEmpty() && stack.peek().val == inorder[j]) {
+                    parent = stack.pop();
+                    j++;
+                }
+                parent.right = node;
+            }
+            stack.push(node);
+        }
+        return tree;
+    }
+
+    /**
+     * 给定二叉树的中序和后序遍历数组，构建二叉树
+     * inorder = [9,3,15,20,7]
+     * postorder = [9,15,7,20,3]
+     * Return the following binary tree:
+     *
      *     3
      *    / \
      *   9  20
      *     /  \
      *    15   7
-     * return its zigzag level order traversal as:
-     * [
-     *   [3],
-     *   [20,9],
-     *   [15,7]
-     * ]
      */
-    public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
-        return null;
+    public TreeNode buildTree2(int[] inorder, int[] postorder) {
+        return helper(0, 0, postorder.length-1, inorder.length-1, postorder, inorder);
     }
 
+    public TreeNode helper(int poststart, int instart, int postend, int inend, int[] postorder, int[] inorder) {
+        if (poststart > postend || instart > inend) return null;
+
+        TreeNode root = new TreeNode(postorder[postend]);
+
+        int index = 0;
+        for (int i = instart; i <= inend; i++) {
+            if (inorder[i] == root.val)
+                index = i;
+        }
+
+        root.left = helper(poststart, instart, postend - inend + index - 1, index - 1, postorder, inorder);
+        root.right = helper(postend - inend + index, index + 1, postend - 1, inend, postorder, inorder);
+        return root;
+    }
+
+    /**
+     * 给定二叉树，从最底层到最高层，从左向右的顺序列出所有元素 （算是广度优先算法  bfs）
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * return its bottom-up level order traversal as:
+     * [
+     *   [15,7],
+     *   [9,20],
+     *   [3]
+     * ]
+     *
+     */
+    public  List<List<Integer>> levelOrderBottom(TreeNode root) {
+        List<List<Integer>> ans = new ArrayList<>();
+        levelOrderBottom(ans, root, 0);
+        return ans;
+    }
+
+    public static void levelOrderBottom(List<List<Integer>> ans, TreeNode node, int level) {
+        if (node == null) {
+            return ;
+        }
+        if (ans.size() == level) {
+            ans.add(0, new ArrayList<>());
+        }
+        ans.get(ans.size()-level-1).add(node.val);
+        int nextLv = level+1;
+        levelOrderBottom(ans, node.left, nextLv);
+        levelOrderBottom(ans, node.right, nextLv);
+    }
+
+    /**
+     * 给定有序数组，将其转换为一个高度平衡的二叉查找树  (高度平衡指两个节点的两个子树的深度相差不超过1)
+     * Given the sorted array: [-10,-3,0,5,9],
+     *
+     * One possible answer is: [0,-3,9,-10,null,5], which represents the following height balanced BST:
+     *
+     *       0
+     *      / \
+     *    -3   9
+     *    /   /
+     *  -10  5
+     */
+    public TreeNode sortedArrayToBST(int[] nums) {
+        return sortedArrayToBST(nums, 0, nums.length);
+    }
+
+    private TreeNode sortedArrayToBST(int[] nums, int beginIndex, int numOfElements) {
+        if (numOfElements == 0) {
+            return null;
+        }
+        int half = numOfElements / 2;
+        int halfIndex = beginIndex + half;
+        TreeNode newNode = new TreeNode(nums[halfIndex]);
+        if (numOfElements > 1) {
+            newNode.left = sortedArrayToBST(nums, beginIndex, half);
+            newNode.right = sortedArrayToBST(nums, halfIndex + 1, numOfElements - half - 1);
+        }
+        return newNode;
+    }
+
+
     public static void main(String[] args) {
-        List<List<Integer>> result = subsetsWithDup(new int[]{1, 2, 2});
-        result.stream().forEach(l -> System.out.println(l));
     }
 }
