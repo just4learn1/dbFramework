@@ -1,6 +1,5 @@
 package com.mzc.leetcode.second;
 
-import com.googlecode.aviator.runtime.function.system.PrintFunction;
 import com.mzc.leetcode.inst.ListNode;
 import com.mzc.leetcode.inst.TreeNode;
 
