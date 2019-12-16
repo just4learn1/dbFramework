@@ -2,6 +2,7 @@ package com.mzc.leetcode.review;
 
 import com.mzc.leetcode.inst.ListNode;
 import com.mzc.leetcode.inst.TreeNode;
+import jdk.internal.org.objectweb.asm.tree.IincInsnNode;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +18,44 @@ public class NeedReview {
      * 求两个有序数组的中位数
      */
     public double findMedianSortedArrays(int[] nums1, int[] nums2) {
-        return 0;
+        //[0,i-1] [i, n]    [0,j-1] [j, m]    i+j-2 = m+n-i-l=> j=(m+n+1)/2 - i  需要n>m才能保证j不会出现负数
+        int[] A = nums1;
+        int[] B = nums2;
+        int m = A.length, n = B.length;
+        if (m > n) {
+            int[] t1 = A; A=B; B=t1;
+            int t2 = m; m=n; n=t2;
+        }
+        int c = (m+n+1)/2;
+        int iMin = 0, iMax = m;
+        while (iMin <= iMax) {
+            int i = (iMin + iMax) / 2;
+            int j = c - i;
+            if (i < iMax && A[i] < B[j-1]) {  //i太小
+                iMin = i + 1;
+            } else if (i > iMin && A[i-1] > B[j]) {
+                iMax = i - 1;
+            } else {        //所需目标
+                int maxLeft, minRight;
+                if (i == 0) {
+                    maxLeft = B[j-1];
+                } else if (j == 0) {
+                    maxLeft = A[i-1];
+                } else {
+                    maxLeft = Math.max(A[i - 1], B[j - 1]);
+                }
+                if ((m+n)%2 == 1) return maxLeft;
+                if (i >= m) {
+                    minRight = B[j];
+                } else if (j >= n) {
+                    minRight = A[i];
+                } else {
+                    minRight = Math.min(A[i], B[j]);
+                }
+                return (maxLeft + minRight) / 2d;
+            }
+        }
+        return 0d;
     }
 
     /**

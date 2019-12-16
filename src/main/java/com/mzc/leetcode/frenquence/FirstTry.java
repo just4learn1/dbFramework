@@ -95,7 +95,7 @@ public class FirstTry {
     /**
      * 寻找两个有序数组对中位数 9:43
      */
-    public double findMedianSortedArrays(int[] nums1, int[] nums2) {
+    public static double findMedianSortedArrays(int[] nums1, int[] nums2) {
         //将数组分为A=nums1, m=A.length; [0, i-1] [i, m] 和 B=˙nums2;n=B.length;[0,j-1] [j, n]
         //只要i-1+j-1=m-1-i+n-1-j既左侧等于右侧,等价于 i = (m+n)/2-j且左侧最大数小于右侧最小数，如果m+n是偶数，那么中位数就是(maxleft+minright)/2,否则为左侧
         //由于边界问题，所以需要m>=n才能保证i不需要判断负值  此处实现使用都是A也就是m<n
@@ -112,7 +112,7 @@ public class FirstTry {
         }
         int c = (m + n + 1) / 2;
         int iMin = 0, iMax = A.length;
-        while (iMin < iMax) {
+        while (iMin <= iMax) {
             int i = (iMin + iMax) / 2;
             int j = c - i;
             if (i < iMax && A[i] < B[j-1]) { //j too big(i too small)
@@ -138,11 +138,9 @@ public class FirstTry {
                 } else {
                     minRight = Math.min(A[i], B[j]);
                 }
-                System.out.printf("minRight:%s, maxLeft:%s\n", minRight, maxLeft);
                 return (maxLeft + minRight) / 2d;
             }
         }
-        // TODO: 2019/12/15 完成算法
         return 0d;
     }
 
@@ -172,48 +170,7 @@ public class FirstTry {
         }
         return head;
     }
-
-    /**
-     * 顺次序，每一位都比前一位大于1都整数，求范围内所有顺次序数
-     * 输出：low = 100, high = 300
-     * 输出：[123,234]
-     */
-    public static List<Integer> sequentialDigits(int low, int high) {
-        List<Integer> list = new ArrayList<>();
-        String highStr = String.valueOf(high);
-        List<Integer> tmpList = new ArrayList<>();
-        for (int j = 1; j <= 10 - highStr.length(); j++) {
-            int tmpNum = 0;
-            for (int i = j; i < highStr.length() + j; i++) {
-                tmpNum *= 10;
-                tmpNum += i;
-            }
-            tmpList.add(tmpNum);
-        }
-        for (int i = 0; i < tmpList.size()-1; i++) {
-            helper(list, tmpList.get(i), highStr.length(), low, high);
-        }
-        helper(list, tmpList.get(tmpList.size()-1)/10, 0, low, high);
-        helper(list, (int)(tmpList.get(tmpList.size()-1) % (Math.pow(10, highStr.length()-1))), 0, low, high);
-        List<Integer> result = new ArrayList<>();
-        list.stream().sorted(Integer::compareTo).forEach(i->result.add(i));
-        return result;
-    }
-
-    public static void helper(List<Integer> list, int num, int cnt, int low, int high) {
-        if (num < low) {
-            return ;
-        }
-        if (num >= low && num <= high) {
-            list.add(num);
-        }
-        helper(list, num/10, cnt-1, low, high);
-//        helper(list, (int)(num%(Math.pow(10, cnt-1))), cnt-1, low, high);
-
-    }
-
-
     public static void main(String[] args) {
-        sequentialDigits(4000, 9000);
+        findMedianSortedArrays(new int[]{1,3}, new int[0]);
     }
 }
