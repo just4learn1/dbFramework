@@ -426,7 +426,6 @@ public class FirstTry {
      * s = "2[abc]3[cd]ef]", 返回 "abcabccdcdcdef".
      */
     public String decodeString(String s) {
-
     }
 
 }
