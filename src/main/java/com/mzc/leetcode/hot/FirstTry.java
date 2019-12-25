@@ -600,4 +600,136 @@ public class FirstTry {
         }
         return dp[0][length - 1];
     }
+
+    /**
+     * 78
+     * 给定一组没有重复元素的数组，返回该数组所有可能的子集
+     * 输入: nums = [1,2,3]
+     * 输出:
+     * [
+     *   [3],
+     *   [1],
+     *   [2],
+     *   [1,2,3],
+     *   [1,3],
+     *   [2,3],
+     *   [1,2],
+     *   []
+     * ]
+     */
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        ans.add(new ArrayList<>());
+        for (int n : nums) {
+            List<List<Integer>> tmp = new ArrayList<>();
+            for (List<Integer> list : ans) {
+                List<Integer> l1 = new ArrayList<>(list);
+                l1.add(n);
+                tmp.add(l1);
+            }
+            ans.addAll(tmp);
+        }
+        return ans;
+    }
+
+    /**
+     * 226
+     * 翻转二叉树
+     * 输入：
+     *
+     *      4
+     *    /   \
+     *   2     7
+     *  / \   / \
+     * 1   3 6   9
+     * 输出：
+     *
+     *      4
+     *    /   \
+     *   7     2
+     *  / \   / \
+     * 9   6 3   1
+     */
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) {
+            return null;
+        }
+        TreeNode tmp = root.left;
+        root.left = root.right;
+        root.right = tmp;
+        invertTree(root.left);
+        invertTree(root.right);
+        return root;
+    }
+
+    /**
+     * 22
+     * 生成括号
+     * 例如，给出 n = 3，生成结果为：
+     *
+     * [
+     *   "((()))",
+     *   "(()())",
+     *   "(())()",
+     *   "()(())",
+     *   "()()()"
+     * ]
+     */
+    public List<String> generateParenthesis(int n) {
+        List<String> result = new ArrayList<>();
+        parenthesisHelper(result, n, "", 0, 0);
+        return result;
+    }
+    public void parenthesisHelper(List<String> ans, int n, String str, int left, int right) {
+        if (right == n) {
+            ans.add(str);
+            return;
+        }
+        if (left < n) {
+            parenthesisHelper(ans, n, str+"(", left+1, right);
+        }
+        if (right < left) {
+            parenthesisHelper(ans, n, str+")", left, right+1);
+        }
+    }
+
+    /**
+     *104
+     * 求二叉树的最大深度
+     * 给定二叉树 [3,9,20,null,null,15,7]，
+     *
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回它的最大深度 3 。
+     */
+    public int maxDepth(TreeNode root) {
+        return maxDepthHelper(root, 1);
+    }
+    public int maxDepthHelper(TreeNode node, int cur) {
+        if (node == null) {
+            return cur;
+        }
+        return Math.max(maxDepthHelper(node.left, cur+1), maxDepthHelper(node.right, cur+1));
+    }
+
+    /**
+     * 二叉树中序遍历 (左根右)   先序（根左右） 后序（左右根）
+     */
+    public List<Integer> inorderTraversal(TreeNode root) {
+        List<Integer> list = new ArrayList<>();
+        inorderHelper(list, root);
+        return list;
+    }
+
+    public void inorderHelper(List<Integer> ans, TreeNode root) {
+        if (root == null) {
+            return ;
+        }
+        inorderHelper(ans, root.left);
+        ans.add(root.val);
+        inorderHelper(ans, root.right);
+    }
 }
