@@ -357,11 +357,11 @@ public class FirstTry {
         Arrays.sort(nums);
         List<List<Integer>> result = new ArrayList<>();
         for (int i = 0; i < nums.length; i++) {
-            if (i > 0 && nums[i] == nums[i-1]) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
                 continue;
             }
             int tmp = -nums[i];
-            int l = i+1, r = nums.length - 1;
+            int l = i + 1, r = nums.length - 1;
             if (tmp >= 0 && nums[r] < 0) {
                 break;
             }
@@ -374,10 +374,10 @@ public class FirstTry {
                     result.add(Arrays.asList(nums[i], nums[l], nums[r]));
                     do {
                         l++;
-                    } while(l < r && nums[l] == nums[l-1]);
+                    } while (l < r && nums[l] == nums[l - 1]);
                     do {
                         r--;
-                    } while (l < r && nums[r] == nums[r+1]);
+                    } while (l < r && nums[r] == nums[r + 1]);
                 } else if (sum > tmp) {
                     r--;
                 } else {
@@ -405,7 +405,7 @@ public class FirstTry {
         for (int i = 1; i < max; i++) {
             for (int j = 0; j < coins.length; j++) {
                 if (coins[j] <= i) {
-                    dp[i] = Math.min(dp[i], dp[i-coins[j]]+1);
+                    dp[i] = Math.min(dp[i], dp[i - coins[j]] + 1);
                 }
             }
         }
@@ -415,17 +415,189 @@ public class FirstTry {
     /**
      * 394
      * 给定一个经过编码的字符串，返回它解码后的字符串。
-     *
+     * <p>
      * 编码规则为: k[encoded_string]，表示其中方括号内部的 encoded_string 正好重复 k 次。注意 k 保证为正整数。
-     *
+     * <p>
      * 你可以认为输入字符串总是有效的；输入字符串中没有额外的空格，且输入的方括号总是符合格式要求的。
-     *
+     * <p>
      * 此外，你可以认为原始数据不包含数字，所有的数字只表示重复的次数 k ，例如不会出现像 3a 或 2[4] 的输入。
      * s = "3[a]2[bc]", 返回 "aaabcbc".
      * s = "3[a2[c]]", 返回 "accaccacc".
      * s = "2[abc]3[cd]ef]", 返回 "abcabccdcdcdef".
      */
     public String decodeString(String s) {
+        LinkedList<Integer> muls = new LinkedList<>();
+        LinkedList<String> mulStrs = new LinkedList<>();
+        StringBuffer ans = new StringBuffer();
+        int num = 0;
+        for (Character c : s.toCharArray()) {
+            if (c == '[') {
+                muls.addLast(num);
+                mulStrs.addLast(ans.toString());
+                num = 0;
+                ans = new StringBuffer();
+            } else if (c == ']') {
+                StringBuffer sb = new StringBuffer();
+                num = 0;
+                int cnt = muls.removeLast();
+                for (int i = 0; i < cnt; i++) {
+                    sb.append(ans);
+                }
+                ans = new StringBuffer(mulStrs.removeLast() + sb);
+            } else if (c >= '0' && c <= '9') {
+                num = num * 10 + Integer.parseInt(c + "");
+            } else {
+                ans.append(c);
+            }
+        }
+        return ans.toString();
     }
 
+    /**
+     * 46
+     * 给定没有重复数字的数组，列出所有可能的全排列
+     * 输入: [1,2,3]
+     * 输出:
+     * [
+     * [1,2,3],
+     * [1,3,2],
+     * [2,1,3],
+     * [2,3,1],
+     * [3,1,2],
+     * [3,2,1]
+     * ]
+     */
+    public static List<List<Integer>> permute(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        permuteHelper(ans, nums, 0);
+        return ans;
+    }
+
+    public static void permuteHelper(List<List<Integer>> ans, int[] nums, int index) {
+        if (index == nums.length - 1) {
+            List<Integer> tmp = new ArrayList<>();
+            for (int i = 0; i < nums.length; i++) {
+                tmp.add(nums[i]);
+            }
+            ans.add(tmp);
+            return;
+        }
+        for (int i = index; i < nums.length; i++) {
+            swap(nums, index, i);
+            permuteHelper(ans, nums, index + 1);
+            swap(nums, index, i);
+        }
+    }
+
+    public static void swap(int[] arr, int l, int r) {
+        int tmp = arr[l];
+        arr[l] = arr[r];
+        arr[r] = tmp;
+    }
+
+    /**
+     * 23
+     * 合并k个有序链表为单个有序链表
+     * 输入:
+     * [
+     * 1->4->5,
+     * 1->3->4,
+     * 2->6
+     * ]
+     * 输出: 1->1->2->3->4->4->5->6
+     */
+    public ListNode mergeKLists(ListNode[] lists) {
+        int len = lists.length;
+        if (len == 0) {
+            return null;
+        }
+        // 将n个链表以中间为对称，合并，即合并
+        while (len > 1) {
+            for (int i = 0; i < len / 2; i++) {
+                lists[i] = mergeTwoLists(lists[i], lists[len - 1 - i]);
+            }
+            len = (len + 1) / 2;
+        }
+        return lists[0];
+    }
+
+    /**
+     * 21
+     * 合并两个有序链表为单个有序链表
+     */
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
+        ListNode head = new ListNode(-1);
+        ListNode p = head;
+        while (l1 != null && l2 != null) {
+            if (l1.val < l2.val) {
+                p.next = l1;
+                l1 = l1.next;
+            } else {
+                p.next = l2;
+                l2 = l2.next;
+            }
+            p = p.next;
+        }
+        if (l1 != null) {
+            p.next = l1;
+        } else if (l2 != null) {
+            p.next = l2;
+        }
+        return head.next;
+    }
+
+    /**
+     * 有 n 个气球，编号为0 到 n-1，每个气球上都标有一个数字，这些数字存在数组 nums 中。
+     * <p>
+     * 现在要求你戳破所有的气球。每当你戳破一个气球 i 时，你可以获得 nums[left] * nums[i] * nums[right] 个硬币。 这里的 left 和 right 代表和 i 相邻的两个气球的序号。注意当你戳破了气球 i 后，气球 left 和气球 right 
+     * 就变成了相邻的气球。
+     * <p>
+     * 求所能获得硬币的最大数量。
+     * <p>
+     * 说明:
+     * <p>
+     * 你可以假设 nums[-1] = nums[n] = 1，但注意它们不是真实存在的所以并不能被戳破。
+     * 0 ≤ n ≤ 500, 0 ≤ nums[i] ≤ 100
+     * 示例:
+     * <p>
+     * 输入: [3,1,5,8]
+     * 输出: 167
+     * 解释: nums = [3,1,5,8] --> [3,5,8] -->   [3,8]   -->  [8]  --> []
+     *      coins =  3*1*5      +  3*5*8    +  1*3*8      + 1*8*1   = 167
+     */
+    public int maxCoins(int[] nums) {
+        //避免空指针异常
+        if (nums == null) {
+            return 0;
+        }
+
+        //创建虚拟边界
+        int length = nums.length;
+        int[] nums2 = new int[length + 2];
+        System.arraycopy(nums, 0, nums2, 1, length);
+        nums2[0] = 1;
+        nums2[length + 1] = 1;
+        length = nums2.length;
+
+        //创建dp表
+        length = nums2.length;
+        int[][] dp = new int[length][length];
+
+        //开始dp：i为begin，j为end，k为在i、j区间划分子问题时的边界
+        for (int i = length - 2; i > -1; i--) {
+            for (int j = i + 2; j < length; j++) {
+                //维护一个最大值；如果i、j相邻，值为0
+                int max = 0;
+                for (int k = i + 1; k < j; k++) {
+                    //dp[i][j]定义为：不戳破i与j，仅戳破i与j之间的气球能得到的最大金币数
+                    int temp = dp[i][k] + dp[k][j] + nums2[i] * nums2[k] * nums2[j];
+                    if (temp > max) {
+                        max = temp;
+                    }
+                }
+                dp[i][j] = max;
+            }
+        }
+        return dp[0][length - 1];
+    }
 }
