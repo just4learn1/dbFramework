@@ -732,4 +732,126 @@ public class FirstTry {
         ans.add(root.val);
         inorderHelper(ans, root.right);
     }
+
+    /**
+     * 617
+     * 合并两个二叉树 （两个二叉树相互覆盖，相同位置如果有数据就合并，没有就覆盖）
+     * 输入:
+     * 	Tree 1                     Tree 2
+     *           1                         2
+     *          / \                       / \
+     *         3   2                     1   3
+     *        /                           \   \
+     *       5                             4   7
+     * 输出:
+     * 合并后的树:
+     * 	     3
+     * 	    / \
+     * 	   4   5
+     * 	  / \   \
+     * 	 5   4   7
+     */
+    public TreeNode mergeTrees(TreeNode t1, TreeNode t2) {
+        if (t1 == null && t2 == null) {
+            return null;
+        }
+        TreeNode left1 = null, left2 = null, right1 = null, right2 = null;
+        int val = 0;
+        if (t1 != null) {
+            val += t1.val;
+            left1 = t1.left;
+            right1 = t1.right;
+        }
+        if (t2 != null) {
+            val += t2.val;
+            left2 = t2.left;
+            right2 = t2.right;
+        }
+        TreeNode node = new TreeNode(val);
+        node.left = mergeTrees(left1, left2);
+        node.right = mergeTrees(right1, right2);
+        return node;
+    }
+
+    /**
+     * 39
+     * 给定一组候选数字和目标数，从候选数字中找出所有组合使其和等于目标数，候选数字可以无限次使用
+     * 输入: candidates = [2,3,5], target = 8,
+     * 所求解集为:
+     * [
+     *   [2,2,2,2],
+     *   [2,3,3],
+     *   [3,5]
+     * ]
+     */
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        Arrays.sort(candidates);
+        List<List<Integer>> ans = new ArrayList<>();
+        combinationSumHelper(ans, new ArrayList<>(), candidates, target, 0);
+        return ans;
+    }
+
+    public void combinationSumHelper(List<List<Integer>> ans, List<Integer> list, int[] candidates, int target, int index) {
+        if (target < 0) {
+            return ;
+        }
+        if (target == 0) {
+            ans.add(new ArrayList<>(list));
+            return;
+        }
+        for (int i = index; i < candidates.length; i++) {
+            if (candidates[i] > target) {
+                return ;
+            }
+            list.add(candidates[i]);
+            combinationSumHelper(ans, list, candidates, target-candidates[i], i);
+            list.remove(list.size()-1);
+        }
+    }
+
+    /**
+     * 114
+     * 给定二叉树，原地将其转换为链表
+     *     1
+     *    / \
+     *   2   5
+     *  / \   \
+     * 3   4   6
+     * 将其展开为：
+     *
+     * 1
+     *  \
+     *   2
+     *    \
+     *     3
+     *      \
+     *       4
+     *        \
+     *         5
+     *          \
+     *           6
+     */
+    public void flatten(TreeNode root) {
+        //遍历一层层将二叉树的右子节点拼接到左子节上，然后设置左子节点为null，右子节点为左子节点并且继续往下一层迭代
+        // TODO: 2019/12/26
+        while (root != null) {
+            //左子树为 null，直接考虑下一个节点
+            if (root.left == null) {
+                root = root.right;
+            } else {
+                // 找左子树最右边的节点
+                TreeNode pre = root.left;
+                while (pre.right != null) {
+                    pre = pre.right;
+                }
+                //将原来的右子树接到左子树的最右边节点
+                pre.right = root.right;
+                // 将左子树插入到右子树的地方
+                root.right = root.left;
+                root.left = null;
+                // 考虑下一个节点
+                root = root.right;
+            }
+        }
+    }
 }
