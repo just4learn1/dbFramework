@@ -889,6 +889,18 @@ public class FirstTry {
      * 输出: [24,12,8,6]
      */
     public int[] productExceptSelf(int[] nums) {
-
+        //解题原理是正序和逆序两遍遍历，第一遍遍历等于设置了output中每个元素等于其之前所有元素的乘积，然后逆序遍历使其与其之后的元素再进行乘积从而得到结果
+        int sum = 1;
+        int[] output = new int[nums.length];
+        for (int i = 0; i < nums.length; i++) {
+            output[i] = sum;
+            sum *= nums[i];
+        }
+        sum = 1;
+        for (int i = nums.length-1; i >= 0; i--) {
+            output[i] *= sum;
+            sum *= nums[i];
+        }
+        return output;
     }
 }
