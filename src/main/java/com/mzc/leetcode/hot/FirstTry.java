@@ -833,25 +833,62 @@ public class FirstTry {
      */
     public void flatten(TreeNode root) {
         //遍历一层层将二叉树的右子节点拼接到左子节上，然后设置左子节点为null，右子节点为左子节点并且继续往下一层迭代
-        // TODO: 2019/12/26
         while (root != null) {
-            //左子树为 null，直接考虑下一个节点
             if (root.left == null) {
                 root = root.right;
             } else {
-                // 找左子树最右边的节点
                 TreeNode pre = root.left;
                 while (pre.right != null) {
                     pre = pre.right;
                 }
-                //将原来的右子树接到左子树的最右边节点
                 pre.right = root.right;
-                // 将左子树插入到右子树的地方
                 root.right = root.left;
                 root.left = null;
-                // 考虑下一个节点
                 root = root.right;
             }
         }
+    }
+
+    /**
+     * 48
+     * 旋转图像， 给定n*n的矩阵，如下方式旋转
+     * 给定 matrix =
+     * [
+     *   [1,2,3],
+     *   [4,5,6],
+     *   [7,8,9]
+     * ],
+     *
+     * 原地旋转输入矩阵，使其变为:
+     * [
+     *   [7,4,1],
+     *   [8,5,2],
+     *   [9,6,3]
+     * ]
+     */
+    public void rotate(int[][] matrix) {
+        // TODO: 2019/12/26
+        int n = matrix.length;
+        int i = 0;
+        while (i < n / 2) {
+            for (int j = i; j < n - i - 1; j++) {
+                int temp = matrix[i][j];            //基础值
+                matrix[i][j] = matrix[n - j - 1][i];    //row=n-j-1  column=i
+                matrix[n - j - 1][i] = matrix[n - i - 1][n - j - 1];    //row=n-i-1, column=n-j-1
+                matrix[n - i - 1][n - j - 1] = matrix[j][n - i - 1];    //row=n-(n-j-1)-1=j, column=n-i-1
+                matrix[j][n - i - 1] = temp;
+            }
+            i++;
+        }
+    }
+
+    /**
+     *238
+     * 给定长度为n的数组，返回和其长度相同的数组，输出数组中每个位置的元素等于原数组中除了相同位置元素外其他元素的乘积
+     * 输入: [1,2,3,4]
+     * 输出: [24,12,8,6]
+     */
+    public int[] productExceptSelf(int[] nums) {
+
     }
 }
